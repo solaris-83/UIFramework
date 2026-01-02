@@ -1,0 +1,108 @@
+﻿namespace UIFramework
+{
+    public enum FeedbackMode
+    {
+        Countdown,
+        ProgressBar
+    }
+    public class UIFeedback : UIElement
+    {
+        public event EventHandler<int> TickElapsed;
+        public UIFeedback(FeedbackMode feedbackMode, string text, int milliseconds)
+        {
+            Props["mode"] = feedbackMode.ToString();
+            Props["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(milliseconds / 1000d) + " seconds remaining" : text;
+            Props["totalSeconds"] = milliseconds / 1000;
+            State["remaining"] = milliseconds / 1000;
+            State["percentage"] = 0;
+        }
+
+        public UIFeedback(FeedbackMode feedbackMode, string text)
+        {
+            Props["mode"] = feedbackMode.ToString();
+            Props["text"] = text;
+        }
+
+        public UIFeedback(FeedbackMode feedbackMode, string text, int milliseconds, bool isManual)
+        {
+            Props["mode"] = feedbackMode.ToString();
+            Props["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(milliseconds / 1000d) + " seconds remaining" : text;
+            State["remaining"] = milliseconds / 1000;
+            Props["totalSeconds"] = milliseconds / 1000;
+            State["isManual"] = isManual;
+            State["percentage"] = 0;
+        }
+
+        private System.Timers.Timer timer;
+
+        public void StartCountdown()
+        {
+            timer = new System.Timers.Timer(1000);
+            var tickCommand = new FeedbackTickCommand(this);
+            timer.Start();
+            timer.Elapsed += (_, _) =>
+            {
+                if (Remaining > 0)
+                {
+                    tickCommand.Execute();
+                    TickElapsed?.Invoke(this, Remaining);
+                    
+                }
+                else
+                {
+                    timer?.Stop();
+                }
+            };
+        }
+
+        public void StopCountdown()
+        {
+            timer?.Stop();
+        }
+
+        public int Percentage
+        {
+           get => (int)State["percentage"];
+           set => State["percentage"] = 100 - Remaining * 100 / Totalseconds;
+        }
+
+        public int Milliseconds
+        {
+            get => (int)Props["totalSeconds"] * 1000;
+        }
+
+        public int Totalseconds
+        {
+            get => (int)Props["totalSeconds"];
+        }
+
+        public int Remaining
+        {
+            get => (int)State["remaining"];
+            set => State["remaining"] = value;
+        }
+
+        public bool IsActive
+        {
+            get => timer != null && timer.Enabled;
+        }
+    }
+
+    public class FeedbackTickCommand : ICommand
+    {
+        private readonly UIFeedback _feedback;
+
+        public FeedbackTickCommand(UIFeedback feedback)
+        {
+            _feedback = feedback;
+        }
+
+        public void Execute()
+        {
+            if (_feedback.Remaining <= 0)
+                return;
+            _feedback.Remaining--;
+            _feedback.Percentage = 100 - _feedback.Remaining * 100 / _feedback.Totalseconds;
+        }
+    }
+}
