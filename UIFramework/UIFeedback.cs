@@ -1,4 +1,6 @@
-﻿namespace UIFramework
+﻿using Newtonsoft.Json;
+
+namespace UIFramework
 {
     public enum FeedbackMode
     {
@@ -13,8 +15,8 @@
             Props["mode"] = feedbackMode.ToString();
             Props["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(milliseconds / 1000d) + " seconds remaining" : text;
             Props["totalSeconds"] = milliseconds / 1000;
-            State["remaining"] = milliseconds / 1000;
-            State["percentage"] = 0;
+            States["remaining"] = milliseconds / 1000;
+            States["percentage"] = 0;
         }
 
         public UIFeedback(FeedbackMode feedbackMode, string text)
@@ -27,10 +29,10 @@
         {
             Props["mode"] = feedbackMode.ToString();
             Props["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(milliseconds / 1000d) + " seconds remaining" : text;
-            State["remaining"] = milliseconds / 1000;
+            States["remaining"] = milliseconds / 1000;
             Props["totalSeconds"] = milliseconds / 1000;
-            State["isManual"] = isManual;
-            State["percentage"] = 0;
+            States["isManual"] = isManual;
+            States["percentage"] = 0;
         }
 
         private System.Timers.Timer timer;
@@ -60,28 +62,33 @@
             timer?.Stop();
         }
 
+        [JsonIgnore]
         public int Percentage
         {
-           get => (int)State["percentage"];
-           set => State["percentage"] = 100 - Remaining * 100 / Totalseconds;
+           get => (int)States["percentage"];
+           set => States["percentage"] = 100 - Remaining * 100 / Totalseconds;
         }
 
+        [JsonIgnore]
         public int Milliseconds
         {
             get => (int)Props["totalSeconds"] * 1000;
         }
 
+        [JsonIgnore]
         public int Totalseconds
         {
             get => (int)Props["totalSeconds"];
         }
 
+        [JsonIgnore]
         public int Remaining
         {
-            get => (int)State["remaining"];
-            set => State["remaining"] = value;
+            get => (int)States["remaining"];
+            set => States["remaining"] = value;
         }
 
+        [JsonIgnore]
         public bool IsActive
         {
             get => timer != null && timer.Enabled;

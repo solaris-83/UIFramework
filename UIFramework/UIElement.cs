@@ -1,8 +1,4 @@
 ﻿
-using System.Runtime.InteropServices;
-using System.Text.Json.Serialization;
-using System.Xml.Linq;
-
 namespace UIFramework
 {
 
@@ -11,25 +7,57 @@ namespace UIFramework
         public UIElement(string id)
         {
             Id = id;
+            Props["type"] = GetType().Name;
+            Props["style"] = new Style();
+            States["visible"] = true;
         }
 
         public UIElement()
         {
+            Props["type"] = GetType().Name;
+            Props["style"] = new Style();
+            States["visible"] = true;
         }
         public string Id { get; init; } = Guid.NewGuid().ToString();
-        public string Type => GetType().Name;
-        public bool Visible { get; set; } = true;
-        public Style Style { get; set; } = new Style();
+
+        public void SetStyle(Style style)
+        {
+            Props["style"] = new Style();
+        }
 
         public Dictionary<string, object> Props { get; } = new();
-        public Dictionary<string, object> State { get; } = new();
+        public Dictionary<string, object> States { get; } = new();
 
-        public virtual void ApplyState(Dictionary<string, object> newState)
+        public virtual void UpdateStates(Dictionary<string, object> newStates)
         {
-            foreach (var kv in newState)
-                State[kv.Key] = kv.Value;
+            if (newStates == null)
+                return;
+
+            UpdateStates(states =>
+            {
+                foreach (var kv in newStates)
+                    States[kv.Key] = kv.Value;
+            });
         }
-        public virtual void Update(Action<Dictionary<string, object>> updater)
+
+        public virtual void UpdateStates(Action<Dictionary<string, object>> updater)
+        {
+            updater(States);
+        }
+
+        public virtual void UpdateProps(Dictionary<string, object> newProps)
+        {
+            if (newProps == null)
+                return;
+
+            UpdateProps(props =>
+            {
+                foreach (var kv in newProps)
+                    props[kv.Key] = kv.Value;
+            });
+        }
+
+        public virtual void UpdateProps(Action<Dictionary<string, object>> updater)
         {
             updater(Props);
         }

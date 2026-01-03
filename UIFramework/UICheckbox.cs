@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+
+using Newtonsoft.Json;
 
 namespace UIFramework
 {
@@ -11,13 +9,14 @@ namespace UIFramework
         public UICheckbox(string text, bool isChecked = false)
         {
             Props["text"] = text;
-            State["checked"] = isChecked;
+            States["checked"] = isChecked;
         }
 
+        [JsonIgnore]
         public bool Checked
         {
-            get => State.TryGetValue("checked", out var v) && (bool)v;
-            set => State["checked"] = value;
+            get => States.TryGetValue("checked", out var v) && (bool)v;
+            set => States["checked"] = value;
         }
     }
 

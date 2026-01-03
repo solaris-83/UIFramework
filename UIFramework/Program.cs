@@ -1,6 +1,7 @@
 ﻿
 using Newtonsoft.Json;
 using UIFramework;
+using UIFramework.Helpers;
 using UIFramework.PredefinedPages;
 
 /*
@@ -264,12 +265,15 @@ class Program
         var page = new Page();
         // Creo una sezione per contenere l'header
         page.SetTitle("Benvenuto nella mia applicazione", "title");
-      
+        page.AddTab("Benvenuto nella mia applicazione", 1, 1);
+        page.AddParagraph("Questa è una demo di UIFramework in C#.", "paragraph", "gray");
+        page.AddButtonStop(true);
+        page.AddButton("CONTINUE", true);
         // Creo un tabcontrol con 2 tab
         var tabs = new UITabControl();
-        var tab1 = new Tab("Generale");
+        var tab1 = new UITab("Generale", 1, 1);
         tab1.Add(new UIButton("Salva", enabled: true));  // mettiamo per forza una section o direttamente dentro il tab?
-        var tab2 = new Tab("Avanzate");
+        var tab2 = new UITab("Avanzate", 1, 1);
         tab2.Add(new UILabel("Opzioni avanzate"));
 
         // Creo una sezione con checkbox e textbox che aggiungo a tab1
@@ -315,27 +319,38 @@ class Program
 
         var dispatcher = new UiCommandDispatcher(page);
         Console.WriteLine("=== LOAD PAGE INIZIALE ===");
-        Console.WriteLine(JsonConvert.SerializeObject(page, Formatting.Indented));
+        Console.WriteLine(PageSerializer.Serialize(page));
+
+        // Mi registro alle variazioni sugli elementi della pagina
+        page.UIElementUpdated += (sender, args) =>
+        {
+            var diffs = dispatcher.EvaluateDiff();
+            Console.WriteLine("\n>>> EvaluateDiff");
+            Console.WriteLine(PageSerializer.Serialize(diffs));
+        };
+
+        page.EnableStop();
+        page.DisableStop();
 
         var diffs = dispatcher.EvaluateDiff();
         Console.WriteLine("\n>>> EvaluateDiff");
-        Console.WriteLine(JsonConvert.SerializeObject(diffs, Formatting.Indented));
+        Console.WriteLine(PageSerializer.Serialize(diffs));
 
         unorderedList.Remove(label.Id);
         diffs = dispatcher.EvaluateDiff();
         Console.WriteLine("\n>>> EvaluateDiff");
-        Console.WriteLine(JsonConvert.SerializeObject(diffs, Formatting.Indented));
+        Console.WriteLine(PageSerializer.Serialize(diffs));
 
         // Simulo evento JS (checkbox click)
-        SimulateJsEvent(dispatcher, chk.Id, "change",
+        SimulateJsEvent(dispatcher, chk.Id, "checked",
             new Dictionary<string, object> { ["checked"] = true });
 
         // Simulo evento JS (textbox input)
-        SimulateJsEvent(dispatcher, txt.Id, "change",
+        SimulateJsEvent(dispatcher, txt.Id, "valueChanged",
             new Dictionary<string, object> { ["value"] = "Mario" });
 
         // Simulo evento JS (dropdown choice)
-        SimulateJsEvent(dispatcher, dropdown.Id, "change",
+        SimulateJsEvent(dispatcher, dropdown.Id, "selectedValueChanged",
             new Dictionary<string, object> { ["selected"] = "FR" });
 
         feedbackCountdown.StartCountdown();
@@ -344,13 +359,14 @@ class Program
         {
             diffs = dispatcher.EvaluateDiff();
             Console.WriteLine("\n>>> EvaluateDiff");
-            Console.WriteLine(JsonConvert.SerializeObject(diffs, Formatting.Indented));
+            Console.WriteLine(PageSerializer.Serialize(diffs));
         };
+
+        
 
         Console.ReadKey();
     }
 
-      
     private static void SimulateJsEvent(
         UiCommandDispatcher dispatcher,
         string elementId,

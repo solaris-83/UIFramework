@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,20 +12,22 @@ namespace UIFramework
         public UIDropDown(IEnumerable<DropDownOption> options, string selected = null)
         {
             Props["options"] = options.ToList();
-            State["selected"] = selected;
-            State["enabled"] = true;
+            States["selected"] = selected;
+            States["enabled"] = true;
         }
 
+        [JsonIgnore]
         public string Selected
         {
-            get => State.TryGetValue("selected", out var v) ? v?.ToString() : null;
-            set => State["selected"] = value;
+            get => States.TryGetValue("selected", out var v) ? v?.ToString() : null;
+            set => States["selected"] = value;
         }
 
+        [JsonIgnore]
         public bool Enabled
         {
-            get => State.TryGetValue("enabled", out var v) && (bool)v;
-            set => State["enabled"] = value;
+            get => States.TryGetValue("enabled", out var v) && (bool)v;
+            set => States["enabled"] = value;
         }
     }
 

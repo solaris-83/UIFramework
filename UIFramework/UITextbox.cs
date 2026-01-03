@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
 
 namespace UIFramework
 {
@@ -11,20 +7,22 @@ namespace UIFramework
         public UITextbox(string placeholder = "", string initialValue = "")
         {
             Props["placeholder"] = placeholder;
-            State["value"] = initialValue;
-            State["enabled"] = true;
+            States["value"] = initialValue;
+            States["enabled"] = true;
         }
 
+        [JsonIgnore]
         public string Value
         {
-            get => State.TryGetValue("value", out var v) ? v?.ToString() : "";
-            set => State["value"] = value;
+            get => States.TryGetValue("value", out var v) ? v?.ToString() : "";
+            set => States["value"] = value;
         }
 
+        [JsonIgnore]
         public bool Enabled
         {
-            get => State.TryGetValue("enabled", out var v) && (bool)v;
-            set => State["enabled"] = value;
+            get => States.TryGetValue("enabled", out var v) && (bool)v;
+            set => States["enabled"] = value;
         }
     }
     public class TextChangedCommand : ICommand

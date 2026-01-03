@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using UIFramework.PredefinedPages;
 
 namespace UIFramework
@@ -94,7 +90,7 @@ namespace UIFramework
             {
                 Id = el.Id,
                 Props = new Dictionary<string, object>(el.Props),
-                State = new Dictionary<string, object>(el.State)
+                State = new Dictionary<string, object>(el.States)
             };
 
             if (el is ContainerElement container)

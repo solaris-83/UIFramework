@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +11,10 @@ namespace UIFramework
     {
         public UIImage(string src)
         {
-            Props["src"] = src;
+            Props["src"] = $"/img/{src}";
         }
 
+        [JsonIgnore]
         public string Src
         {
             get => Props["src"]?.ToString();

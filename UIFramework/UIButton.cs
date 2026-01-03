@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿
+
+using Newtonsoft.Json;
 
 namespace UIFramework
 {
@@ -12,24 +9,24 @@ namespace UIFramework
         public UIButton(string id, bool enabled) : base(id)
         {
             Props["text"] = id;
-            State["enabled"] = enabled;
+            States["enabled"] = enabled;
         }
 
         public UIButton(string id,  bool enabled, string style) : base(id)
         {
             Props["text"] = id;
-            State["enabled"] = enabled;
-            Style = new Style
+            States["enabled"] = enabled;
+            Props["style"] = new Style
             {
                 Layout = style
             };
         }
 
-        public UIButton(string id, bool enabled, string style, string text) : base(id)
+        public UIButton(string id, bool enabled, string style, string translation) : base(id)
         {
-            Props["text"] = text;
-            State["enabled"] = enabled;
-            Style = new Style
+            Props["text"] = translation;
+            States["enabled"] = enabled;
+            Props["style"] = new Style
             {
                 Layout = style
             };
@@ -38,8 +35,28 @@ namespace UIFramework
         [JsonIgnore]
         public bool Enabled
         {
-            get => State.TryGetValue("enabled", out var v) && (bool)v;
-            set => State["enabled"] = value;
+            get => States.TryGetValue("enabled", out var v) && (bool)v;
+            set => States["enabled"] = value;
+        }
+
+        [JsonIgnore]
+        public Style Style
+        {
+            get
+            {
+                Props.TryGetValue("style", out var style);
+                if (style is Style s)
+                    return s;
+                return null;
+            }
+            set => Props["style"] = value;
+        }
+
+        [JsonIgnore]
+        public string Text
+        {
+            get => Props["text"]?.ToString();
+            set => Props["text"] = value;
         }
 
         public class ButtonChangedCommand : ICommand

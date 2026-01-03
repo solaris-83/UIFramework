@@ -1,4 +1,6 @@
-﻿namespace UIFramework.PredefinedPages
+﻿using UIFramework.PredefinedPages;
+
+namespace UIFramework.Helpers
 {
     public static class PageExtensions
     {

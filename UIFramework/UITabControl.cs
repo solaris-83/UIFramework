@@ -1,21 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
+using System.Runtime.CompilerServices;
 
 namespace UIFramework
 {
     public class UITabControl : ContainerElement
     {
+        [JsonIgnore]
+        //[System.Text.Json.Serialization.JsonIgnore] // System.Text.Json
         public string SelectedTabId
         {
-            get => State.TryGetValue("selectedTabId", out var v) ? v?.ToString() : null;
-            set => State["selectedTabId"] = value;
-        }
-
+            get => States.TryGetValue("selectedTabId", out var v) ? v?.ToString() : null;
+            set => States["selectedTabId"] = value;
+        } 
+        
         public class TabControlChangedCommand : ICommand
-        {
+        { 
             private readonly UITabControl _tabControl;
             private readonly string _selectedTabId;
 
@@ -32,11 +31,48 @@ namespace UIFramework
         }
     }
 
-    public class Tab : ContainerElement
+    public class UITab : ContainerElement
     {
-        public Tab(string header)
+        public UITab(int rows, int cols)
         {
-            Props["header"] = header;
+            Props["grid"] = new Grid(rows, cols);
         }
+
+        public UITab(string title, int rows, int cols) : this(rows, cols)
+        {
+            Props["title"] = title;
+        }
+
+        [JsonIgnore]
+        public string Title
+        {
+            get => Props["title"]?.ToString();
+            set => Props["title"] = value;
+        }
+
+        [JsonIgnore]
+        public Grid Grid
+        {
+            get  
+            { 
+                Props.TryGetValue("grid", out var grid);
+                if (grid is Grid g)
+                    return g;
+                return null;
+            }
+            set => Props["grid"] = value;
+        }
+    }
+
+    public class Grid
+    {
+        public Grid(int rows, int cols)
+        {
+            Rows = rows;
+            Cols = cols;
+        }
+
+        public int Rows { get; set; }
+        public int Cols { get; set; }
     }
 }

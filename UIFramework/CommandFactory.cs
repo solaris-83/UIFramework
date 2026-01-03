@@ -1,4 +1,5 @@
-﻿using UIFramework.PredefinedPages;
+﻿using UIFramework.Helpers;
+using UIFramework.PredefinedPages;
 using static UIFramework.UIButton;
 using static UIFramework.UITabControl;
 
@@ -17,33 +18,39 @@ namespace UIFramework
         {
             var element = _page.FindById(evt.ElementId);
 
+#pragma warning disable CS8603 // Possible null reference return.
+#pragma warning disable CS8604 // Possible null reference argument.
             return element switch
             {
-                UITabControl tabControl when evt?.EventType == "change"
+                UITabControl tabControl when evt?.EventType == "selectedTabChanged"
                     => new TabControlChangedCommand(
                         tabControl,
                         evt.Payload["selectedTabId"]?.ToString()),
 
-                UIButton btn when evt?.EventType == "change"
+                UIButton btn when evt?.EventType == "enabledChanged"
                     => new ButtonChangedCommand(
                         btn,
                         Convert.ToBoolean(evt.Payload["enabled"])),
 
-                UICheckbox cb when evt?.EventType == "change"
+                UICheckbox cb when evt?.EventType == "checked"
                     => new CheckboxChangedCommand(
                         cb,
                         Convert.ToBoolean(evt.Payload["checked"])),
 
-                UITextbox tb when evt?.EventType == "change"
+                UITextbox tb when evt?.EventType == "valueChanged"
                     => new TextChangedCommand(
                         tb,
                         evt.Payload["value"]?.ToString()),
 
-                UIDropDown dd when evt?.EventType == "change"
-                     => new DropDownChangedCommand(dd, evt.Payload["selected"]?.ToString()),
+                UIDropDown dd when evt?.EventType == "selectedValueChanged"
+                     => new DropDownChangedCommand(
+                         dd, 
+                         evt.Payload["selected"]?.ToString()),
 
                 _ => null
             };
+#pragma warning restore CS8604 // Possible null reference argument.
+#pragma warning restore CS8603 // Possible null reference return.
         }
     }
 }

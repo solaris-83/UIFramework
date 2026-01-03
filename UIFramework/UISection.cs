@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace UIFramework
 {
+    // TODO capire se le sections servono e dove piazzarle come contenitori logici di altri elementi
     public class UISection : ContainerElement
     {
         public UISection()
