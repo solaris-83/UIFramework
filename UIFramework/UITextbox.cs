@@ -28,19 +28,17 @@ namespace UIFramework
     public class TextChangedCommand : ICommand
     {
         private readonly UITextbox _textBox;
-        private readonly string _value;
+        private readonly Dictionary<string, object> _states;
 
-        public TextChangedCommand(UITextbox textBox, string value)
+        public TextChangedCommand(UITextbox textBox, Dictionary<string, object> states)
         {
             _textBox = textBox;
-            _value = value;
+            _states = states;
         }
 
         public void Execute()
         {
-            _textBox.Value = _value;
+            _textBox.UpdateStates(_states);
         }
     }
-
-
 }

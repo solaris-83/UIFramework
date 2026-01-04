@@ -4,20 +4,20 @@ namespace UIFramework
 
     public class UIElement
     {
-        //public UIElement(string id)
-        //{
-        //    Id = id;
-        //    Props["type"] = GetType().Name;
-        //    Props["style"] = new Style();
-        //    States["visible"] = true;
-        //}
-
         public UIElement()
         {
+            Props["tag"] = null;
             Props["type"] = GetType().Name;
             Props["style"] = new Style();
             States["visible"] = true;
         }
+
+        public object Tag
+        {
+            get => Props["tag"];
+            set => Props["tag"] = value;
+        }
+
         public string Id { get; init; } = Guid.NewGuid().ToString();
 
         public void SetStyle(Style style)

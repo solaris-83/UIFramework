@@ -29,19 +29,34 @@ namespace UIFramework.PredefinedPages
 
         [JsonIgnore]
         public UITabControl TabControl => _tabControl ??= new UITabControl();
-        //protected string Id { get; init; } = Guid.NewGuid().ToString();
 
-        //protected string Type { get; private set; }
+        // Backing field for the event delegate
+        private EventHandler<Type> _updated;
 
-        public event EventHandler<Type> Updated;
+        // Custom event with controlled add/remove
+        public event EventHandler<Type> Updated
+        {
+            add
+            {
+                if (_updated != null)
+                {
+                    throw new InvalidOperationException("This event already has a subscriber.");
+                }
+                _updated = value;
+            }
+            remove
+            {
+                _updated -= value;
+            }
+        }
 
         public UILabel SetTitle(string idStr, string style)
         {
             var titleLabel = new UILabel(idStr);
             var titleStyle = new Style() { Layout = style };
             titleLabel.SetStyle(titleStyle); // da qui evinco che è un title e quindi usa uno stile particolare
-           
             Add(titleLabel);
+            _updated?.Invoke(this, titleLabel.GetType());
             return titleLabel;
         }
 
@@ -66,9 +81,10 @@ namespace UIFramework.PredefinedPages
             _currentTab = new UITab(title, rows, cols);
             _tabControl.Add(_currentTab);
             _tabControl.SelectedActiveTabId = _currentTab.Id;
+            // non so se serve l'evento, per il momento non lo mettiamo
             return _currentTab;
         }
-
+        
         public UIImage AddImage(string imageName)
         {
             var image = new UIImage(imageName);
@@ -81,6 +97,7 @@ namespace UIFramework.PredefinedPages
 
             image.Src = ImageHelper.ConvertImageToBase64(imagePath);
             _currentTab.Add(image);
+            _updated?.Invoke(this, image.GetType());
             return image;
         }
 
@@ -96,9 +113,51 @@ namespace UIFramework.PredefinedPages
                 return null;
             }
             img.Src = ImageHelper.ConvertImageToBase64(imagePath);
-            Updated?.Invoke(this, img.GetType());
+            _updated?.Invoke(this, img.GetType());
             return img;
         }
+
+        public UILabel AddBulletedItem(string idStr)
+        {
+            UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
+            label.SetStyle(new Style() { Layout = "list-item-unordered" });
+            _currentTab.Add(label);
+            _updated?.Invoke(this, label.GetType());
+            return label;
+        }
+
+        public UILabel UpdateBulletedItem(string itemId, string newIdStr)
+        {
+            var item = this.FindById(itemId);
+            if (item == null || item is not UILabel label)
+                return null;
+            label.Text = newIdStr;
+            _updated?.Invoke(this, label.GetType());
+            return label;
+        }
+
+        // "list-item-ordered" è in Style.Layout
+        // index è in Tag
+        public UILabel AddOrderedItem(string idStr, int index)
+        {
+            UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
+            label.SetStyle(new Style() { Layout = "list-item-ordered" });
+            label.Tag = index;
+            _currentTab.Add(label);
+            _updated?.Invoke(this, label.GetType());
+            return label;
+        }
+
+        public UILabel AddOrderedItem(string idStr, string style)
+        {
+            throw new NotImplementedException();
+        }
+
+        public UILabel AddOrderedItem(string idStr)
+        {
+            return AddOrderedItem(idStr, "");
+        }
+
 
         public UILabel AddParagraph(string idStr)
         {
@@ -110,6 +169,7 @@ namespace UIFramework.PredefinedPages
             var label = new UILabel(idStr);
             label.SetStyle(new Style() { Layout = style, ForegroundColor = color });
             _currentTab.Add(label);
+            _updated?.Invoke(this, label.GetType());
             return label;
         }
 
@@ -125,7 +185,7 @@ namespace UIFramework.PredefinedPages
                 return null;
             label.SetStyle(new Style() { Layout = style, ForegroundColor = color });
             label.Text = newIdStr;
-            Updated?.Invoke(this, label.GetType());
+            _updated?.Invoke(this, label.GetType());
             return label;
         }
 
@@ -134,6 +194,7 @@ namespace UIFramework.PredefinedPages
         {
             var button = new UIButton(id, false, ""); // non c'è uno stile per il default??
             _currentTab.Add(button);
+            _updated?.Invoke(this, button.GetType());
             return button;
         }
 
@@ -141,6 +202,7 @@ namespace UIFramework.PredefinedPages
         {
             var button = new UIButton(id, isEnabled, style);
             _currentTab.Add(button);
+            _updated?.Invoke(this, button.GetType());
             return button;
         }
 
@@ -148,6 +210,7 @@ namespace UIFramework.PredefinedPages
         {
             var button = new UIButton(id, isEnabled, "");
             _currentTab.Add(button);
+            _updated?.Invoke(this, button.GetType());
             return button;
         }
 
@@ -155,6 +218,7 @@ namespace UIFramework.PredefinedPages
         {
             var button = new UIButton(id, false, "", text);
             _currentTab.Add(button);
+            _updated?.Invoke(this, button.GetType());
             return button;
         }
 
@@ -162,6 +226,7 @@ namespace UIFramework.PredefinedPages
         {
             var button = new UIButton(id, isEnabled, "standard", text);
             _currentTab.Add(button);
+            _updated?.Invoke(this, button.GetType());
             return button;
         }
         #endregion
@@ -186,7 +251,7 @@ namespace UIFramework.PredefinedPages
                 btn.Enabled = true;
             //button.Enabled = true;
             // TODO Mettere un warning se non ci si è registrati all'evento
-            Updated?.Invoke(this, button.GetType());
+            _updated?.Invoke(this, button.GetType());
             return true;
         }
 
@@ -198,7 +263,7 @@ namespace UIFramework.PredefinedPages
             if (button is UIButton btn)
                 btn.Enabled = false;
             // TODO Mettere un warning se non ci si è registrati all'evento
-            Updated?.Invoke(this, button.GetType());
+            _updated?.Invoke(this, button.GetType());
             return true;
         }
         #endregion
@@ -213,13 +278,21 @@ namespace UIFramework.PredefinedPages
         {
             var feedback = new UIFeedback(FeedbackMode.Countdown, "countdown", (ms * 1000).ToString() /* BasicLibraries.UTILITY.FormatDuration(ms * 1000)*/, ms, isManual);
             _currentTab.Add(feedback);
+            _updated?.Invoke(this, feedback.GetType());
+            feedback.TickElapsed += Feedback_TickElapsed;
             return feedback;
+        }
+
+        private void Feedback_TickElapsed(object? sender, int e)
+        {
+            _updated?.Invoke(this, sender.GetType());
         }
 
         public UIFeedback AddFeedbackProgress(int perc)
         {
             var feedback = new UIFeedback(FeedbackMode.ProgressBar, "progress", "", perc);
             _currentTab.Add(feedback);
+            _updated?.Invoke(this, feedback.GetType());
             return feedback;
         }
 
@@ -233,6 +306,7 @@ namespace UIFramework.PredefinedPages
             //msg = TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(msg);
             var feedback = new UIFeedback(FeedbackMode.Message, "message", msg);
             _currentTab.Add(feedback);
+            _updated?.Invoke(this, feedback.GetType());
             return feedback;
         }
 

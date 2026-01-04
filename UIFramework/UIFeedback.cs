@@ -62,24 +62,27 @@ namespace UIFramework
             timer = new System.Timers.Timer(1000);
             var tickCommand = new FeedbackTickCommand(this);
             timer.Start();
-            timer.Elapsed += (_, _) =>
+            timer.Elapsed += (_, __) => Timer_Elapsed(_, __, tickCommand); 
+        }
+
+        private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e, FeedbackTickCommand? command = null)
+        {
+            Console.WriteLine("Timer_Elapsed called");
+            if (Remaining > 0)
             {
-                if (Remaining > 0)
-                {
-                    tickCommand.Execute();
-                    TickElapsed?.Invoke(this, Remaining);
-                    
-                }
-                else
-                {
-                    timer?.Stop();
-                }
-            };
+                command?.Execute();
+                TickElapsed?.Invoke(this, Remaining);
+            }
+            else
+            {
+                timer?.Stop();
+            }
         }
 
         public void StopCountdown()
         {
-            timer?.Stop();
+            timer.Stop();
+            timer.Elapsed -= (_, __) => Timer_Elapsed(_, __);
         }
 
         [JsonIgnore]
@@ -130,6 +133,23 @@ namespace UIFramework
                 return;
             _feedback.Remaining--;
             _feedback.Percentage = 100 - _feedback.Remaining * 100 / _feedback.Totalseconds;
+        }
+    }
+
+    public class FeedbackChangedCommand : ICommand
+    {
+        private readonly UIFeedback _feedback;
+        private readonly Dictionary<string, object> _states;
+
+        public FeedbackChangedCommand(UIFeedback feedback, Dictionary<string, object> states)
+        {
+            _feedback = feedback;
+            _states = states;
+        }
+
+        public void Execute()
+        {
+            _feedback.UpdateStates(_states);
         }
     }
 }

@@ -23,17 +23,17 @@ namespace UIFramework
     public class CheckboxChangedCommand : ICommand
     {
         private readonly UICheckbox _checkbox;
-        private readonly bool _newValue;
+        private readonly Dictionary<string, object> _states;
 
-        public CheckboxChangedCommand(UICheckbox checkbox, bool newValue)
+        public CheckboxChangedCommand(UICheckbox checkbox, Dictionary<string, object> states)
         {
             _checkbox = checkbox;
-            _newValue = newValue;
+            _states = states;
         }
 
         public void Execute()
         {
-            _checkbox.Checked = _newValue;
+           _checkbox.UpdateStates(_states);
         }
     }
 }

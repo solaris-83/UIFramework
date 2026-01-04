@@ -25,27 +25,40 @@ namespace UIFramework
                 UITabControl tabControl when evt?.EventType == "selectedActiveTabChanged"
                     => new TabControlChangedCommand(
                         tabControl,
-                        evt.Payload["selectedActiveTabId"]?.ToString()),
+                        //evt.Payload["selectedActiveTabId"]?.ToString()
+                        evt.Payload),
 
                 UIButton btn when evt?.EventType == "enabledChanged"
                     => new ButtonChangedCommand(
                         btn,
-                        Convert.ToBoolean(evt.Payload["enabled"])),
+                        evt.Payload
+                        //Convert.ToBoolean(evt.Payload["enabled"])
+                        ),
+
+                UIButton btn when evt?.EventType == "visibilityChanged"
+                    => new ButtonChangedCommand(
+                        btn,
+                        evt.Payload
+                        //Convert.ToBoolean(evt.Payload["visible"])
+                        ),
 
                 UICheckbox cb when evt?.EventType == "checked"
                     => new CheckboxChangedCommand(
                         cb,
-                        Convert.ToBoolean(evt.Payload["checked"])),
+                        // Convert.ToBoolean(evt.Payload["checked"])
+                        evt.Payload),
 
                 UITextbox tb when evt?.EventType == "valueChanged"
                     => new TextChangedCommand(
                         tb,
-                        evt.Payload["value"]?.ToString()),
+                        // evt.Payload["value"]?.ToString()
+                        evt.Payload),
 
                 UIDropDown dd when evt?.EventType == "selectedValueChanged"
                      => new DropDownChangedCommand(
-                         dd, 
-                         evt.Payload["selected"]?.ToString()),
+                         dd,
+                         // evt.Payload["selected"]?.ToString()
+                         evt.Payload),
 
                 _ => throw new InvalidOperationException($"Unsupported event type '{evt?.EventType}' for element '{element?.GetType().Name}'.")
             };

@@ -259,7 +259,11 @@ class Program
 
 class Program
 {
-    
+
+    // =================== DA FARE DOMANI 
+    // Implementare Addbulleteditem, ecc, 
+    // testare Feedback con countdown e progress dentro una pagina con/senza Start automatico.
+
     static void Main()
     {
         LibraryUI libraryUI = new LibraryUI();
@@ -291,22 +295,42 @@ class Program
         // Aggiungo paragrafo e bottoni
         customPage.AddParagraph("Questa è una demo di UIFramework in C#.", "paragraph", "gray");
         customPage.AddButtonStop(true);
-        customPage.AddButton("CONTINUE", true);
+        var continueButton = customPage.AddButton("CONTINUE", true);
         // Recupero il tabcontrol creato nel CTOR di page per agganciarci altri 2 tab
         // Automaticamente viene settato come attivo l'ultimo tab creato
         var tabControl = customPage.TabControl;
         var tab1 = new UITab("Generale", 1, 1);
-        tab1.Add(new UIButton("Salva", enabled: true));  // mettiamo per forza una section o direttamente dentro il tab?
+        tab1.Add(new UIButton("Salva", enabled: true));  // TODO mettiamo per forza una section o direttamente dentro il tab?
         var tab2 = new UITab("Avanzate", 1, 1);
         tab2.Add(new UILabel("Opzioni avanzate"));
         customPage.TabControl.Add(tab1);
         customPage.TabControl.Add(tab2);
+        var feedback = customPage.AddFeedbackCountdown(15000);
         libraryUI.ShowAndWait(customPage);
+
 
         // Simulo evento JS (selezione di un tab)
         libraryUI.SimulateJsEvent(tabControl.Id, "selectedActiveTabChanged",
             new Dictionary<string, object> { ["selectedActiveTabId"] = firstTab.Id });
 
+        // Simulo evento JS (enable/disable di un button)
+        libraryUI.SimulateJsEvent(continueButton.Id, "enabledChanged",
+            new Dictionary<string, object> { ["enabled"] = false });
+
+        // Simulo evento JS (visibilità di un button)
+        libraryUI.SimulateJsEvent(continueButton.Id, "visibilityChanged",
+            new Dictionary<string, object> { ["visible"] = false });
+
+        // Faccio partire il countdown
+        feedback.StartCountdown();
+        Thread.Sleep(5000);
+        feedback.StopCountdown();
+
+        Thread.Sleep(5000);
+        // Faccio partire il countdown
+        feedback.StartCountdown();
+        Thread.Sleep(5000);
+        feedback.StopCountdown();
         /*
         // Creo una sezione con checkbox e textbox che aggiungo a tab1
         var section1 = new UISection("Preferenze");

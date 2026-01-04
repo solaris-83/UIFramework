@@ -32,17 +32,17 @@ namespace UIFramework
         public class TabControlChangedCommand : ICommand
         { 
             private readonly UITabControl _tabControl;
-            private readonly string _selectedActiveTabId;
+            private readonly Dictionary<string, object> _states;
 
-            public TabControlChangedCommand(UITabControl tabControl, string value)
+            public TabControlChangedCommand(UITabControl tabControl, Dictionary<string, object> states)
             {
                 _tabControl = tabControl;
-                _selectedActiveTabId = value;
+                _states = states;
             }
 
             public void Execute()
             {
-                _tabControl.SelectedActiveTabId = _selectedActiveTabId;
+                _tabControl.UpdateStates(_states);
             }
         }
     }

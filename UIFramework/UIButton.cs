@@ -65,17 +65,17 @@ namespace UIFramework
         public class ButtonChangedCommand : ICommand
         {
             private readonly UIButton _button;
-            private readonly bool _newValue;
+            private readonly Dictionary<string, object> _states;
 
-            public ButtonChangedCommand(UIButton button, bool newValue)
+            public ButtonChangedCommand(UIButton button, Dictionary<string, object> states)
             {
                 _button = button;
-                _newValue = newValue;
+                _states = states;
             }
 
             public void Execute()
             {
-                _button.Enabled = _newValue;
+                _button.UpdateStates(_states);
             }
         }
     }

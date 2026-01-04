@@ -40,35 +40,22 @@ namespace UIFramework
             Console.WriteLine($"=== LOAD PAGE INIZIALE {page.GetType().Name} ===");
             Console.WriteLine(PageSerializer.Serialize(page));
 
-            // Mi registro agli aggiornati degli UIElement della page triggerati dal C#
-            page.Updated += (sender, args) =>
-            {
-                var diffs = _dispatcher.EvaluateDiff();
-                Console.WriteLine("\n>>> EvaluateDiff");
-                Console.WriteLine(PageSerializer.Serialize(diffs));
-            };
+            // Mi registro agli aggiornamenti degli UIElement della page triggerati dal C#
+            page.Updated += Page_Updated;
+            // TODO deregistrarsi da tutti gli eventi tramite dispose alla fine
         }
-    
-        private void ValidatePage(Page page)
-        {
-            var tabControls = page.FindAllByType<UITabControl>();
-            if (!tabControls.Any())
-            {
-                throw new InvalidOperationException("La pagina deve contenere almeno un UITabControl.");
-            }
-            if (tabControls.Count() > 1)
-            {
-                throw new InvalidOperationException("La pagina deve contenere un solo UITabControl.");
-            }
 
-            if (string.IsNullOrEmpty(tabControls.Single().SelectedActiveTabId))
-            {
-                throw new InvalidOperationException("UITabControl deve avere un UITab selezionato.");
-            }
+        private void Page_Updated(object? sender, Type e)
+        {
+            var diffs = _dispatcher.EvaluateDiff();
+            Console.WriteLine("\n>>> EvaluateDiff");
+            Console.WriteLine(PageSerializer.Serialize(diffs));
         }
 
         // Simula l'arrivo di un evento JS dall'interfaccia utente verso il dispatcher C# 
+        // ======== A T T E N Z I O N E =================
         // SERVE SOLO PER TEST
+        // ==============================================
         public void SimulateJsEvent(
                 string elementId,
                 string eventType,
