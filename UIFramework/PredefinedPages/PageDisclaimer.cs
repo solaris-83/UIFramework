@@ -2,6 +2,7 @@
 
 namespace UIFramework.PredefinedPages
 {
+    // TODO quali metodi mettiamo a diposizione? derivare dall'intera Page è troppo?
     public sealed class PageDisclaimer : Page
     {
         [JsonIgnore]

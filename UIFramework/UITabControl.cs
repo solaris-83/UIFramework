@@ -4,27 +4,45 @@ namespace UIFramework
 {
     public class UITabControl : ContainerElement
     {
-        [JsonIgnore]
-        public string SelectedTabId
+        public UITabControl()
         {
-            get => States.TryGetValue("selectedTabId", out var v) ? v?.ToString() : null;
-            set => States["selectedTabId"] = value;
+            
+        }
+
+        public new void Add(UIElement element)
+        {             
+            if (element is UITab tab)
+            {
+                base.Add(tab);
+                SelectedActiveTabId = tab.Id;
+            }
+            else
+            {
+                throw new InvalidOperationException("Only UITab elements can be added to UITabControl.");
+            }
+        }
+
+        [JsonIgnore]
+        public string SelectedActiveTabId
+        {
+            get => States.TryGetValue("selectedActiveTabId", out var v) ? v?.ToString() : null;
+            set => States["selectedActiveTabId"] = value;
         } 
         
         public class TabControlChangedCommand : ICommand
         { 
             private readonly UITabControl _tabControl;
-            private readonly string _selectedTabId;
+            private readonly string _selectedActiveTabId;
 
             public TabControlChangedCommand(UITabControl tabControl, string value)
             {
                 _tabControl = tabControl;
-                _selectedTabId = value;
+                _selectedActiveTabId = value;
             }
 
             public void Execute()
             {
-                _tabControl.SelectedTabId = _selectedTabId;
+                _tabControl.SelectedActiveTabId = _selectedActiveTabId;
             }
         }
     }

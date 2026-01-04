@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
-using System.Drawing;
 using UIFramework.Helpers;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace UIFramework.PredefinedPages
 {
@@ -28,11 +26,14 @@ namespace UIFramework.PredefinedPages
                 _title = value;
             }   
         }
+
+        [JsonIgnore]
+        public UITabControl TabControl => _tabControl ??= new UITabControl();
         //protected string Id { get; init; } = Guid.NewGuid().ToString();
 
         //protected string Type { get; private set; }
 
-        public event EventHandler<Page> Updated;
+        public event EventHandler<Type> Updated;
 
         public UILabel SetTitle(string idStr, string style)
         {
@@ -64,7 +65,7 @@ namespace UIFramework.PredefinedPages
         {
             _currentTab = new UITab(title, rows, cols);
             _tabControl.Add(_currentTab);
-            _tabControl.SelectedTabId = _currentTab.Id;
+            _tabControl.SelectedActiveTabId = _currentTab.Id;
             return _currentTab;
         }
 
@@ -95,7 +96,7 @@ namespace UIFramework.PredefinedPages
                 return null;
             }
             img.Src = ImageHelper.ConvertImageToBase64(imagePath);
-            Updated?.Invoke(img, this);
+            Updated?.Invoke(this, img.GetType());
             return img;
         }
 
@@ -124,7 +125,7 @@ namespace UIFramework.PredefinedPages
                 return null;
             label.SetStyle(new Style() { Layout = style, ForegroundColor = color });
             label.Text = newIdStr;
-            Updated?.Invoke(label, this);
+            Updated?.Invoke(this, label.GetType());
             return label;
         }
 
@@ -185,7 +186,7 @@ namespace UIFramework.PredefinedPages
                 btn.Enabled = true;
             //button.Enabled = true;
             // TODO Mettere un warning se non ci si è registrati all'evento
-            Updated?.Invoke(button, this);
+            Updated?.Invoke(this, button.GetType());
             return true;
         }
 
@@ -197,9 +198,44 @@ namespace UIFramework.PredefinedPages
             if (button is UIButton btn)
                 btn.Enabled = false;
             // TODO Mettere un warning se non ci si è registrati all'evento
-            Updated?.Invoke(button, this);
+            Updated?.Invoke(this, button.GetType());
             return true;
         }
+        #endregion
+
+
+        #region FEEDBACK
+        public UIFeedback AddFeedbackCountdown(int ms)
+        {
+            return AddFeedbackCountdown(ms, true); // default is manual
+        }
+        public UIFeedback AddFeedbackCountdown(int ms, bool isManual)
+        {
+            var feedback = new UIFeedback(FeedbackMode.Countdown, "countdown", (ms * 1000).ToString() /* BasicLibraries.UTILITY.FormatDuration(ms * 1000)*/, ms, isManual);
+            _currentTab.Add(feedback);
+            return feedback;
+        }
+
+        public UIFeedback AddFeedbackProgress(int perc)
+        {
+            var feedback = new UIFeedback(FeedbackMode.ProgressBar, "progress", "", perc);
+            _currentTab.Add(feedback);
+            return feedback;
+        }
+
+        public UIFeedback AddFeedbackMessage()
+        {
+            return AddFeedbackMessage("");
+        }
+
+        public UIFeedback AddFeedbackMessage(string msg)
+        {
+            //msg = TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(msg);
+            var feedback = new UIFeedback(FeedbackMode.Message, "message", msg);
+            _currentTab.Add(feedback);
+            return feedback;
+        }
+
         #endregion
 
         // TODO sostituire con il tipo corretto di messaggio

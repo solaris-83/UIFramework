@@ -259,31 +259,55 @@ class Program
 
 class Program
 {
+    
     static void Main()
     {
+        LibraryUI libraryUI = new LibraryUI();
+        // ==== DISCLAIMER PAGE ====
         // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
-        var page = new PageDisclaimer();
+        var page = libraryUI.CreatePageDisclaimer();
         var par1 = page.AddParagraph("Paragraph #1.", "paragraph", "gray");
         var par2 = page.AddParagraph("Paragraph #2.", "paragraph", "gray");
         page.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
         page.Remove(par2.Id);
         page.AddImage("Screenshot.png");
+        libraryUI.ShowAndWait(page);
+
+        // ==== RESULT PAGE ====
+        var pageResult = libraryUI.CreatePageResult();
+        pageResult.AddParagraph("Questa è la pagina di risultato.", "result-paragraph", "blue");
+        libraryUI.ShowAndWait(pageResult);
+
+
+        // ==== PAGINA CUSTOM ====
         // Istanzio pagina
-        // page = new Page();
-        // Creo una sezione per contenere l'header
-        //  page.SetTitle("Benvenuto nella mia applicazione", "title");
-        page.Title = "Demo UIFramework C#";
-        page.AddTab("Benvenuto nella mia applicazione", 1, 1);
-        page.AddParagraph("Questa è una demo di UIFramework in C#.", "paragraph", "gray");
-        page.AddButtonStop(true);
-        page.AddButton("CONTINUE", true);
-        // Creo un tabcontrol con 2 tab
-        var tabs = new UITabControl();
+        var customPage = new Page();
+        // Creo l'header
+        customPage.SetTitle("Benvenuto nella mia applicazione", "title");
+        // oppure set di Title direttamente
+        customPage.Title = "Demo UIFramework C#";
+        // Aggiungo un tab
+        var firstTab = customPage.AddTab("Benvenuto nella mia applicazione", 1, 1);
+        // Aggiungo paragrafo e bottoni
+        customPage.AddParagraph("Questa è una demo di UIFramework in C#.", "paragraph", "gray");
+        customPage.AddButtonStop(true);
+        customPage.AddButton("CONTINUE", true);
+        // Recupero il tabcontrol creato nel CTOR di page per agganciarci altri 2 tab
+        // Automaticamente viene settato come attivo l'ultimo tab creato
+        var tabControl = customPage.TabControl;
         var tab1 = new UITab("Generale", 1, 1);
         tab1.Add(new UIButton("Salva", enabled: true));  // mettiamo per forza una section o direttamente dentro il tab?
         var tab2 = new UITab("Avanzate", 1, 1);
         tab2.Add(new UILabel("Opzioni avanzate"));
+        customPage.TabControl.Add(tab1);
+        customPage.TabControl.Add(tab2);
+        libraryUI.ShowAndWait(customPage);
 
+        // Simulo evento JS (selezione di un tab)
+        libraryUI.SimulateJsEvent(tabControl.Id, "selectedActiveTabChanged",
+            new Dictionary<string, object> { ["selectedActiveTabId"] = firstTab.Id });
+
+        /*
         // Creo una sezione con checkbox e textbox che aggiungo a tab1
         var section1 = new UISection("Preferenze");
         var chk = new UICheckbox("Abilita notifiche", false);
@@ -322,13 +346,18 @@ class Program
         // Aggiungo i tab al tabcontrol e lo aggiungo alla pagina
         tabs.Add(tab1);
         tabs.Add(tab2);
-        tabs.SelectedTabId = tab1.Id;
+        tabs.SelectedActiveTabId = tab1.Id;
         page.Add(tabs);
 
         var dispatcher = new UiCommandDispatcher(page);
         Console.WriteLine("=== LOAD PAGE INIZIALE ===");
         Console.WriteLine(PageSerializer.Serialize(page));
 
+
+        */
+
+
+        /*
         // Mi registro alle variazioni sugli elementi della pagina. Nella BCA sarà quando faccio uno ShwoAndWait o ShowAndContinue
         page.Updated += (sender, args) =>
         {
@@ -372,7 +401,7 @@ class Program
             Console.WriteLine(PageSerializer.Serialize(diffs));
         };
 
-        
+        */
 
         Console.ReadKey();
     }

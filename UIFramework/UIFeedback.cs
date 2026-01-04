@@ -5,35 +5,52 @@ namespace UIFramework
     public enum FeedbackMode
     {
         Countdown,
-        ProgressBar
+        ProgressBar,
+        Message
     }
 
     // TODO createsectioncountdown si può rimuovere e usare AddFeedbackCountdown? diciamo di farlo?
+    // TODO CreatePageCountdown si può rimuovere? Usata solo in GENERIC_ASK_WRITING(snippet)
 
     public class UIFeedback : UIElement
     {
         public event EventHandler<int> TickElapsed;
-        public UIFeedback(FeedbackMode feedbackMode, string text, int milliseconds)
+        public UIFeedback(FeedbackMode feedbackMode, string style, string text, int ms)
         {
+            Props["tag"] = $"feedback-{style}";
+            Props["style"] = new Style
+            {
+                Layout = style
+            };
             Props["mode"] = feedbackMode.ToString();
-            Props["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(milliseconds / 1000d) + " seconds remaining" : text;
-            Props["totalSeconds"] = milliseconds / 1000;
-            States["remaining"] = milliseconds / 1000;
+            Props["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
+            Props["totalSeconds"] = ms / 1000;
+            States["remaining"] = ms / 1000;
             States["percentage"] = 0;
         }
 
-        public UIFeedback(FeedbackMode feedbackMode, string text)
+        public UIFeedback(FeedbackMode feedbackMode, string style, string text)
         {
+            Props["style"] = new Style
+            {
+                Layout = style
+            };
+            Props["tag"] = $"feedback-{style}";
             Props["mode"] = feedbackMode.ToString();
             Props["text"] = text;
         }
 
-        public UIFeedback(FeedbackMode feedbackMode, string text, int milliseconds, bool isManual)
+        public UIFeedback(FeedbackMode feedbackMode, string style, string text, int ms, bool isManual)
         {
+            Props["style"] = new Style
+            {
+                Layout = style
+            };
+            Props["tag"] = $"feedback-{style}";
             Props["mode"] = feedbackMode.ToString();
-            Props["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(milliseconds / 1000d) + " seconds remaining" : text;
-            States["remaining"] = milliseconds / 1000;
-            Props["totalSeconds"] = milliseconds / 1000;
+            Props["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
+            States["remaining"] = ms / 1000;
+            Props["totalSeconds"] = ms / 1000;
             States["isManual"] = isManual;
             States["percentage"] = 0;
         }

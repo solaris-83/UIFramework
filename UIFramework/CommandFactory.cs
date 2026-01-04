@@ -22,10 +22,10 @@ namespace UIFramework
 #pragma warning disable CS8604 // Possible null reference argument.
             return element switch
             {
-                UITabControl tabControl when evt?.EventType == "selectedTabChanged"
+                UITabControl tabControl when evt?.EventType == "selectedActiveTabChanged"
                     => new TabControlChangedCommand(
                         tabControl,
-                        evt.Payload["selectedTabId"]?.ToString()),
+                        evt.Payload["selectedActiveTabId"]?.ToString()),
 
                 UIButton btn when evt?.EventType == "enabledChanged"
                     => new ButtonChangedCommand(
@@ -47,7 +47,7 @@ namespace UIFramework
                          dd, 
                          evt.Payload["selected"]?.ToString()),
 
-                _ => null
+                _ => throw new InvalidOperationException($"Unsupported event type '{evt?.EventType}' for element '{element?.GetType().Name}'.")
             };
 #pragma warning restore CS8604 // Possible null reference argument.
 #pragma warning restore CS8603 // Possible null reference return.

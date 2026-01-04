@@ -1,4 +1,6 @@
-﻿using UIFramework.PredefinedPages;
+﻿using System;
+using System.Collections.Generic;
+using UIFramework.PredefinedPages;
 
 namespace UIFramework.Helpers
 {
@@ -31,6 +33,35 @@ namespace UIFramework.Helpers
             }
 
             return null;
+        }
+
+        public static IEnumerable<T> FindAllByType<T>(this Page page) where T : UIElement
+        {
+            if (page == null)
+                throw new ArgumentNullException(nameof(page));
+
+            var results = new List<T>();
+
+            foreach (var el in page.Children)
+            {
+                CollectRecursive(el, results);
+            }
+
+            return results;
+        }
+
+        private static void CollectRecursive<T>(UIElement element, List<T> results) where T : UIElement
+        {
+            if (element is T matched)
+                results.Add(matched);
+
+            if (element is ContainerElement container)
+            {
+                foreach (var child in container.Children)
+                {
+                    CollectRecursive(child, results);
+                }
+            }
         }
     }
 }
