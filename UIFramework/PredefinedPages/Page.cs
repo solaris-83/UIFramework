@@ -279,7 +279,9 @@ namespace UIFramework.PredefinedPages
             var feedback = new UIFeedback(FeedbackMode.Countdown, "countdown", (ms * 1000).ToString() /* BasicLibraries.UTILITY.FormatDuration(ms * 1000)*/, ms, isManual);
             _currentTab.Add(feedback);
             _updated?.Invoke(this, feedback.GetType());
-            feedback.TickElapsed += Feedback_TickElapsed;
+            feedback.TickElapsed += Feedback_TickElapsed; // TODO Bisogna desottoscriversi
+            if (!isManual)
+                feedback.StartCountdown();
             return feedback;
         }
 

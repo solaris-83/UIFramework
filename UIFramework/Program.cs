@@ -262,7 +262,7 @@ class Program
 
     // =================== DA FARE DOMANI 
     // Implementare Addbulleteditem, ecc, 
-    // testare Feedback con countdown e progress dentro una pagina con/senza Start automatico.
+    // testare Feedback con countdown e progress dentro una pagina con/senza Start automatico. Bisogna registrarsi agli eventi tick una sola volta per la stessa feedback
 
     static void Main()
     {
@@ -305,7 +305,7 @@ class Program
         tab2.Add(new UILabel("Opzioni avanzate"));
         customPage.TabControl.Add(tab1);
         customPage.TabControl.Add(tab2);
-        var feedback = customPage.AddFeedbackCountdown(15000);
+        var feedback = customPage.AddFeedbackCountdown(15000);  // 15 secondi, non parte automaticamente
         libraryUI.ShowAndWait(customPage);
 
 
