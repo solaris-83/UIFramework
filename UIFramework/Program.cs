@@ -1,7 +1,6 @@
 ﻿
 using Newtonsoft.Json;
 using UIFramework;
-using UIFramework.Helpers;
 using UIFramework.PredefinedPages;
 
 /*
@@ -259,10 +258,10 @@ class Program
 
 class Program
 {
-
     // =================== DA FARE DOMANI 
-    // Implementare Addbulleteditem, ecc, 
-    // testare Feedback con countdown e progress dentro una pagina con/senza Start automatico. Bisogna registrarsi agli eventi tick una sola volta per la stessa feedback
+    // Correggere Addbulleteditem, OrderedItem perché devono usare una UIListElement ecc, 
+    // testare Feedback con countdown e progress dentro una pagina con/senza Start automatico.
+    // Bisogna registrarsi agli eventi tick una sola volta per la stessa feedback
 
     static void Main()
     {
@@ -307,7 +306,6 @@ class Program
         customPage.TabControl.Add(tab2);
         var feedback = customPage.AddFeedbackCountdown(15000);  // 15 secondi, non parte automaticamente
         libraryUI.ShowAndWait(customPage);
-
 
         // Simulo evento JS (selezione di un tab)
         libraryUI.SimulateJsEvent(tabControl.Id, "selectedActiveTabChanged",

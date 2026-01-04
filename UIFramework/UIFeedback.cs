@@ -55,14 +55,15 @@ namespace UIFramework
             States["percentage"] = 0;
         }
 
-        private System.Timers.Timer timer;
-
-        public void StartCountdown()
+        private System.Timers.Timer _timer;
+        
+        public bool StartCountdown()
         {
-            timer = new System.Timers.Timer(1000);
+            _timer = new System.Timers.Timer(1000);
             var tickCommand = new FeedbackTickCommand(this);
-            timer.Start();
-            timer.Elapsed += (_, __) => Timer_Elapsed(_, __, tickCommand); 
+            _timer.Start();
+            _timer.Elapsed += (_, __) => Timer_Elapsed(_, __, tickCommand);
+            return true;
         }
 
         private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e, FeedbackTickCommand? command = null)
@@ -75,15 +76,25 @@ namespace UIFramework
             }
             else
             {
-                timer?.Stop();
+                _timer?.Stop();
             }
         }
 
-        public void StopCountdown()
+        public bool StopCountdown()
         {
-            timer.Stop();
-            timer.Elapsed -= (_, __) => Timer_Elapsed(_, __);
+            _timer.Stop();
+            _timer.Elapsed -= (_, __) => Timer_Elapsed(_, __);
+            return true;
         }
+
+        public bool RestartCountdown()
+        {
+            StopCountdown();
+            Remaining = Totalseconds;
+            Percentage = 0;
+            return StartCountdown();
+        }
+
 
         [JsonIgnore]
         public int Percentage
@@ -114,7 +125,7 @@ namespace UIFramework
         [JsonIgnore]
         public bool IsActive
         {
-            get => timer != null && timer.Enabled;
+            get => _timer != null && _timer.Enabled;
         }
     }
 
