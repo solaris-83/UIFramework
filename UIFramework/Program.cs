@@ -261,10 +261,18 @@ class Program
 {
     static void Main()
     {
+        // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
+        var page = new PageDisclaimer();
+        var par1 = page.AddParagraph("Paragraph #1.", "paragraph", "gray");
+        var par2 = page.AddParagraph("Paragraph #2.", "paragraph", "gray");
+        page.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
+        page.Remove(par2.Id);
+        page.AddImage("Screenshot.png");
         // Istanzio pagina
-        var page = new Page();
+        // page = new Page();
         // Creo una sezione per contenere l'header
-        page.SetTitle("Benvenuto nella mia applicazione", "title");
+        //  page.SetTitle("Benvenuto nella mia applicazione", "title");
+        page.Title = "Demo UIFramework C#";
         page.AddTab("Benvenuto nella mia applicazione", 1, 1);
         page.AddParagraph("Questa è una demo di UIFramework in C#.", "paragraph", "gray");
         page.AddButtonStop(true);
@@ -321,8 +329,8 @@ class Program
         Console.WriteLine("=== LOAD PAGE INIZIALE ===");
         Console.WriteLine(PageSerializer.Serialize(page));
 
-        // Mi registro alle variazioni sugli elementi della pagina
-        page.UIElementUpdated += (sender, args) =>
+        // Mi registro alle variazioni sugli elementi della pagina. Nella BCA sarà quando faccio uno ShwoAndWait o ShowAndContinue
+        page.Updated += (sender, args) =>
         {
             var diffs = dispatcher.EvaluateDiff();
             Console.WriteLine("\n>>> EvaluateDiff");
@@ -332,11 +340,13 @@ class Program
         page.EnableStop();
         page.DisableStop();
 
+        page.AddImage("Screenshot.png");
         var diffs = dispatcher.EvaluateDiff();
         Console.WriteLine("\n>>> EvaluateDiff");
         Console.WriteLine(PageSerializer.Serialize(diffs));
 
-        unorderedList.Remove(label.Id);
+       // unorderedList.Remove(label.Id);
+        page.Remove(par1.Id);
         diffs = dispatcher.EvaluateDiff();
         Console.WriteLine("\n>>> EvaluateDiff");
         Console.WriteLine(PageSerializer.Serialize(diffs));

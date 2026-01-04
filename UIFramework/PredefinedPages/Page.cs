@@ -1,7 +1,7 @@
-﻿
-
-using System.Xml.Linq;
+﻿using Newtonsoft.Json;
+using System.Drawing;
 using UIFramework.Helpers;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace UIFramework.PredefinedPages
 {
@@ -16,25 +16,50 @@ namespace UIFramework.PredefinedPages
             Add(_tabControl);
         }
 
+        private string _title;
+        [JsonIgnore]
+        public string Title 
+        {
+            get => _title;
+            set  
+            {
+                value ??= "Information";
+                SetTitle(value, "info"); 
+                _title = value;
+            }   
+        }
         //protected string Id { get; init; } = Guid.NewGuid().ToString();
 
         //protected string Type { get; private set; }
 
-        public event EventHandler<Page> UIElementUpdated;
+        public event EventHandler<Page> Updated;
 
-        // Per creare il titolo di una page creo una sezione e ci aggiungo una label
-        public bool SetTitle(string idStr, string style)
+        public UILabel SetTitle(string idStr, string style)
         {
-            var section = new UISection();
-            var titleStyle = new Style() { Layout = style };
-            section.SetStyle(titleStyle);
             var titleLabel = new UILabel(idStr);
+            var titleStyle = new Style() { Layout = style };
             titleLabel.SetStyle(titleStyle); // da qui evinco che è un title e quindi usa uno stile particolare
-            section.Add(titleLabel);
-            Add(section);
-            return true;
+           
+            Add(titleLabel);
+            return titleLabel;
         }
 
+        //// Per creare il titolo di una page creo una sezione e ci aggiungo una label
+        //public bool SetTitle(string idStr, string style)
+        //{
+        //    var section = new UISection();
+        //    var titleStyle = new Style() { Layout = style };
+        //    section.SetStyle(titleStyle);
+        //    var titleLabel = new UILabel(idStr);
+        //    titleLabel.SetStyle(titleStyle); // da qui evinco che è un title e quindi usa uno stile particolare
+        //    section.Add(titleLabel);
+        //    Add(section);
+        //    return true;
+        //}
+
+        // TODO UITab o bool?? Devo creare section?
+        // TODO Il tab deve avere come primo parametro lo stile.
+        // TODO non esiste la possibilità di mettere l'header?
         public UITab AddTab(string title, int rows, int cols)  // TODO UITab o bool?? Devo creare section?
         {
             _currentTab = new UITab(title, rows, cols);
@@ -43,11 +68,11 @@ namespace UIFramework.PredefinedPages
             return _currentTab;
         }
 
-        public bool AddImage(string imageName)
+        public UIImage AddImage(string imageName)
         {
             var image = new UIImage(imageName);
             //string imagePath = Path.Combine(ExecutionResultManager.Global.Directories.ModuleFolder, "Resources", "img", imageName);
-            string imagePath = Path.Combine("Resources", "img", imageName);
+            string imagePath = Path.Combine("Helpers", "imgs", imageName);
             if (!File.Exists(imagePath))
             {
                // _logger.Error($"Image not found in the Working Unit {element.Source}");
@@ -55,66 +80,98 @@ namespace UIFramework.PredefinedPages
 
             image.Src = ImageHelper.ConvertImageToBase64(imagePath);
             _currentTab.Add(image);
-            return true;
+            return image;
         }
 
-        public bool AddParagraph(string idStr)
+        public UIImage UpdateImage(string imageId, string newImageName)
+        {
+            var image = this.FindById(imageId);
+            if (image == null || image is not UIImage img)
+                return null;
+            string imagePath = Path.Combine("Resources", "img", newImageName);
+            if (!File.Exists(imagePath))
+            {
+                // _logger.Error($"Image not found in the Working Unit {element.Source}");
+                return null;
+            }
+            img.Src = ImageHelper.ConvertImageToBase64(imagePath);
+            Updated?.Invoke(img, this);
+            return img;
+        }
+
+        public UILabel AddParagraph(string idStr)
         {
             return AddParagraph(idStr, "", "");
         }
 
-        public bool AddParagraph(string idStr, string style, string color) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
+        public UILabel AddParagraph(string idStr, string style, string color) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
         {
             var label = new UILabel(idStr);
             label.SetStyle(new Style() { Layout = style, ForegroundColor = color });
             _currentTab.Add(label);
-            return true;
+            return label;
+        }
+
+        public UILabel UpdateParagraph(string paragraphId, string newIdStr) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
+        {
+            return UpdateParagraph(paragraphId, newIdStr, "", "");
+        }
+
+        public UILabel UpdateParagraph(string paragraphId, string newIdStr, string style, string color) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
+        {
+            var paragraph = this.FindById(paragraphId);
+            if (paragraph == null || paragraph is not UILabel label)
+                return null;
+            label.SetStyle(new Style() { Layout = style, ForegroundColor = color });
+            label.Text = newIdStr;
+            Updated?.Invoke(label, this);
+            return label;
         }
 
         #region ADD BUTTON 
-        public bool AddButton(string id)
+        public UIButton AddButton(string id)
         {
             var button = new UIButton(id, false, ""); // non c'è uno stile per il default??
             _currentTab.Add(button);
-            return true;
+            return button;
         }
 
-        public bool AddButton(string id, bool isEnabled, string style)
+        public UIButton AddButton(string id, bool isEnabled, string style)
         {
             var button = new UIButton(id, isEnabled, style);
             _currentTab.Add(button);
-            return true;
+            return button;
         }
 
-        public bool AddButton(string id, bool isEnabled)
+        public UIButton AddButton(string id, bool isEnabled)
         {
             var button = new UIButton(id, isEnabled, "");
             _currentTab.Add(button);
-            return true;
+            return button;
         }
 
-        public bool AddButton(string id, string text)
+        public UIButton AddButton(string id, string text)
         {
             var button = new UIButton(id, false, "", text);
             _currentTab.Add(button);
-            return true;
+            return button;
         }
 
-        public bool AddButton(string id, string text, bool isEnabled)
+        public UIButton AddButton(string id, string text, bool isEnabled)
         {
             var button = new UIButton(id, isEnabled, "standard", text);
             _currentTab.Add(button);
-            return true;
+            return button;
         }
         #endregion
 
         #region STOP BUTTON (ABORT)
-        public bool AddButtonStop()
+        public UIButton AddButtonStop()
         {
             return AddButton(STOP_BUTTON_TEXT, true, "danger");
         }
 
-        public bool AddButtonStop(bool isEnabled)
+        public UIButton AddButtonStop(bool isEnabled)
         {
             return AddButton(STOP_BUTTON_TEXT, isEnabled, "danger");
         }
@@ -128,7 +185,7 @@ namespace UIFramework.PredefinedPages
                 btn.Enabled = true;
             //button.Enabled = true;
             // TODO Mettere un warning se non ci si è registrati all'evento
-            UIElementUpdated?.Invoke(button, this);
+            Updated?.Invoke(button, this);
             return true;
         }
 
@@ -140,9 +197,12 @@ namespace UIFramework.PredefinedPages
             if (button is UIButton btn)
                 btn.Enabled = false;
             // TODO Mettere un warning se non ci si è registrati all'evento
-            UIElementUpdated?.Invoke(button, this);
+            Updated?.Invoke(button, this);
             return true;
         }
         #endregion
+
+        // TODO sostituire con il tipo corretto di messaggio
+        public virtual void ReceiveUpdate(object message) { }
     }
 }

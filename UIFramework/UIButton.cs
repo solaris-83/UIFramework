@@ -6,15 +6,17 @@ namespace UIFramework
 {
     public class UIButton : UIElement
     {
-        public UIButton(string id, bool enabled) : base(id)
+        public UIButton(string tag, bool enabled)
         {
-            Props["text"] = id;
+            Props["tag"] = tag;
+            Props["text"] = tag;
             States["enabled"] = enabled;
         }
 
-        public UIButton(string id,  bool enabled, string style) : base(id)
+        public UIButton(string tag,  bool enabled, string style)
         {
-            Props["text"] = id;
+            Props["tag"] = tag;
+            Props["text"] = tag;
             States["enabled"] = enabled;
             Props["style"] = new Style
             {
@@ -22,8 +24,9 @@ namespace UIFramework
             };
         }
 
-        public UIButton(string id, bool enabled, string style, string translation) : base(id)
+        public UIButton(string tag, bool enabled, string style, string translation)
         {
+            Props["tag"] = tag;
             Props["text"] = translation;
             States["enabled"] = enabled;
             Props["style"] = new Style

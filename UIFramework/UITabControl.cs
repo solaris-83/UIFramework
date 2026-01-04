@@ -1,12 +1,10 @@
 ﻿using Newtonsoft.Json;
-using System.Runtime.CompilerServices;
 
 namespace UIFramework
 {
     public class UITabControl : ContainerElement
     {
         [JsonIgnore]
-        //[System.Text.Json.Serialization.JsonIgnore] // System.Text.Json
         public string SelectedTabId
         {
             get => States.TryGetValue("selectedTabId", out var v) ? v?.ToString() : null;
@@ -38,17 +36,23 @@ namespace UIFramework
             Props["grid"] = new Grid(rows, cols);
         }
 
-        public UITab(string title, int rows, int cols) : this(rows, cols)
+        public UITab(string tag, int rows, int cols)
         {
-            Props["title"] = title;
+            Props["tag"] = tag;
+            Props["grid"] = new Grid(rows, cols);
         }
 
-        [JsonIgnore]
-        public string Title
-        {
-            get => Props["title"]?.ToString();
-            set => Props["title"] = value;
-        }
+        //public UITab(string id, int rows, int cols) : this(id, rows, cols)
+        //{
+        //   // Props["title"] = title;
+        //}
+
+        //[JsonIgnore]
+        //public string Title
+        //{
+        //    get => Props["title"]?.ToString();
+        //    set => Props["title"] = value;
+        //}
 
         [JsonIgnore]
         public Grid Grid

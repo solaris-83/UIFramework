@@ -4,13 +4,13 @@ namespace UIFramework
 
     public class UIElement
     {
-        public UIElement(string id)
-        {
-            Id = id;
-            Props["type"] = GetType().Name;
-            Props["style"] = new Style();
-            States["visible"] = true;
-        }
+        //public UIElement(string id)
+        //{
+        //    Id = id;
+        //    Props["type"] = GetType().Name;
+        //    Props["style"] = new Style();
+        //    States["visible"] = true;
+        //}
 
         public UIElement()
         {
@@ -22,7 +22,7 @@ namespace UIFramework
 
         public void SetStyle(Style style)
         {
-            Props["style"] = new Style();
+            Props["style"] = style;
         }
 
         public Dictionary<string, object> Props { get; } = new();

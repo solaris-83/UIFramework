@@ -7,6 +7,9 @@ namespace UIFramework
         Countdown,
         ProgressBar
     }
+
+    // TODO createsectioncountdown si può rimuovere e usare AddFeedbackCountdown? diciamo di farlo?
+
     public class UIFeedback : UIElement
     {
         public event EventHandler<int> TickElapsed;
