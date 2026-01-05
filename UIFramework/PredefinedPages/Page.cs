@@ -46,8 +46,15 @@ namespace UIFramework.PredefinedPages
             }
             remove
             {
+                // Properly unsubscribe the delegate instead of overwriting it
                 _updated = value;
             }
+        }
+
+        // Protected helper to allow derived classes to raise the event
+        protected virtual void OnUpdated(Type updatedType)
+        {
+            _updated?.Invoke(this, updatedType);
         }
 
         public UILabel SetTitle(string idStr, string style)
@@ -56,7 +63,7 @@ namespace UIFramework.PredefinedPages
             var titleStyle = new Style() { Layout = style };
             titleLabel.SetStyle(titleStyle); // da qui evinco che è un title e quindi usa uno stile particolare
             Add(titleLabel);
-            _updated?.Invoke(this, titleLabel.GetType());
+            OnUpdated(titleLabel.GetType());
             return titleLabel;
         }
 
@@ -97,7 +104,7 @@ namespace UIFramework.PredefinedPages
 
             image.Src = ImageHelper.ConvertImageToBase64(imagePath);
             _currentTab.Add(image);
-            _updated?.Invoke(this, image.GetType());
+            OnUpdated(image.GetType());
             return image;
         }
 
@@ -113,7 +120,7 @@ namespace UIFramework.PredefinedPages
                 return null;
             }
             img.Src = ImageHelper.ConvertImageToBase64(imagePath);
-            _updated?.Invoke(this, img.GetType());
+            OnUpdated(img.GetType());
             return img;
         }
 
@@ -122,7 +129,7 @@ namespace UIFramework.PredefinedPages
             UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
             label.SetStyle(new Style() { Layout = "list-item-unordered" });
             _currentTab.Add(label);
-            _updated?.Invoke(this, label.GetType());
+            OnUpdated(label.GetType());
             return label;
         }
 
@@ -132,7 +139,7 @@ namespace UIFramework.PredefinedPages
             if (item == null || item is not UILabel label)
                 return null;
             label.Text = newIdStr;
-            _updated?.Invoke(this, label.GetType());
+            OnUpdated(label.GetType());
             return label;
         }
 
@@ -144,7 +151,7 @@ namespace UIFramework.PredefinedPages
             label.SetStyle(new Style() { Layout = "list-item-ordered" });
             label.Tag = index;
             _currentTab.Add(label);
-            _updated?.Invoke(this, label.GetType());
+            OnUpdated(label.GetType());
             return label;
         }
 
@@ -169,7 +176,7 @@ namespace UIFramework.PredefinedPages
             var label = new UILabel(idStr);
             label.SetStyle(new Style() { Layout = style, ForegroundColor = color });
             _currentTab.Add(label);
-            _updated?.Invoke(this, label.GetType());
+            OnUpdated(label.GetType());
             return label;
         }
 
@@ -185,7 +192,7 @@ namespace UIFramework.PredefinedPages
                 return null;
             label.SetStyle(new Style() { Layout = style, ForegroundColor = color });
             label.Text = newIdStr;
-            _updated?.Invoke(this, label.GetType());
+            OnUpdated(label.GetType());
             return label;
         }
 
@@ -194,7 +201,7 @@ namespace UIFramework.PredefinedPages
         {
             var button = new UIButton(id, false, ""); // non c'è uno stile per il default??
             _currentTab.Add(button);
-            _updated?.Invoke(this, button.GetType());
+            OnUpdated(button.GetType());
             return button;
         }
 
@@ -202,7 +209,7 @@ namespace UIFramework.PredefinedPages
         {
             var button = new UIButton(id, isEnabled, style);
             _currentTab.Add(button);
-            _updated?.Invoke(this, button.GetType());
+            OnUpdated(button.GetType());
             return button;
         }
 
@@ -210,7 +217,7 @@ namespace UIFramework.PredefinedPages
         {
             var button = new UIButton(id, isEnabled, "");
             _currentTab.Add(button);
-            _updated?.Invoke(this, button.GetType());
+            OnUpdated(button.GetType());
             return button;
         }
 
@@ -218,7 +225,7 @@ namespace UIFramework.PredefinedPages
         {
             var button = new UIButton(id, false, "", text);
             _currentTab.Add(button);
-            _updated?.Invoke(this, button.GetType());
+            OnUpdated(button.GetType());
             return button;
         }
 
@@ -226,7 +233,7 @@ namespace UIFramework.PredefinedPages
         {
             var button = new UIButton(id, isEnabled, "standard", text);
             _currentTab.Add(button);
-            _updated?.Invoke(this, button.GetType());
+            OnUpdated(button.GetType());
             return button;
         }
         #endregion
@@ -251,7 +258,7 @@ namespace UIFramework.PredefinedPages
                 btn.Enabled = true;
             //button.Enabled = true;
             // TODO Mettere un warning se non ci si è registrati all'evento
-            _updated?.Invoke(this, button.GetType());
+            OnUpdated(button.GetType());
             return true;
         }
 
@@ -263,7 +270,7 @@ namespace UIFramework.PredefinedPages
             if (button is UIButton btn)
                 btn.Enabled = false;
             // TODO Mettere un warning se non ci si è registrati all'evento
-            _updated?.Invoke(this, button.GetType());
+            OnUpdated(button.GetType());
             return true;
         }
         #endregion
@@ -278,7 +285,7 @@ namespace UIFramework.PredefinedPages
         {
             var feedback = new UIFeedback(FeedbackMode.Countdown, "countdown", (ms * 1000).ToString() /* BasicLibraries.UTILITY.FormatDuration(ms * 1000)*/, ms, isManual);
             _currentTab.Add(feedback);
-            _updated?.Invoke(this, feedback.GetType());
+            OnUpdated(feedback.GetType());
             feedback.TickElapsed += Feedback_TickElapsed; // TODO Bisogna desottoscriversi
             if (!isManual)
                 feedback.StartCountdown();
@@ -287,14 +294,14 @@ namespace UIFramework.PredefinedPages
 
         private void Feedback_TickElapsed(object? sender, int e)
         {
-            _updated?.Invoke(this, sender.GetType());
+            OnUpdated(sender.GetType());
         }
 
         public UIFeedback AddFeedbackProgress(int perc)
         {
             var feedback = new UIFeedback(FeedbackMode.ProgressBar, "progress", "", perc);
             _currentTab.Add(feedback);
-            _updated?.Invoke(this, feedback.GetType());
+            OnUpdated(feedback.GetType());
             return feedback;
         }
 
@@ -308,7 +315,7 @@ namespace UIFramework.PredefinedPages
             //msg = TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(msg);
             var feedback = new UIFeedback(FeedbackMode.Message, "message", msg);
             _currentTab.Add(feedback);
-            _updated?.Invoke(this, feedback.GetType());
+            OnUpdated(feedback.GetType());
             return feedback;
         }
 

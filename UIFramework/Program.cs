@@ -267,15 +267,82 @@ class Program
     {
         LibraryUI libraryUI = new LibraryUI();
         // =========== MENU PAGE ===========
+        // Singola selezione con checkbox
         var menuPage = libraryUI.CreatePageMenu();
         menuPage.HasCheckboxes = true;
         menuPage.IsMultipleSelection = false;
         menuPage.SetMessage("S_COMP");
-        menuPage.AddItem("Activate_Injectors", "Activte_Injectors");
-        menuPage.AddItem("Activate_Coils", "Activte_Ignition_Coil");
-        menuPage.AddItem("Deactivate_Injectors", "Deactivte_Injectors");
-        libraryUI.ShowAndWait(menuPage);  
-        
+        var chbx1 = menuPage.AddItem("Activate_Injectors", "Activte_Injectors");
+        var chbx2 = menuPage.AddItem("Activate_Coils", "Activte_Ignition_Coil");
+        var chbx3 = menuPage.AddItem("Deactivate_Injectors", "Deactivte_Injectors");
+        libraryUI.ShowAndWait(menuPage);
+
+        Console.WriteLine("HasCheckBoxes " + menuPage.HasCheckboxes);
+        Console.WriteLine("IsMultipleSelection " + menuPage.IsMultipleSelection);
+        Console.WriteLine("SelectedId " + menuPage.SelectedId);
+        Console.WriteLine("SelectedIndex " + menuPage.SelectedIndex);
+        Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAny("Activate_Injectors"));
+        Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAny(0));
+
+        // Simulo evento JS (selezione di un tab)
+        libraryUI.SimulateJsEvent(chbx1.Id, "propertyChanged",
+            new Dictionary<string, object> { ["checked"] = true });
+
+        Console.WriteLine("HasCheckBoxes " + menuPage.HasCheckboxes);
+        Console.WriteLine("IsMultipleSelection " + menuPage.IsMultipleSelection);
+        Console.WriteLine("SelectedId " + menuPage.SelectedId);
+        Console.WriteLine("SelectedIndex " + menuPage.SelectedIndex);
+        Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAny("Activate_Injectors"));
+        Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAny(0));
+
+        // Multipla selezione con checkbox
+        menuPage = libraryUI.CreatePageMenu();
+        menuPage.HasCheckboxes = true;
+        menuPage.IsMultipleSelection = true;
+        menuPage.SetMessage("S_COMP");
+        chbx1 = menuPage.AddItem("Activate_Injectors", "Activte_Injectors");
+        chbx2 = menuPage.AddItem("Activate_Coils", "Activte_Ignition_Coil");
+        chbx3 = menuPage.AddItem("Deactivate_Injectors", "Deactivte_Injectors");
+        libraryUI.ShowAndWait(menuPage);
+
+        Console.WriteLine("HasCheckBoxes " + menuPage.HasCheckboxes);
+        Console.WriteLine("IsMultipleSelection " + menuPage.IsMultipleSelection);
+        try
+        {
+            Console.WriteLine("SelectedId " + menuPage.SelectedId);
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        try
+        {
+            Console.WriteLine("SelectedIndex " + menuPage.SelectedIndex);
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+        Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAny("Activate_Injectors"));  
+        Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAny(0));  
+
+        // Simulo evento JS (selezione di un tab)
+        libraryUI.SimulateJsEvent(chbx1.Id, "propertyChanged",
+            new Dictionary<string, object> { ["checked"] = true });
+        libraryUI.SimulateJsEvent(chbx2.Id, "propertyChanged",
+            new Dictionary<string, object> { ["checked"] = true });
+
+        Console.WriteLine("HasCheckBoxes " + menuPage.HasCheckboxes);
+        Console.WriteLine("IsMultipleSelection " + menuPage.IsMultipleSelection);
+        Console.WriteLine("SelectedIds Count " + menuPage.SelectedIds.Count);
+        Console.WriteLine("SelectedIndexes Count " + menuPage.SelectedIndexes.Count);
+        Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAny("Activate_Injectors", "Activate_Coils")); 
+        Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAny(0, 1));
+
+        Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAll("Activate_Injectors", "Activate_Coils"));  // TODO non funziona capire come mai con Alberto
+        Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAll(0, 1));   // TODO non funziona capire come mai con Alberto
+
         // ==== DISCLAIMER PAGE ====
         // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
         var page = libraryUI.CreatePageDisclaimer();

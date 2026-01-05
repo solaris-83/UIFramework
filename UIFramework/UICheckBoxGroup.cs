@@ -3,18 +3,19 @@ namespace UIFramework
 {
     internal class UICheckBoxGroup : ContainerElement
     {
-        public IEnumerable<UICheckbox> AllCheckboxes => Children.OfType<UICheckbox>();
+        public IList<UICheckbox> AllCheckboxes => Children.OfType<UICheckbox>().ToList();
        
-        public IEnumerable<UICheckbox> SelectedCheckboxes
-            => AllCheckboxes.Where(c => c.Checked);
+        public IList<UICheckbox> SelectedCheckboxes
+            => AllCheckboxes.Where(c => c.Checked).ToList();
 
         public UICheckbox SelectedCheckbox
             => AnySelected ? SelectedCheckboxes.Single() : null;
 
-        public IEnumerable<int> SelectedIndexes
+        public IList<int> SelectedIndexes
             => AllCheckboxes.Select((item, index) => new { item, index })
                             .Where(x => x.item.Checked)
-                            .Select(x => x.index);
+                            .Select(x => x.index)
+                            .ToList();
 
         public int SelectedIndex
             => AnySelected ? SelectedIndexes.Single() : -1;

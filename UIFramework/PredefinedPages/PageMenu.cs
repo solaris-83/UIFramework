@@ -37,11 +37,29 @@ namespace UIFramework.PredefinedPages
             throw new InvalidOperationException("You cannot retrieve SelectedIndex if IsMutipleSection is set to TRUE. Use SelectedIds instead.");
 
         [JsonIgnore]
-        public DataArray SelectedIndexes => new DataArray(_checkboxgroup.SelectedIndexes);
+        public DataArray SelectedIndexes
+        {
+            get
+            {
+                var da = new DataArray();
+                foreach (var idx in _checkboxgroup.SelectedIndexes)
+                    da.Add(idx);
+                return da;
+            }
+        }
         
 
         [JsonIgnore]
-        public DataArray SelectedIds => new DataArray(_checkboxgroup.SelectedCheckboxes.Select(chk => chk.Tag));
+        public DataArray SelectedIds
+        {
+            get
+            {
+                var da = new DataArray();
+                foreach (var chb in _checkboxgroup.SelectedCheckboxes)
+                    da.Add(chb.Tag);
+                return da;
+            }
+        }
 
 
         public PageMenu() : base()
@@ -59,6 +77,7 @@ namespace UIFramework.PredefinedPages
         {
             var chkbox = new UICheckbox(idStr, isChecked: false, isEnabled: true, tag);
             _checkboxgroup.Add(chkbox);
+            OnUpdated(chkbox.GetType());
             return chkbox;
         }
 
