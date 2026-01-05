@@ -62,12 +62,12 @@ namespace UIFramework
             set => Props["text"] = value;
         }
 
-        public class ButtonChangedCommand : ICommand
+        public class ButtonPropertyChangedCommand : ICommand
         {
             private readonly UIButton _button;
             private readonly Dictionary<string, object> _states;
 
-            public ButtonChangedCommand(UIButton button, Dictionary<string, object> states)
+            public ButtonPropertyChangedCommand(UIButton button, Dictionary<string, object> states)
             {
                 _button = button;
                 _states = states;

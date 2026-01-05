@@ -14,7 +14,26 @@ namespace UIFramework
 
     public class UIFeedback : UIElement
     {
-        public event EventHandler<int> TickElapsed;
+        // Backing field for the event delegate
+        private EventHandler<int> _tickElapsed;
+
+        // Custom event with controlled add/remove
+        public event EventHandler<int> TickElapsed
+        {
+            add
+            {
+                if (_tickElapsed != null)
+                {
+                    throw new InvalidOperationException("TickElapsed already has a subscriber.");
+                }
+                _tickElapsed = value;
+            }
+            remove
+            {
+                _tickElapsed = value;
+            }
+        }
+        
         public UIFeedback(FeedbackMode feedbackMode, string style, string text, int ms)
         {
             Props["tag"] = $"feedback-{style}";
@@ -72,7 +91,7 @@ namespace UIFramework
             if (Remaining > 0)
             {
                 command?.Execute();
-                TickElapsed?.Invoke(this, Remaining);
+                _tickElapsed?.Invoke(this, Remaining);
             }
             else
             {

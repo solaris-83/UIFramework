@@ -3,7 +3,7 @@ using UIFramework.Helpers;
 
 namespace UIFramework.PredefinedPages
 {
-    public class Page : ContainerElement
+    public class Page : ContainerElement, IDisposable
     {
         private UITabControl _tabControl;
         private UITab _currentTab;
@@ -40,13 +40,13 @@ namespace UIFramework.PredefinedPages
             {
                 if (_updated != null)
                 {
-                    throw new InvalidOperationException("This event already has a subscriber.");
+                    throw new InvalidOperationException("Updated event already has a subscriber.");
                 }
                 _updated = value;
             }
             remove
             {
-                _updated -= value;
+                _updated = value;
             }
         }
 
@@ -80,7 +80,7 @@ namespace UIFramework.PredefinedPages
         {
             _currentTab = new UITab(title, rows, cols);
             _tabControl.Add(_currentTab);
-            _tabControl.SelectedActiveTabId = _currentTab.Id;
+            _tabControl.ActiveTabId = _currentTab.Id;
             // non so se serve l'evento, per il momento non lo mettiamo
             return _currentTab;
         }
@@ -161,7 +161,7 @@ namespace UIFramework.PredefinedPages
 
         public UILabel AddParagraph(string idStr)
         {
-            return AddParagraph(idStr, "", "");
+            return AddParagraph(idStr, "paragraph", "");
         }
 
         public UILabel AddParagraph(string idStr, string style, string color) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
@@ -316,5 +316,10 @@ namespace UIFramework.PredefinedPages
 
         // TODO sostituire con il tipo corretto di messaggio
         public virtual void ReceiveUpdate(object message) { }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

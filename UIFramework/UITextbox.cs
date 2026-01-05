@@ -25,12 +25,12 @@ namespace UIFramework
             set => States["enabled"] = value;
         }
     }
-    public class TextChangedCommand : ICommand
+    public class TextPropertyChangedCommand : ICommand
     {
         private readonly UITextbox _textBox;
         private readonly Dictionary<string, object> _states;
 
-        public TextChangedCommand(UITextbox textBox, Dictionary<string, object> states)
+        public TextPropertyChangedCommand(UITextbox textBox, Dictionary<string, object> states)
         {
             _textBox = textBox;
             _states = states;

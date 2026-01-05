@@ -22,40 +22,40 @@ namespace UIFramework
 #pragma warning disable CS8604 // Possible null reference argument.
             return element switch
             {
-                UITabControl tabControl when evt?.EventType == "selectedActiveTabChanged"
-                    => new TabControlChangedCommand(
+                UITabControl tabControl when evt?.EventType == "propertyChanged" // activeTabChanged
+                    => new TabControlPropertyChangedCommand(
                         tabControl,
-                        //evt.Payload["selectedActiveTabId"]?.ToString()
+                        //evt.Payload["activeTabId"]?.ToString()
                         evt.Payload),
 
-                UIButton btn when evt?.EventType == "enabledChanged"
-                    => new ButtonChangedCommand(
+                UIButton btn when evt?.EventType == "propertyChanged" // "enabledChanged"
+                    => new ButtonPropertyChangedCommand(
                         btn,
                         evt.Payload
                         //Convert.ToBoolean(evt.Payload["enabled"])
                         ),
 
-                UIButton btn when evt?.EventType == "visibilityChanged"
-                    => new ButtonChangedCommand(
+                UIButton btn when evt?.EventType == "propertyChanged" // "visibilityChanged"
+                    => new ButtonPropertyChangedCommand(
                         btn,
                         evt.Payload
                         //Convert.ToBoolean(evt.Payload["visible"])
                         ),
 
-                UICheckbox cb when evt?.EventType == "checked"
-                    => new CheckboxChangedCommand(
+                UICheckbox cb when evt?.EventType == "propertyChanged" // "checked"
+                    => new CheckboxPropertyChangedCommand(
                         cb,
                         // Convert.ToBoolean(evt.Payload["checked"])
                         evt.Payload),
 
-                UITextbox tb when evt?.EventType == "valueChanged"
-                    => new TextChangedCommand(
+                UITextbox tb when evt?.EventType == "propertyChanged" // "valueChanged"
+                    => new TextPropertyChangedCommand(
                         tb,
                         // evt.Payload["value"]?.ToString()
                         evt.Payload),
 
-                UIDropDown dd when evt?.EventType == "selectedValueChanged"
-                     => new DropDownChangedCommand(
+                UIDropDown dd when evt?.EventType == "propertyChanged" // "selectedValueChanged"
+                     => new DropDownPropertyChangedCommand(
                          dd,
                          // evt.Payload["selected"]?.ToString()
                          evt.Payload),

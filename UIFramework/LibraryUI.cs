@@ -18,6 +18,11 @@ namespace UIFramework
             return new PageResult();
         }
 
+        public PageMenu CreatePageMenu()
+        {
+            return new PageMenu();
+        }
+
         public Page CreatePage()
         {
             return new Page();

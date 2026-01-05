@@ -14,7 +14,7 @@ namespace UIFramework
             if (element is UITab tab)
             {
                 base.Add(tab);
-                SelectedActiveTabId = tab.Id;
+                ActiveTabId = tab.Id;
             }
             else
             {
@@ -23,18 +23,18 @@ namespace UIFramework
         }
 
         [JsonIgnore]
-        public string SelectedActiveTabId
+        public string ActiveTabId
         {
-            get => States.TryGetValue("selectedActiveTabId", out var v) ? v?.ToString() : null;
-            set => States["selectedActiveTabId"] = value;
+            get => States.TryGetValue("activeTabId", out var v) ? v?.ToString() : null;
+            set => States["activeTabId"] = value;
         } 
         
-        public class TabControlChangedCommand : ICommand
+        public class TabControlPropertyChangedCommand : ICommand
         { 
             private readonly UITabControl _tabControl;
             private readonly Dictionary<string, object> _states;
 
-            public TabControlChangedCommand(UITabControl tabControl, Dictionary<string, object> states)
+            public TabControlPropertyChangedCommand(UITabControl tabControl, Dictionary<string, object> states)
             {
                 _tabControl = tabControl;
                 _states = states;

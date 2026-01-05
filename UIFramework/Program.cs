@@ -259,13 +259,23 @@ class Program
 class Program
 {
     // =================== DA FARE DOMANI 
-    // Correggere Addbulleteditem, OrderedItem perché devono usare una UIListElement ecc, 
-    // testare Feedback con countdown e progress dentro una pagina con/senza Start automatico.
+    // (OBSOLETE) Correggere Addbulleteditem, OrderedItem perché devono usare una UIListElement ecc, 
+    // (OK) testare Feedback con countdown e progress dentro una pagina con/senza Start automatico.
     // Bisogna registrarsi agli eventi tick una sola volta per la stessa feedback
 
     static void Main()
     {
         LibraryUI libraryUI = new LibraryUI();
+        // =========== MENU PAGE ===========
+        var menuPage = libraryUI.CreatePageMenu();
+        menuPage.HasCheckboxes = true;
+        menuPage.IsMultipleSelection = false;
+        menuPage.SetMessage("S_COMP");
+        menuPage.AddItem("Activate_Injectors", "Activte_Injectors");
+        menuPage.AddItem("Activate_Coils", "Activte_Ignition_Coil");
+        menuPage.AddItem("Deactivate_Injectors", "Deactivte_Injectors");
+        libraryUI.ShowAndWait(menuPage);  
+        
         // ==== DISCLAIMER PAGE ====
         // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
         var page = libraryUI.CreatePageDisclaimer();
@@ -308,15 +318,15 @@ class Program
         libraryUI.ShowAndWait(customPage);
 
         // Simulo evento JS (selezione di un tab)
-        libraryUI.SimulateJsEvent(tabControl.Id, "selectedActiveTabChanged",
-            new Dictionary<string, object> { ["selectedActiveTabId"] = firstTab.Id });
+        libraryUI.SimulateJsEvent(tabControl.Id, "propertyChanged",
+            new Dictionary<string, object> { ["activeTabId"] = firstTab.Id });
 
         // Simulo evento JS (enable/disable di un button)
-        libraryUI.SimulateJsEvent(continueButton.Id, "enabledChanged",
+        libraryUI.SimulateJsEvent(continueButton.Id, "propertyChanged",
             new Dictionary<string, object> { ["enabled"] = false });
 
         // Simulo evento JS (visibilità di un button)
-        libraryUI.SimulateJsEvent(continueButton.Id, "visibilityChanged",
+        libraryUI.SimulateJsEvent(continueButton.Id, "propertyChanged",
             new Dictionary<string, object> { ["visible"] = false });
 
         // Faccio partire il countdown
@@ -327,8 +337,8 @@ class Program
         Thread.Sleep(5000);
         // Faccio partire il countdown
         feedback.StartCountdown();
-        Thread.Sleep(5000);
-        feedback.StopCountdown();
+        
+        feedback.RestartCountdown();
         /*
         // Creo una sezione con checkbox e textbox che aggiungo a tab1
         var section1 = new UISection("Preferenze");
@@ -368,7 +378,7 @@ class Program
         // Aggiungo i tab al tabcontrol e lo aggiungo alla pagina
         tabs.Add(tab1);
         tabs.Add(tab2);
-        tabs.SelectedActiveTabId = tab1.Id;
+        tabs.ActiveTabId = tab1.Id;
         page.Add(tabs);
 
         var dispatcher = new UiCommandDispatcher(page);

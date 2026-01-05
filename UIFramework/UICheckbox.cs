@@ -6,10 +6,28 @@ namespace UIFramework
 {
     public class UICheckbox : UIElement
     {
-        public UICheckbox(string text, bool isChecked = false)
+        public UICheckbox(string text, bool isChecked, bool isEnabled)
         {
+            Props["tag"] = null;
             Props["text"] = text;
             States["checked"] = isChecked;
+            States["enabled"] = isEnabled;
+        }
+
+        public UICheckbox(string text, bool isChecked, bool isEnabled, string tag)
+        {
+            Props["tag"] = tag;
+            Props["text"] = text;
+            States["checked"] = isChecked;
+            States["enabled"] = isEnabled;
+        }
+
+        public UICheckbox(string text, bool isEnabled, string tag)
+        {
+            Props["tag"] = tag;
+            Props["text"] = text;
+            States["checked"] = false;
+            States["enabled"] = isEnabled;
         }
 
         [JsonIgnore]
@@ -18,14 +36,21 @@ namespace UIFramework
             get => States.TryGetValue("checked", out var v) && (bool)v;
             set => States["checked"] = value;
         }
+
+        [JsonIgnore]
+        public bool Enabled
+        {
+            get => States.TryGetValue("enabled", out var v) && (bool)v;
+            set => States["enabled"] = value;
+        }
     }
 
-    public class CheckboxChangedCommand : ICommand
+    public class CheckboxPropertyChangedCommand : ICommand
     {
         private readonly UICheckbox _checkbox;
         private readonly Dictionary<string, object> _states;
 
-        public CheckboxChangedCommand(UICheckbox checkbox, Dictionary<string, object> states)
+        public CheckboxPropertyChangedCommand(UICheckbox checkbox, Dictionary<string, object> states)
         {
             _checkbox = checkbox;
             _states = states;
