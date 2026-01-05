@@ -262,6 +262,8 @@ class Program
     // (OBSOLETE) Correggere Addbulleteditem, OrderedItem perché devono usare una UIListElement ecc, 
     // (OK) testare Feedback con countdown e progress dentro una pagina con/senza Start automatico.
     // Bisogna registrarsi agli eventi tick una sola volta per la stessa feedback
+    // Implementare dispose (tra cui eventi) 
+    // Implementare sequence
 
     static void Main()
     {

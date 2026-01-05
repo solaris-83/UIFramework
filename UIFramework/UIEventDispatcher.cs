@@ -3,40 +3,6 @@ using UIFramework.PredefinedPages;
 
 namespace UIFramework
 {
-    //public class UIEventDispatcher
-    //{
-    //    private readonly Page _page;
-
-    //    public UIEventDispatcher(Page page)
-    //    {
-    //        _page = page;
-    //    }
-
-    //    public void Dispatch(UiEvent evt)
-    //    {
-    //        var element = _page.FindById(evt.ElementId);
-    //        if (element == null)
-    //            return;
-
-    //        switch (evt.EventType)
-    //        {
-    //            case "change":
-    //                element.ApplyState(evt.Payload);
-    //                break;
-
-    //            case "click":
-    //                HandleClick(element);
-    //                break;
-    //        }
-    //    }
-
-    //    private void HandleClick(UIElement element)
-    //    {
-    //        // opzionale: eventi applicativi
-    //    }
-    //}
-
-
     public class UiEvent
     {
         public string ElementId { get; set; }
