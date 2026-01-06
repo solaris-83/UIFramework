@@ -15,7 +15,7 @@ namespace UIFramework
         public string Text
         {
             get => States.ContainsKey("text") ? States["text"].ToString() : "";
-            set => States["text"] = value;
+            set { States["text"] = value; OnPropertyChanged(nameof(Text)); }
         }
     }
 }

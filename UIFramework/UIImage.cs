@@ -13,7 +13,7 @@ namespace UIFramework
         public string Src
         {
             get => States.ContainsKey("src")? States["src"].ToString() : "";
-            set => States["src"] = value;
+            set { States["src"] = value; OnPropertyChanged(nameof(Src)); }
         }
     }
 }

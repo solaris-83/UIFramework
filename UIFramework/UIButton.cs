@@ -39,7 +39,7 @@ namespace UIFramework
         public string Text
         {
             get => Props.ContainsKey("text")?  Props["text"].ToString() : "";
-            set => Props["text"] = value;
+            set { Props["text"] = value; OnPropertyChanged(nameof(Text)); }
         }
 
         public class ButtonPropertyChangedCommand : ICommand

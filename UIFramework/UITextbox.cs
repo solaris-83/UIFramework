@@ -15,7 +15,7 @@ namespace UIFramework
         public string Value
         {
             get => States.ContainsKey("value")? States["value"].ToString() : "";
-            set => States["value"] = value;
+            set { States["value"] = value; OnPropertyChanged(nameof(Value)); }
         }
 
         [JsonIgnore]

@@ -34,14 +34,14 @@ namespace UIFramework
         public bool Checked
         {
             get => States.TryGetValue("checked", out var v) && (bool)v;
-            set => States["checked"] = value;
+            set { States["checked"] = value; OnPropertyChanged(nameof(Checked)); }
         }
 
         [JsonIgnore]
         public bool Enabled
         {
             get => States.TryGetValue("enabled", out var v) && (bool)v;
-            set => States["enabled"] = value;
+            set { States["enabled"] = value; OnPropertyChanged(nameof(Enabled)); }
         }
     }
 

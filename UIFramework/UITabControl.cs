@@ -26,7 +26,7 @@ namespace UIFramework
         public string ActiveTabId
         {
             get => States.ContainsKey("activeTabId")? States["activeTabId"].ToString() : "";
-            set => States["activeTabId"] = value;
+            set { States["activeTabId"] = value; OnPropertyChanged(nameof(ActiveTabId)); } 
         } 
         
         public class TabControlPropertyChangedCommand : ICommand

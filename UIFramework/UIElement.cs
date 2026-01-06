@@ -1,11 +1,12 @@
 ﻿
 using Newtonsoft.Json;
+using System.ComponentModel;
 
 namespace UIFramework
 {
-
-    public class UIElement
+    public class UIElement : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
         public UIElement()
         {
             Props["tag"] = null;
@@ -19,21 +20,21 @@ namespace UIFramework
         public object Tag
         {
             get => Props["tag"];
-            set => Props["tag"] = value;
+            set  { Props["tag"] = value; OnPropertyChanged(nameof(Tag)); }
         }
 
         [JsonIgnore]
         public bool Enabled
         {
             get => States.TryGetValue("enabled", out var v) && (bool)v;
-            set => States["enabled"] = value;
+            set { States["enabled"] = value; OnPropertyChanged(nameof(Enabled)); }
         }
 
         [JsonIgnore]
         public bool Visible
         {
             get => States.TryGetValue("visible", out var v) && (bool)v;
-            set => States["visible"] = value;
+            set { States["visible"] = value; OnPropertyChanged(nameof(Visible)); }
         }
 
         [JsonIgnore]
@@ -46,7 +47,7 @@ namespace UIFramework
                     return s;
                 return null;
             }
-            set => Props["style"] = value;
+            set { Props["style"] = value; OnPropertyChanged(nameof(Style)); }
         }
 
         public string Id { get; init; } = Guid.NewGuid().ToString();
@@ -91,6 +92,11 @@ namespace UIFramework
         public virtual void UpdateProps(Action<Dictionary<string, object>> updater)
         {
             updater(Props);
+        }
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 

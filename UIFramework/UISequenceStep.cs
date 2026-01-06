@@ -1,5 +1,6 @@
 ﻿
 using Newtonsoft.Json;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace UIFramework
 {
@@ -18,15 +19,15 @@ namespace UIFramework
         public string Text
         {
             get => States.ContainsKey("text") ? States["text"].ToString() : "";
-            set => States["text"] = value;
+            set { States["text"] = value; OnPropertyChanged(nameof(Text)); }
         }
 
         [JsonIgnore]
         public string Status
         {
             get => States.ContainsKey("status") ? States["status"].ToString() : "";
-            set => States["status"] = value;
-        }
+            set { States["status"] = value; OnPropertyChanged(nameof(Status)); }
+            }
     }
 
     public class UISequence : ContainerElement
@@ -94,7 +95,7 @@ namespace UIFramework
                 }
                 return null;
             }
-            set => States["currentStep"] = value;
+            set { States["currentStep"] = value; OnPropertyChanged(nameof(CurrentStep)); }
         }
     }
 }
