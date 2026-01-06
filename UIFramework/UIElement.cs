@@ -1,4 +1,6 @@
 ﻿
+using Newtonsoft.Json;
+
 namespace UIFramework
 {
 
@@ -10,12 +12,41 @@ namespace UIFramework
             Props["type"] = GetType().Name;
             Props["style"] = new Style();
             States["visible"] = true;
+            States["enabled"] = true;
         }
 
+        [JsonIgnore]
         public object Tag
         {
             get => Props["tag"];
             set => Props["tag"] = value;
+        }
+
+        [JsonIgnore]
+        public bool Enabled
+        {
+            get => States.TryGetValue("enabled", out var v) && (bool)v;
+            set => States["enabled"] = value;
+        }
+
+        [JsonIgnore]
+        public bool Visible
+        {
+            get => States.TryGetValue("visible", out var v) && (bool)v;
+            set => States["visible"] = value;
+        }
+
+        [JsonIgnore]
+        public Style Style
+        {
+            get
+            {
+                Props.TryGetValue("style", out var style);
+                if (style is Style s)
+                    return s;
+                return null;
+            }
+            set => Props["style"] = value;
         }
 
         public string Id { get; init; } = Guid.NewGuid().ToString();

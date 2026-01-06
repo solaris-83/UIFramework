@@ -259,12 +259,14 @@ class Program
 class Program
 {
     // =================== DA FARE DOMANI 
-    // (OBSOLETE) Correggere Addbulleteditem, OrderedItem perché devono usare una UIListElement ecc, 
-    // (OK) testare Feedback con countdown e progress dentro una pagina con/senza Start automatico.
-    // Bisogna registrarsi agli eventi tick una sola volta per la stessa feedback
-    // Implementare dispose (tra cui eventi) 
-    // Implementare sequence  ( ci sono rif. a sequence nella app di tutorial e bundle update => si possono dismettere i vecchi metodi)
-
+    // 1. (OBSOLETE) Correggere Addbulleteditem, OrderedItem perché devono usare una UIListElement ecc, 
+    // 2. (OK) testare Feedback con countdown e progress dentro una pagina con/senza Start automatico.
+    // 3. (OK mi sembra, ricontrollare, magari servirsi della dispose?) Bisogna registrarsi agli eventi tick una sola volta per la stessa feedback
+    // 4. TODO Implementare dispose (tra cui eventi) 
+    // 5. TODO Implementare sequence  ( ci sono rif. a sequence nella app di tutorial e bundle update => si possono dismettere i vecchi metodi)
+    // 6. TODO C'è un problema: per UIELement che devono notificare da C# -> JS se non sono dentro una predefinedPage e quindi non c'è a disposizione l'evento Updated
+    //      abbiamo un problema perché non possiamo chiamare OnUpdated direttamente dalla Add/Update del ContainerElement. E' possibile usare INotifyPropertyChanged?
+    // 7. TODO Verificare se il nuovo metodo Update del ContainerElement può essere  riutilizzato in imepelemtazione già fatte in altro modo.
     static void Main()
     {
         LibraryUI libraryUI = new LibraryUI();
@@ -356,11 +358,18 @@ class Program
 
         Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAll("Activate_Injectors", "Activate_Coils", "NewCheckbox"));  // TODO non funziona capire come mai con Alberto
         Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAll(0, 1, 3));
+        
+        
         // ==== DISCLAIMER PAGE ====
         // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
         var page = libraryUI.CreatePageDisclaimer();
         var par1 = page.AddParagraph("Paragraph #1.", "paragraph", "gray");
         var par2 = page.AddParagraph("Paragraph #2.", "paragraph", "gray");
+        page.AddBulletedItem("#1 bulletted item");
+        page.AddBulletedItem("#2 bulletted item");
+        page.AddOrderedItem("Item 1");
+        page.AddOrderedItem("Item 2");
+        page.AddOrderedItem("Item 3");
         page.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
         page.Remove(par2.Id);
         page.AddImage("Screenshot.png");
@@ -380,7 +389,7 @@ class Program
         // oppure set di Title direttamente
         customPage.Title = "Demo UIFramework C#";
         // Aggiungo un tab
-        var firstTab = customPage.AddTab("Benvenuto nella mia applicazione", 1, 1);
+        var firstTab = customPage.AddTab("mytab", 1, 1);
         // Aggiungo paragrafo e bottoni
         customPage.AddParagraph("Questa è una demo di UIFramework in C#.", "paragraph", "gray");
         customPage.AddButtonStop(true);
@@ -419,101 +428,15 @@ class Program
         feedback.StartCountdown();
         
         feedback.RestartCountdown();
-        /*
-        // Creo una sezione con checkbox e textbox che aggiungo a tab1
-        var section1 = new UISection("Preferenze");
-        var chk = new UICheckbox("Abilita notifiche", false);
-        var txt = new UITextbox("Email", "");
-        var feedbackCountdown = new UIFeedback(FeedbackMode.Countdown, text: "Operazione in corso...", milliseconds: 23000);
-        
-        section1.Add(feedbackCountdown);
-        section1.Add(chk);
-        section1.Add(txt);
-        tab1.Add(section1);
 
-        // Creo una sezione con dropdown, textbox e lista unordered che aggiungo a tab2
-        var section2 = new UISection("Dati");
-        var dropdown = new UIDropDown(
-        [
-            new DropDownOption("IT", "Italia"),
-            new DropDownOption("FR", "Francia"),
-            new DropDownOption("DE", "Germania")
-        ])
-        {
-            Id = "dd-country"
-        };
+        Thread.Sleep(5000);
+        feedback.StopCountdown();
 
-        var name = new UITextbox("Nome") { Id = "txt-name" };
-        section2.Add(dropdown);
-        section2.Add(name);
-
-        var unorderedList = new UIListElement(ListKind.Unordered);
-        var label = new UILabel("Elemento 3");
-        unorderedList.Add(new UILabel("Elemento 1"));
-        unorderedList.Add(new UILabel("Elemento 2"));
-        unorderedList.Add(label);
-        section2.Add(unorderedList);
-        tab2.Add(section2);
-
-        // Aggiungo i tab al tabcontrol e lo aggiungo alla pagina
-        tabs.Add(tab1);
-        tabs.Add(tab2);
-        tabs.ActiveTabId = tab1.Id;
-        page.Add(tabs);
-
-        var dispatcher = new UiCommandDispatcher(page);
-        Console.WriteLine("=== LOAD PAGE INIZIALE ===");
-        Console.WriteLine(PageSerializer.Serialize(page));
-
-
-        */
-
-
-        /*
-        // Mi registro alle variazioni sugli elementi della pagina. Nella BCA sarà quando faccio uno ShwoAndWait o ShowAndContinue
-        page.Updated += (sender, args) =>
-        {
-            var diffs = dispatcher.EvaluateDiff();
-            Console.WriteLine("\n>>> EvaluateDiff");
-            Console.WriteLine(PageSerializer.Serialize(diffs));
-        };
-
-        page.EnableStop();
-        page.DisableStop();
-
-        page.AddImage("Screenshot.png");
-        var diffs = dispatcher.EvaluateDiff();
-        Console.WriteLine("\n>>> EvaluateDiff");
-        Console.WriteLine(PageSerializer.Serialize(diffs));
-
-       // unorderedList.Remove(label.Id);
-        page.Remove(par1.Id);
-        diffs = dispatcher.EvaluateDiff();
-        Console.WriteLine("\n>>> EvaluateDiff");
-        Console.WriteLine(PageSerializer.Serialize(diffs));
-
-        // Simulo evento JS (checkbox click)
-        SimulateJsEvent(dispatcher, chk.Id, "checked",
-            new Dictionary<string, object> { ["checked"] = true });
-
-        // Simulo evento JS (textbox input)
-        SimulateJsEvent(dispatcher, txt.Id, "valueChanged",
-            new Dictionary<string, object> { ["value"] = "Mario" });
-
-        // Simulo evento JS (dropdown choice)
-        SimulateJsEvent(dispatcher, dropdown.Id, "selectedValueChanged",
-            new Dictionary<string, object> { ["selected"] = "FR" });
-
-        feedbackCountdown.StartCountdown();
-        // TODO da migliorare perché va capito a chi agganciare l'evento in eslx
-        feedbackCountdown.TickElapsed += (s, remaining) =>
-        {
-            diffs = dispatcher.EvaluateDiff();
-            Console.WriteLine("\n>>> EvaluateDiff");
-            Console.WriteLine(PageSerializer.Serialize(diffs));
-        };
-
-        */
+        customPage = new Page();
+        customPage.SetTitle("Titolo della pagina", "title");
+        // Aggiungo un tab
+        firstTab = customPage.AddTab("mytab", 1, 1);
+        var sequence = libraryUI.CreateSequence();
 
         Console.ReadKey();
     }

@@ -28,6 +28,11 @@ namespace UIFramework
             return new Page();
         }
 
+        public UISequence CreateSequence()
+        {
+            return new UISequence();
+        }
+
         public void ShowAndWait(Page page)
         {
             Validate(page);

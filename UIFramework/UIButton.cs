@@ -36,26 +36,6 @@ namespace UIFramework
         }
 
         [JsonIgnore]
-        public bool Enabled
-        {
-            get => States.TryGetValue("enabled", out var v) && (bool)v;
-            set => States["enabled"] = value;
-        }
-
-        [JsonIgnore]
-        public Style Style
-        {
-            get
-            {
-                Props.TryGetValue("style", out var style);
-                if (style is Style s)
-                    return s;
-                return null;
-            }
-            set => Props["style"] = value;
-        }
-
-        [JsonIgnore]
         public string Text
         {
             get => Props.ContainsKey("text")?  Props["text"].ToString() : "";

@@ -9,10 +9,6 @@ namespace UIFramework
     // Un ContainerElement è un UIElement che può contenere altri UIElement come figli che si chiamano Children.
     public class ContainerElement : UIElement
     {
-        //public ContainerElement(string id) : base(id)
-        //{
-        //}
-
         public ContainerElement()
         {
         }
@@ -36,6 +32,15 @@ namespace UIFramework
             }
 
             return false;
+        }
+
+        public bool Update(string id, UIElement element)
+        {
+            var foundElement = GetUIElement(id);
+            if (foundElement == null)
+                return false;
+            foundElement.UpdateStates(element.States);
+            return true;
         }
 
         public UIElement GetUIElement(string id)
