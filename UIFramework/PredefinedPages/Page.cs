@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Drawing;
 using UIFramework.Helpers;
 
 namespace UIFramework.PredefinedPages
@@ -108,20 +109,20 @@ namespace UIFramework.PredefinedPages
             return image;
         }
 
-        public UIImage UpdateImage(string imageId, string newImageName)
+        public bool UpdateImage(string imageId, string newImageName)
         {
             var image = this.FindById(imageId);
             if (image == null || image is not UIImage img)
-                return null;
+                return false;
             string imagePath = Path.Combine("Resources", "img", newImageName);
             if (!File.Exists(imagePath))
             {
                 // _logger.Error($"Image not found in the Working Unit {element.Source}");
-                return null;
+                return false;
             }
             img.Src = ImageHelper.ConvertImageToBase64(imagePath);
             OnUpdated(img.GetType());
-            return img;
+            return true;
         }
 
         public UILabel AddBulletedItem(string idStr)
@@ -133,14 +134,14 @@ namespace UIFramework.PredefinedPages
             return label;
         }
 
-        public UILabel UpdateBulletedItem(string itemId, string newIdStr)
+        public bool UpdateBulletedItem(string itemId, string newIdStr)
         {
             var item = this.FindById(itemId);
             if (item == null || item is not UILabel label)
-                return null;
+                return false;
             label.Text = newIdStr;
             OnUpdated(label.GetType());
-            return label;
+            return true;
         }
 
         // "list-item-ordered" è in Style.Layout
@@ -180,20 +181,20 @@ namespace UIFramework.PredefinedPages
             return label;
         }
 
-        public UILabel UpdateParagraph(string paragraphId, string newIdStr) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
+        public bool UpdateParagraph(string paragraphId, string newIdStr) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
         {
             return UpdateParagraph(paragraphId, newIdStr, "", "");
         }
 
-        public UILabel UpdateParagraph(string paragraphId, string newIdStr, string style, string color) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
+        public bool UpdateParagraph(string paragraphId, string newIdStr, string style, string color) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
         {
             var paragraph = this.FindById(paragraphId);
             if (paragraph == null || paragraph is not UILabel label)
-                return null;
+                return false;
             label.SetStyle(new Style() { Layout = style, ForegroundColor = color });
             label.Text = newIdStr;
             OnUpdated(label.GetType());
-            return label;
+            return true;
         }
 
         #region ADD BUTTON 
@@ -292,6 +293,17 @@ namespace UIFramework.PredefinedPages
             return feedback;
         }
 
+        public bool UpdateFeedbackCountdown(string feedbackId, int ms)
+        {
+            var feedback = this.FindById(feedbackId);
+            if (feedback == null || feedback is not UIFeedback uIFeedback)
+                return false;
+
+            uIFeedback.Remaining = ms;
+            OnUpdated(uIFeedback.GetType());
+            return true;
+        }
+
         private void Feedback_TickElapsed(object? sender, int e)
         {
             OnUpdated(sender.GetType());
@@ -305,9 +317,41 @@ namespace UIFramework.PredefinedPages
             return feedback;
         }
 
+        public bool UpdateFeedbackProgress(string feedbackId, int perc, string msg)
+        {
+            var feedback = this.FindById(feedbackId);
+            if (feedback == null || feedback is not UIFeedback uIFeedback)
+                return false;
+
+            uIFeedback.Text = msg;
+            uIFeedback.Percentage = perc;
+            OnUpdated(uIFeedback.GetType());
+            return true;
+        }
+
+        public bool UpdateFeedbackProgress(string feedbackId, double perc)
+        {
+            return UpdateFeedbackProgress(feedbackId, perc, "");
+        }
+
+        public bool UpdateFeedbackProgress(string feedbackId, double perc, string msg)
+        {
+            return UpdateFeedbackProgress(feedbackId, perc, msg);
+        }
+
+        public bool UpdateFeedbackProgress(string feedbackId, int perc)
+        {
+            return UpdateFeedbackProgress(feedbackId, perc);
+        }
+
         public UIFeedback AddFeedbackMessage()
         {
             return AddFeedbackMessage("");
+        }
+
+        public bool UpdateFeedbackMessage(string feedbackId)
+        {
+            return UpdateFeedbackMessage(feedbackId, "");
         }
 
         public UIFeedback AddFeedbackMessage(string msg)
@@ -317,6 +361,17 @@ namespace UIFramework.PredefinedPages
             _currentTab.Add(feedback);
             OnUpdated(feedback.GetType());
             return feedback;
+        }
+
+        public bool UpdateFeedbackMessage(string feedbackId, string msg)
+        {
+            var feedback = this.FindById(feedbackId);
+            if (feedback == null || feedback is not UIFeedback uIFeedback)
+                return false;
+
+            uIFeedback.Text = msg;
+            OnUpdated(uIFeedback.GetType());
+            return true;
         }
 
         #endregion

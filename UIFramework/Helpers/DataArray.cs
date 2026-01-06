@@ -15,7 +15,7 @@ namespace UIFramework.Helpers
         {
             foreach (object item in items)
             {
-                if (!base.Contains(items)) return false;
+                if (!base.Contains(item)) return false;
             }
             return true;
         }

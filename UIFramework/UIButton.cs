@@ -58,7 +58,7 @@ namespace UIFramework
         [JsonIgnore]
         public string Text
         {
-            get => Props["text"]?.ToString();
+            get => Props.ContainsKey("text")?  Props["text"].ToString() : "";
             set => Props["text"] = value;
         }
 

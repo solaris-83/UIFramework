@@ -14,7 +14,7 @@ namespace UIFramework
         [JsonIgnore]
         public string Value
         {
-            get => States.TryGetValue("value", out var v) ? v?.ToString() : "";
+            get => States.ContainsKey("value")? States["value"].ToString() : "";
             set => States["value"] = value;
         }
 

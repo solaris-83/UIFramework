@@ -25,7 +25,7 @@ namespace UIFramework
         [JsonIgnore]
         public string ActiveTabId
         {
-            get => States.TryGetValue("activeTabId", out var v) ? v?.ToString() : null;
+            get => States.ContainsKey("activeTabId")? States["activeTabId"].ToString() : "";
             set => States["activeTabId"] = value;
         } 
         

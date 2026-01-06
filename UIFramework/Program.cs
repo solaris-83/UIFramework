@@ -263,7 +263,7 @@ class Program
     // (OK) testare Feedback con countdown e progress dentro una pagina con/senza Start automatico.
     // Bisogna registrarsi agli eventi tick una sola volta per la stessa feedback
     // Implementare dispose (tra cui eventi) 
-    // Implementare sequence
+    // Implementare sequence  ( ci sono rif. a sequence nella app di tutorial e bundle update => si possono dismettere i vecchi metodi)
 
     static void Main()
     {
@@ -278,6 +278,8 @@ class Program
         var chbx2 = menuPage.AddItem("Activate_Coils", "Activte_Ignition_Coil");
         var chbx3 = menuPage.AddItem("Deactivate_Injectors", "Deactivte_Injectors");
         libraryUI.ShowAndWait(menuPage);
+
+        var chbx4 = menuPage.AddItem("NewCheckbox", "New Checkbox");
 
         Console.WriteLine("HasCheckBoxes " + menuPage.HasCheckboxes);
         Console.WriteLine("IsMultipleSelection " + menuPage.IsMultipleSelection);
@@ -307,6 +309,8 @@ class Program
         chbx3 = menuPage.AddItem("Deactivate_Injectors", "Deactivte_Injectors");
         libraryUI.ShowAndWait(menuPage);
 
+        chbx4 = menuPage.AddItem("NewCheckbox", "New Checkbox");
+
         Console.WriteLine("HasCheckBoxes " + menuPage.HasCheckboxes);
         Console.WriteLine("IsMultipleSelection " + menuPage.IsMultipleSelection);
         try
@@ -334,6 +338,8 @@ class Program
             new Dictionary<string, object> { ["checked"] = true });
         libraryUI.SimulateJsEvent(chbx2.Id, "propertyChanged",
             new Dictionary<string, object> { ["checked"] = true });
+        libraryUI.SimulateJsEvent(chbx4.Id, "propertyChanged",
+            new Dictionary<string, object> { ["checked"] = true });
 
         Console.WriteLine("HasCheckBoxes " + menuPage.HasCheckboxes);
         Console.WriteLine("IsMultipleSelection " + menuPage.IsMultipleSelection);
@@ -345,6 +351,11 @@ class Program
         Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAll("Activate_Injectors", "Activate_Coils"));  // TODO non funziona capire come mai con Alberto
         Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAll(0, 1));   // TODO non funziona capire come mai con Alberto
 
+        Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAny("NewCheckbox"));
+        Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAny(3));
+
+        Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAll("Activate_Injectors", "Activate_Coils", "NewCheckbox"));  // TODO non funziona capire come mai con Alberto
+        Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAll(0, 1, 3));
         // ==== DISCLAIMER PAGE ====
         // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
         var page = libraryUI.CreatePageDisclaimer();

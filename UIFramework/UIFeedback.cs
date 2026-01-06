@@ -42,7 +42,7 @@ namespace UIFramework
                 Layout = style
             };
             Props["mode"] = feedbackMode.ToString();
-            Props["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
+            States["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
             Props["totalSeconds"] = ms / 1000;
             States["remaining"] = ms / 1000;
             States["percentage"] = 0;
@@ -56,7 +56,7 @@ namespace UIFramework
             };
             Props["tag"] = $"feedback-{style}";
             Props["mode"] = feedbackMode.ToString();
-            Props["text"] = text;
+            States["text"] = text;
         }
 
         public UIFeedback(FeedbackMode feedbackMode, string style, string text, int ms, bool isManual)
@@ -67,10 +67,10 @@ namespace UIFramework
             };
             Props["tag"] = $"feedback-{style}";
             Props["mode"] = feedbackMode.ToString();
-            Props["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
+            States["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
             States["remaining"] = ms / 1000;
             Props["totalSeconds"] = ms / 1000;
-            States["isManual"] = isManual;
+            Props["isManual"] = isManual;
             States["percentage"] = 0;
         }
 
@@ -116,9 +116,9 @@ namespace UIFramework
 
 
         [JsonIgnore]
-        public int Percentage
+        public double Percentage
         {
-           get => (int)States["percentage"];
+           get => (double)States["percentage"];
            set => States["percentage"] = 100 - Remaining * 100 / Totalseconds;
         }
 
@@ -135,6 +135,12 @@ namespace UIFramework
         }
 
         [JsonIgnore]
+        public bool IsManual
+        {
+            get => Props.TryGetValue("isManual", out var v) && (bool)v;
+        }
+
+        [JsonIgnore]
         public int Remaining
         {
             get => (int)States["remaining"];
@@ -145,6 +151,13 @@ namespace UIFramework
         public bool IsActive
         {
             get => _timer != null && _timer.Enabled;
+        }
+
+        [JsonIgnore]
+        public string Text
+        {
+            get => States.ContainsKey("text") ? States["text"].ToString() : "";
+            set => States["text"] = value;
         }
     }
 
