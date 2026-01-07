@@ -12,7 +12,7 @@ namespace UIFramework
         public ContainerElement()
         {
         }
-        public List<UIElement> Children { get; } = new();
+        public List<UIElement> Children { get; } = new List<UIElement>();
 
         public void Add(UIElement element) => Children.Add(element);
 

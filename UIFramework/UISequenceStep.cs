@@ -61,11 +61,11 @@ namespace UIFramework
             if (foundIndex < 0)
                 return false;
 
-            // Mark previous steps as completed
+            // Mark previous steps as completed if they were active
             for (int i = 0; i < foundIndex; i++)
             {
                 var prev = Steps[i];
-                if (prev != null)
+                if (prev != null && prev.Status == "active")
                     prev.Status = "completed";
             }
 

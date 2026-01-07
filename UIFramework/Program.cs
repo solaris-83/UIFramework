@@ -383,7 +383,7 @@ class Program
 
         // ==== PAGINA CUSTOM ====
         // Istanzio pagina
-        var customPage = new Page();
+        var customPage = libraryUI.CreatePage();
         // Creo l'header
         customPage.SetTitle("Benvenuto nella mia applicazione", "title");
         // oppure set di Title direttamente
@@ -432,11 +432,19 @@ class Program
         Thread.Sleep(5000);
         feedback.StopCountdown();
 
-        customPage = new Page();
-        customPage.SetTitle("Titolo della pagina", "title");
+        // === CUSTOM PAGE CON SEQUENCE ===
+        var sequencePage = libraryUI.CreatePage();
+        sequencePage.SetTitle("Titolo della pagina", "title");
         // Aggiungo un tab
-        firstTab = customPage.AddTab("mytab", 1, 1);
+        var tabSequence = sequencePage.AddTab("mytab", 1, 1);
         var sequence = libraryUI.CreateSequence();
+        var step1 = sequence.AddStep("1", "Faults reading");
+        sequence.AddStep("2", "Ecu feature reading");
+        sequence.AddStep("3", "Probing");
+        tabSequence.Add(sequence);
+        libraryUI.ShowAndWait(sequencePage);
+
+        sequence.UpdateStatusStep(step1.Id, "active");
 
         Console.ReadKey();
     }
@@ -481,35 +489,35 @@ class Program
         JSON Diff → JS
     */
 }
-public static class SigmoidGenerator
-    {
+//public static class SigmoidGenerator
+//    {
 
-        public static IEnumerable<double> SigmoidGrowth(
-        double target,
-        int totalSteps,
-        double steepness = 10.0)
-        {
-            for (int step = 0; step <= totalSteps; step++)
-            {
-                // normalizza 0–1
-                double t = (double)step / totalSteps;
+//        public static IEnumerable<double> SigmoidGrowth(
+//        double target,
+//        int totalSteps,
+//        double steepness = 10.0)
+//        {
+//            for (int step = 0; step <= totalSteps; step++)
+//            {
+//                // normalizza 0–1
+//                double t = (double)step / totalSteps;
 
-                // funzione sigmoide
-                double s = 1.0 / (1.0 + Math.Exp(-steepness * (t - 0.5)));
+//                // funzione sigmoide
+//                double s = 1.0 / (1.0 + Math.Exp(-steepness * (t - 0.5)));
 
-                // scala verso il target
-                yield return s * target;
-            }
-        }
+//                // scala verso il target
+//                yield return s * target;
+//            }
+//        }
 
 
-        public static IEnumerable<double> RandomDouble(double min, double max)
-        {
-            var _rnd = new Random();
-            while (true)
-            {
-                yield return _rnd.NextDouble() * (max - min) + min;
-            }
-        }
-    }
+//        public static IEnumerable<double> RandomDouble(double min, double max)
+//        {
+//            var _rnd = new Random();
+//            while (true)
+//            {
+//                yield return _rnd.NextDouble() * (max - min) + min;
+//            }
+//        }
+//    }
 
