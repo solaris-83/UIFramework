@@ -23,7 +23,8 @@ namespace UIFramework
         public DiffOperationType Operation { get; set; }
         public string ElementId { get; set; }
         public string ParentId { get; set; } // serve??? (chatgpt dice per Add ma poi non lo usa)
-        public Dictionary<string, object> Data { get; set; }  // Contiene props o state
+        public Dictionary<string, object> Props { get; set; } 
+        public Dictionary<string, object> States { get; set; }
     }
 
     public class PageSnapshot
@@ -35,7 +36,7 @@ namespace UIFramework
     {
         public string Id { get; set; }
         public Dictionary<string, object> Props { get; set; }
-        public Dictionary<string, object> State { get; set; }
+        public Dictionary<string, object> States { get; set; }
     }
 
     public static class PageSnapshotBuilder
@@ -56,7 +57,7 @@ namespace UIFramework
             {
                 Id = el.Id,
                 Props = new Dictionary<string, object>(el.Props),
-                State = new Dictionary<string, object>(el.States)
+                States = new Dictionary<string, object>(el.States)
             };
 
             if (el is ContainerElement container)
@@ -90,7 +91,8 @@ namespace UIFramework
                 {
                     Operation = DiffOperationType.Add,
                     ElementId = id,
-                    Data = newSnap.Elements[id].Props
+                    Props = newSnap.Elements[id].Props, 
+                    States = newSnap.Elements[id].States,
                 });
             }
 
@@ -106,17 +108,17 @@ namespace UIFramework
                     {
                         Operation = DiffOperationType.UpdateProps,
                         ElementId = id,
-                        Data = newEl.Props
+                        Props = newEl.Props,
                     });
                 }
 
-                if (!DictionaryEquals(oldEl.State, newEl.State))
+                if (!DictionaryEquals(oldEl.States, newEl.States))
                 {
                     diffs.Add(new UiDiff
                     {
                         Operation = DiffOperationType.UpdateState,
                         ElementId = id,
-                        Data = newEl.State
+                        States = newEl.States
                     });
                 }
             }

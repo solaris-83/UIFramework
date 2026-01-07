@@ -6,7 +6,6 @@ namespace UIFramework
 {
     public class UIElement : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
         public UIElement()
         {
             Props["tag"] = null;
@@ -15,6 +14,8 @@ namespace UIFramework
             States["visible"] = true;
             States["enabled"] = true;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         [JsonIgnore]
         public object Tag

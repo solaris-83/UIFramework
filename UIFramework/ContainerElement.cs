@@ -9,12 +9,20 @@ namespace UIFramework
     // Un ContainerElement è un UIElement che può contenere altri UIElement come figli che si chiamano Children.
     public class ContainerElement : UIElement
     {
-        public ContainerElement()
+        protected ContainerElement()
         {
         }
-        public List<UIElement> Children { get; } = new List<UIElement>();
+        private readonly List<UIElement> _children = new();
+        public List<UIElement> Children => _children;
 
-        public void Add(UIElement element) => Children.Add(element);
+        public event Action<ContainerElement, UIElement>? ItemAdded;
+        public event Action<ContainerElement, UIElement>? ItemRemoved;
+
+        public void Add(UIElement element)
+        {
+            _children.Add(element);
+            ItemAdded?.Invoke(this, element);
+        }
 
         public bool Remove(string id)
         {
@@ -22,6 +30,7 @@ namespace UIFramework
             if (element != null)
             {
                 Children.Remove(element);
+                ItemRemoved?.Invoke(this, element);
                 return true;
             }
 
@@ -34,20 +43,25 @@ namespace UIFramework
             return false;
         }
 
-        public bool Update(string id, UIElement element)
-        {
-            var foundElement = GetUIElement(id);
-            if (foundElement == null)
-                return false;
-            foundElement.UpdateStates(element.States);
-            return true;
-        }
+        //public bool Update(string id, UIElement element)
+        //{
+        //    var foundElement = GetUIElement(id);
+        //    if (foundElement == null)
+        //        return false;
+        //    foundElement.UpdateStates(element.States);
+        //    return true;
+        //}
 
-        public UIElement GetUIElement(string id)
-        {
-            var element = Children.FirstOrDefault(e => e.Id == id);
-            element ??= Children.OfType<ContainerElement>().FirstOrDefault(e => e.Id == id);
-            return element;
-        }
+        //public UIElement GetUIElement(string id)
+        //{
+        //    var element = Children.FirstOrDefault(e => e.Id == id);
+        //    element ??= Children.OfType<ContainerElement>().FirstOrDefault(e => e.Id == id);
+        //    return element;
+        //}
+
+        //internal virtual void OnChildPropertyChanged(UIElement source, string propertyName)
+        //{
+        //    Parent?.OnChildPropertyChanged(source, propertyName);
+        //}
     }
 }

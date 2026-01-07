@@ -36,6 +36,7 @@ namespace UIFramework
         public void ShowAndWait(Page page)
         {
             Validate(page);
+            page.AttachContainer(page.TabControl);
 
             _dispatcher = new UiCommandDispatcher(page);
             Console.WriteLine($"=== LOAD PAGE INIZIALE {page.GetType().Name} ===");
@@ -92,6 +93,7 @@ namespace UIFramework
                 EventType = eventType,
                 Payload = payload
             };
+            Console.WriteLine(JsonConvert.SerializeObject(evt, Formatting.Indented));
 
             var diffs = _dispatcher.HandleEvent(evt);
 

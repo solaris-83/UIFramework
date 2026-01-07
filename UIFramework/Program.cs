@@ -270,6 +270,31 @@ class Program
     static void Main()
     {
         LibraryUI libraryUI = new LibraryUI();
+
+        // ==== DISCLAIMER PAGE ====
+        // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
+        var page = libraryUI.CreatePageDisclaimer();
+        var par1 = page.AddParagraph("Paragraph #1.", "paragraph", "gray");
+        var par2 = page.AddParagraph("Paragraph #2.", "paragraph", "gray");
+        page.AddBulletedItem("#1 bulletted item");
+        page.AddBulletedItem("#2 bulletted item");
+        page.AddOrderedItem("Item 1");
+        page.AddOrderedItem("Item 2");
+        page.AddOrderedItem("Item 3");
+        page.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
+        page.Remove(par2.Id);
+        page.AddImage("Screenshot.png");
+        libraryUI.ShowAndWait(page);
+
+        var par3 = page.AddParagraph("Paragraph #3 after ShowAndWait");
+
+        page.UpdateParagraph(par3.Id, "Paragraph #3 - BIS -  after ShowAndWait");
+
+        // ==== RESULT PAGE ====
+        var pageResult = libraryUI.CreatePageResult();
+        pageResult.AddParagraph("Questa è la pagina di risultato.", "result-paragraph", "blue");
+        libraryUI.ShowAndWait(pageResult);
+
         // =========== MENU PAGE ===========
         // Singola selezione con checkbox
         var menuPage = libraryUI.CreatePageMenu();
@@ -360,25 +385,7 @@ class Program
         Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAll(0, 1, 3));
         
         
-        // ==== DISCLAIMER PAGE ====
-        // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
-        var page = libraryUI.CreatePageDisclaimer();
-        var par1 = page.AddParagraph("Paragraph #1.", "paragraph", "gray");
-        var par2 = page.AddParagraph("Paragraph #2.", "paragraph", "gray");
-        page.AddBulletedItem("#1 bulletted item");
-        page.AddBulletedItem("#2 bulletted item");
-        page.AddOrderedItem("Item 1");
-        page.AddOrderedItem("Item 2");
-        page.AddOrderedItem("Item 3");
-        page.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
-        page.Remove(par2.Id);
-        page.AddImage("Screenshot.png");
-        libraryUI.ShowAndWait(page);
-
-        // ==== RESULT PAGE ====
-        var pageResult = libraryUI.CreatePageResult();
-        pageResult.AddParagraph("Questa è la pagina di risultato.", "result-paragraph", "blue");
-        libraryUI.ShowAndWait(pageResult);
+        
 
 
         // ==== PAGINA CUSTOM ====
