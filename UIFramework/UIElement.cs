@@ -18,6 +18,9 @@ namespace UIFramework
         public event PropertyChangedEventHandler PropertyChanged;
 
         [JsonIgnore]
+        public string ParentId { get; internal set; }
+
+        [JsonIgnore]
         public object Tag
         {
             get => Props["tag"];

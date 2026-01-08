@@ -7,7 +7,9 @@ namespace UIFramework
 {
     internal class LibraryUI
     {
-        UiCommandDispatcher _dispatcher = null;
+        private UiCommandDispatcher _dispatcher = null;
+        private Page _currentPage = null;
+
         public PageDisclaimer CreatePageDisclaimer()
         {
             return new PageDisclaimer();
@@ -35,6 +37,7 @@ namespace UIFramework
 
         public void ShowAndWait(Page page)
         {
+            _currentPage?.Dispose();
             Validate(page);
             page.AttachContainer(page.TabControl);
 
@@ -45,6 +48,7 @@ namespace UIFramework
             // Mi registro agli aggiornamenti degli UIElement della page triggerati dal C#
             page.Updated += Page_Updated;
             // TODO deregistrarsi da tutti gli eventi tramite dispose alla fine
+            _currentPage = page;
         }
 
         private void Validate(Page page)

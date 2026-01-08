@@ -61,6 +61,15 @@ namespace UIFramework.PredefinedPages
                 AttachElement(child);
         }
 
+        public void DetachContainer(ContainerElement container)
+        {
+            foreach (var child in container.Children)
+                DetachElement(child);
+
+            container.ItemAdded -= OnItemAdded;
+            container.ItemRemoved -= OnItemRemoved;
+        }
+
         private void AttachElement(UIElement element)
         {
             element.PropertyChanged += OnPropertyChanged;
@@ -131,10 +140,10 @@ namespace UIFramework.PredefinedPages
         //}
 
         // Protected helper to allow derived classes to raise the event
-        protected virtual void OnUpdated(Type updatedType)
-        {
-            _updated?.Invoke(this, updatedType);
-        }
+        //protected virtual void OnUpdated(Type updatedType)
+        //{
+        //    _updated?.Invoke(this, updatedType);
+        //}
 
         public UILabel SetTitle(string idStr, string style)
         {
@@ -476,7 +485,7 @@ namespace UIFramework.PredefinedPages
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            DetachContainer(TabControl);
         }
     }
 }

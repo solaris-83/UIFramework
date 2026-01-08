@@ -22,7 +22,7 @@ namespace UIFramework
     {
         public DiffOperationType Operation { get; set; }
         public string ElementId { get; set; }
-        public string ParentId { get; set; } // serve??? (chatgpt dice per Add ma poi non lo usa)
+        public string ParentId { get; set; } // serve per Add
         public Dictionary<string, object> Props { get; set; } 
         public Dictionary<string, object> States { get; set; }
     }
@@ -35,6 +35,7 @@ namespace UIFramework
     public class UiElementSnapshot
     {
         public string Id { get; set; }
+        public string ParentId { get; set; }
         public Dictionary<string, object> Props { get; set; }
         public Dictionary<string, object> States { get; set; }
     }
@@ -56,6 +57,7 @@ namespace UIFramework
             snapshot.Elements[el.Id] = new UiElementSnapshot
             {
                 Id = el.Id,
+                ParentId = el.ParentId,
                 Props = new Dictionary<string, object>(el.Props),
                 States = new Dictionary<string, object>(el.States)
             };
@@ -91,6 +93,7 @@ namespace UIFramework
                 {
                     Operation = DiffOperationType.Add,
                     ElementId = id,
+                    ParentId = newSnap.Elements[id].ParentId,
                     Props = newSnap.Elements[id].Props, 
                     States = newSnap.Elements[id].States,
                 });

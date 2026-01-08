@@ -20,6 +20,7 @@ namespace UIFramework
 
         public void Add(UIElement element)
         {
+            element.ParentId = Id;
             _children.Add(element);
             ItemAdded?.Invoke(this, element);
         }
