@@ -58,18 +58,9 @@ namespace UIFramework.PredefinedPages
             container.ItemRemoved += OnItemRemoved;
 
             foreach (var child in container.Children)
-                AttachElement(child);
+                AttachElement(child);   
         }
-
-        public void DetachContainer(ContainerElement container)
-        {
-            foreach (var child in container.Children)
-                DetachElement(child);
-
-            container.ItemAdded -= OnItemAdded;
-            container.ItemRemoved -= OnItemRemoved;
-        }
-
+        
         private void AttachElement(UIElement element)
         {
             element.PropertyChanged += OnPropertyChanged;
@@ -77,20 +68,33 @@ namespace UIFramework.PredefinedPages
             if (element is ContainerElement c)
                 AttachContainer(c);
         }
-       
+
+        public void DetachContainer(ContainerElement container)
+        {
+            // Detach children (each DetachElement will process its subtree from inner-most to outer-most)
+            foreach (var child in container.Children)
+                DetachElement(child);
+
+            // Unsubscribe container-level events after children are detached
+            container.ItemAdded -= OnItemAdded;
+            container.ItemRemoved -= OnItemRemoved;
+        }
 
         private void DetachElement(UIElement element)
         {
-            element.PropertyChanged -= OnPropertyChanged;
-
             if (element is ContainerElement c)
             {
-                c.ItemAdded -= OnItemAdded;
-                c.ItemRemoved -= OnItemRemoved;
-
+                // First detach all children (deepest elements are detached first)
                 foreach (var child in c.Children)
                     DetachElement(child);
+
+                // Then unsubscribe container events
+                c.ItemAdded -= OnItemAdded;
+                c.ItemRemoved -= OnItemRemoved;
             }
+
+            // Finally unsubscribe property-change handler for this element
+            element.PropertyChanged -= OnPropertyChanged;
         }
 
         private void OnItemAdded(ContainerElement parent, UIElement child)
@@ -122,22 +126,6 @@ namespace UIFramework.PredefinedPages
             //    )
             //);
         }
-
-        //private void SendToJs(DiffOperation diff)
-        //{
-        //    // CEF → JS
-        //}
-
-
-
-        
-
-
-        //internal virtual void OnChildPropertyChanged(UIElement source, string propertyName)
-        //{
-        //    // Parent?.OnChildPropertyChanged(source, propertyName);
-        //    _updated?.Invoke(this, source.GetType());
-        //}
 
         // Protected helper to allow derived classes to raise the event
         //protected virtual void OnUpdated(Type updatedType)
