@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIFramework", "UIFramework\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIFramework.UnitTest", "UnitTestProject1\UIFramework.UnitTest.csproj", "{DFD645E5-8D32-4266-BA78-CB3E13F8F896}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIFrameworkDotNet", "UIFrameworkDotNet\UIFrameworkDotNet.csproj", "{758CF145-2067-448D-A646-E7288862FE70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{1931FEF2-7F09-45E4-8B00-CF9B16CFA566}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{DFD645E5-8D32-4266-BA78-CB3E13F8F896}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFD645E5-8D32-4266-BA78-CB3E13F8F896}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFD645E5-8D32-4266-BA78-CB3E13F8F896}.Release|Any CPU.Build.0 = Release|Any CPU
+		{758CF145-2067-448D-A646-E7288862FE70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{758CF145-2067-448D-A646-E7288862FE70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{758CF145-2067-448D-A646-E7288862FE70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{758CF145-2067-448D-A646-E7288862FE70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1931FEF2-7F09-45E4-8B00-CF9B16CFA566}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1931FEF2-7F09-45E4-8B00-CF9B16CFA566}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1931FEF2-7F09-45E4-8B00-CF9B16CFA566}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1931FEF2-7F09-45E4-8B00-CF9B16CFA566}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

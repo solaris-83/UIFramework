@@ -56,9 +56,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UIFramework\UIFramework.csproj">
-      <Project>{073a04fd-5c52-4f1c-b1ba-a2875a623cb8}</Project>
-      <Name>UIFramework</Name>
+    <ProjectReference Include="..\UIFrameworkDotNet\UIFrameworkDotNet.csproj">
+      <Project>{758cf145-2067-448d-a646-e7288862fe70}</Project>
+      <Name>UIFrameworkDotNet</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
