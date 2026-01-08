@@ -8,17 +8,17 @@ namespace UIFramework
     {
         public UIButton(string tag, bool enabled)
         {
-            Props["tag"] = tag;
-            Props["text"] = tag;
-            States["enabled"] = enabled;
+            Tag = tag;
+            Text = tag;
+            Enabled = enabled;
         }
 
         public UIButton(string tag,  bool enabled, string style)
         {
-            Props["tag"] = tag;
-            Props["text"] = tag;
-            States["enabled"] = enabled;
-            Props["style"] = new Style
+            Tag = tag;
+            Text = tag;
+            Enabled = enabled;
+            Style = new Style
             {
                 Layout = style
             };
@@ -26,23 +26,30 @@ namespace UIFramework
 
         public UIButton(string tag, bool enabled, string style, string translation)
         {
-            Props["tag"] = tag;
-            Props["text"] = translation;
-            States["enabled"] = enabled;
-            Props["style"] = new Style
+            Tag = tag;
+            Text = translation;
+            Enabled = enabled;
+            Style = new Style
             {
                 Layout = style
             };
         }
 
+        private string _text;
         [JsonIgnore]
         public string Text
         {
-            get => Props.ContainsKey("text")?  Props["text"].ToString() : "";
-            set => Props["text"] = value;
+            get => _text;
+            set 
+            {
+                if (_text == value) return;
+                _text = value;
+                Props["text"] = value; 
+                OnPropertyChanged(nameof(Text)); 
+            }
         }
 
-        public class ButtonPropertyChangedCommand : ICommand
+        public class ButtonPropertyChangedCommand : ICommandOld
         {
             private readonly UIButton _button;
             private readonly Dictionary<string, object> _states;

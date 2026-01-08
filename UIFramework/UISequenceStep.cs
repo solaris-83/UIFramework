@@ -1,31 +1,60 @@
-﻿
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace UIFramework
 {
     // TODO c'è del lavoro da fare anche a livello ESLX non solo JS (cambiamenti ma non ci sono app che la usano mi sa).
+    // TODO gestire gli Equals
     public class UISequenceStep : UIElement
     {
         public UISequenceStep(string tag, string text)
         {
-            Props["tag"] = tag;
-            States["text"] = text;
+            Tag= tag;
+            Text = text;
             //  States["subtitle"]
-            States["status"] = "inactive";
+            Status = "inactive";
         }
 
+        private string _text;
         [JsonIgnore]
         public string Text
         {
-            get => States.ContainsKey("text") ? States["text"].ToString() : "";
-            set => States["text"] = value;
+            get => _text;
+            set 
+            { 
+                if (_text == value) return;
+                _text = value;
+                Props["text"] = value; 
+                OnPropertyChanged(nameof(Text)); 
+            }
         }
 
+        private string _status;
         [JsonIgnore]
         public string Status
         {
-            get => States.ContainsKey("status") ? States["status"].ToString() : "";
-            set => States["status"] = value;
+            get => _status;
+            set 
+            { 
+                if (_status == value) return;
+                _status = value;
+                States["status"] = value; 
+                OnPropertyChanged(nameof(Status)); 
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            Debug.Assert(obj != null);
+            return obj is UISequenceStep step &&
+                   EqualityComparer<object>.Default.Equals(Tag, step.Tag) &&
+                   Text == step.Text &&
+                   Status == step.Status;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Tag, Text, Status);
         }
     }
 
@@ -35,7 +64,7 @@ namespace UIFramework
         public List<UISequenceStep> Steps => Children.OfType<UISequenceStep>().ToList();
         public UISequence()
         {
-            States["currentStep"] = null;
+            CurrentStep = null;
         }
 
         public UISequenceStep AddStep(string tag, string text)
@@ -82,19 +111,21 @@ namespace UIFramework
             return true;
         }
 
+        private UISequenceStep _currentStep;
         [JsonIgnore]
         public UISequenceStep CurrentStep
         {
             get 
             {
-                States.TryGetValue("currentStep", out var v);
-                if (v is UISequenceStep step)
-                {
-                    return step;
-                }
-                return null;
+                return _currentStep;
             }
-            set => States["currentStep"] = value;
+            set 
+            { 
+                if (_currentStep.Equals(value)) return;
+                _currentStep = value;
+                States["currentStep"] = value; 
+                OnPropertyChanged(nameof(CurrentStep)); 
+            }
         }
     }
 }

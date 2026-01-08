@@ -15,14 +15,14 @@ namespace UIFramework
         public string Selected
         {
             get => States.ContainsKey("selected")? States["selected"]?.ToString() : "";
-            set => States["selected"] = value;
+            set { States["selected"] = value; OnPropertyChanged(nameof(Selected)); }
         }
 
         [JsonIgnore]
         public bool Enabled
         {
             get => States.TryGetValue("enabled", out var v) && (bool)v;
-            set => States["enabled"] = value;
+            set { States["enabled"] = value; OnPropertyChanged(nameof(Enabled)); }
         }
     }
 
@@ -38,7 +38,7 @@ namespace UIFramework
         }
     }
 
-    public class DropDownPropertyChangedCommand : ICommand
+    public class DropDownPropertyChangedCommand : ICommandOld
     {
         private readonly UIDropDown _dropDown;
         private readonly Dictionary<string, object> _states;

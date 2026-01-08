@@ -22,14 +22,21 @@ namespace UIFramework
             }
         }
 
+        private string _activeTabId;
         [JsonIgnore]
         public string ActiveTabId
         {
-            get => States.ContainsKey("activeTabId")? States["activeTabId"].ToString() : "";
-            set => States["activeTabId"] = value;
+            get => _activeTabId;
+            set 
+            { 
+                if (_activeTabId == value) return;
+                _activeTabId = value;
+                States["activeTabId"] = value; 
+                OnPropertyChanged(nameof(ActiveTabId)); 
+            } 
         } 
         
-        public class TabControlPropertyChangedCommand : ICommand
+        public class TabControlPropertyChangedCommand : ICommandOld
         { 
             private readonly UITabControl _tabControl;
             private readonly Dictionary<string, object> _states;
@@ -51,38 +58,27 @@ namespace UIFramework
     {
         public UITab(int rows, int cols)
         {
-            Props["grid"] = new Grid(rows, cols);
+            Grid = new Grid(rows, cols);
         }
 
         public UITab(string tag, int rows, int cols)
         {
-            Props["tag"] = tag;
-            Props["grid"] = new Grid(rows, cols);
+            Tag = tag;
+            Grid = new Grid(rows, cols);
         }
 
-        //public UITab(string id, int rows, int cols) : this(id, rows, cols)
-        //{
-        //   // Props["title"] = title;
-        //}
-
-        //[JsonIgnore]
-        //public string Title
-        //{
-        //    get => Props["title"]?.ToString();
-        //    set => Props["title"] = value;
-        //}
-
+        private Grid _grid;
         [JsonIgnore]
         public Grid Grid
         {
-            get  
-            { 
-                Props.TryGetValue("grid", out var grid);
-                if (grid is Grid g)
-                    return g;
-                return null;
+            get => _grid;
+            set
+            {
+                if (_grid != null && _grid.Equals(value)) return; 
+                _grid = value;
+                Props["grid"] = value;
+                OnPropertyChanged(nameof(Grid));
             }
-            set => Props["grid"] = value;
         }
     }
 
@@ -96,5 +92,17 @@ namespace UIFramework
 
         public int Rows { get; set; }
         public int Cols { get; set; }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is Grid grid &&
+                   Rows == grid.Rows &&
+                   Cols == grid.Cols;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Rows, Cols);
+        }
     }
 }
