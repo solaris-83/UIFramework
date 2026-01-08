@@ -10,12 +10,31 @@ namespace UIFramework
         public Dictionary<string, object> Payload { get; set; }
     }
 
+    public sealed class DiffOperation
+    {
+        public DiffOperationType Operation { get; }
+        public string TargetId { get; }
+        public object? Payload { get; }
+
+        public DiffOperation(
+            DiffOperationType operation,
+            string targetId,
+            object? payload)
+        {
+            Operation = operation;
+            TargetId = targetId;
+            Payload = payload;
+        }
+    }
+
+
     public enum DiffOperationType
     {
         Add = 0,
         Remove = 1,
         UpdateProps = 2,
-        UpdateState = 3
+        UpdateState = 3, 
+        Move = 4
     }
 
     public class UiDiff
@@ -29,121 +48,242 @@ namespace UIFramework
 
     public class PageSnapshot
     {
-        public Dictionary<string, UiElementSnapshot> Elements { get; } = new();
+        public Dictionary<string, UIElementSnapshot> Elements { get; } = new();
     }
 
-    public class UiElementSnapshot
+    public class UIElementSnapshot
     {
         public string Id { get; set; }
+        public string Type { get; }
         public string ParentId { get; set; }
         public Dictionary<string, object> Props { get; set; }
         public Dictionary<string, object> States { get; set; }
+        public UIElementSnapshot(
+        string id,
+        string type,
+        Dictionary<string, object> props,
+        Dictionary<string, object> states,
+        string? parentId)
+        {
+            Id = id;
+            Type = type;
+            Props = props;
+            States = states;
+            ParentId = parentId;
+        }
     }
 
-    public static class PageSnapshotBuilder
+    public sealed class UISnapshot
     {
-        public static PageSnapshot Create(Page page)
+        public UISnapshot()
         {
-            var snapshot = new PageSnapshot();
+            
+        }
+        public IReadOnlyDictionary<string, UIElementSnapshot> Elements { get; }
 
-            foreach (var el in page.Children)
-                Collect(el, snapshot);
+        public UISnapshot(IEnumerable<UIElementSnapshot> elements)
+        {
+            Elements = elements.ToDictionary(e => e.Id);
+        }
+    }
 
-            return snapshot;
+    public static class SnapshotBuilder
+    {
+        public static UISnapshot From(Page page)
+        {
+            var list = new List<UIElementSnapshot>();
+
+            // Root: TabControl
+            Visit(
+                element: page,
+                parentId: null,
+                list: list
+            );
+
+            return new UISnapshot(list);
         }
 
-        private static void Collect(UIElement el, PageSnapshot snapshot)
-        {
-            snapshot.Elements[el.Id] = new UiElementSnapshot
-            {
-                Id = el.Id,
-                ParentId = el.ParentId,
-                Props = new Dictionary<string, object>(el.Props),
-                States = new Dictionary<string, object>(el.States)
-            };
 
-            if (el is ContainerElement container)
+        private static void Visit(
+        UIElement element,
+        string? parentId,
+        List<UIElementSnapshot> list)
+        {
+            list.Add(
+                new UIElementSnapshot(
+                    id: element.Id,
+                    type: element.GetType().Name,
+                    props: new Dictionary<string, object>(element.Props),
+                    states: new Dictionary<string, object>(element.States),
+                    parentId: parentId
+                )
+            );
+
+            if (element is ContainerElement container)
             {
                 foreach (var child in container.Children)
-                    Collect(child, snapshot);
+                {
+                    Visit(child, element.Id, list);
+                }
             }
         }
     }
+
+    //public static class PageSnapshotBuilder
+    //{
+    //    public static UISnapshot Create(Page page)
+    //    {
+    //        var snapshot = new UISnapshot();
+
+    //        foreach (var el in page.Children)
+    //            Collect(el, snapshot);
+
+    //        return snapshot;
+    //    }
+
+    //    private static void Collect(UIElement el, UISnapshot snapshot)
+    //    {
+    //        snapshot.Elements[el.Id] = new UIElementSnapshot(el.Id, el.GetType().Name, el.Props, el.States, el.ParentId);
+
+    //        if (el is ContainerElement container)
+    //        {
+    //            foreach (var child in container.Children)
+    //                Collect(child, snapshot);
+    //        }
+    //    }
+    //}
 
     public static class DiffEngine
     {
-        public static List<UiDiff> Compute(PageSnapshot oldSnap, PageSnapshot newSnap)
+        public static List<DiffOperation> Compute(
+            UISnapshot oldSnapshot,
+            UISnapshot newSnapshot)
         {
-            var diffs = new List<UiDiff>();
+            var diffs = new List<DiffOperation>();
 
-            // REMOVED
-            foreach (var id in oldSnap.Elements.Keys.Except(newSnap.Elements.Keys))
+            var oldElements = oldSnapshot.Elements;
+            var newElements = newSnapshot.Elements;
+
+            // 1️⃣ REMOVED
+            foreach (var oldId in oldElements.Keys)
             {
-                diffs.Add(new UiDiff
+                if (!newElements.ContainsKey(oldId))
                 {
-                    Operation = DiffOperationType.Remove,
-                    ElementId = id
-                });
+                    diffs.Add(
+                        new DiffOperation(
+                            DiffOperationType.Remove,
+                            oldId,
+                            null
+                        )
+                    );
+                }
             }
 
-            // ADDED
-            foreach (var id in newSnap.Elements.Keys.Except(oldSnap.Elements.Keys))
+            // 2️⃣ ADDED + UPDATED + MOVED
+            foreach (var (id, newEl) in newElements)
             {
-                diffs.Add(new UiDiff
+                if (!oldElements.TryGetValue(id, out var oldEl))
                 {
-                    Operation = DiffOperationType.Add,
-                    ElementId = id,
-                    ParentId = newSnap.Elements[id].ParentId,
-                    Props = newSnap.Elements[id].Props, 
-                    States = newSnap.Elements[id].States,
-                });
-            }
-
-            // UPDATED
-            foreach (var id in newSnap.Elements.Keys.Intersect(oldSnap.Elements.Keys))
-            {
-                var oldEl = oldSnap.Elements[id];
-                var newEl = newSnap.Elements[id];
-
-                if (!DictionaryEquals(oldEl.Props, newEl.Props))
-                {
-                    diffs.Add(new UiDiff
-                    {
-                        Operation = DiffOperationType.UpdateProps,
-                        ElementId = id,
-                        Props = newEl.Props,
-                    });
+                    // ADD
+                    diffs.Add(
+                        new DiffOperation(
+                            DiffOperationType.Add,
+                            newEl.ParentId!,
+                            newEl
+                        )
+                    );
+                    continue;
                 }
 
-                if (!DictionaryEquals(oldEl.States, newEl.States))
+                // MOVE
+                if (oldEl.ParentId != newEl.ParentId)
                 {
-                    diffs.Add(new UiDiff
-                    {
-                        Operation = DiffOperationType.UpdateState,
-                        ElementId = id,
-                        States = newEl.States
-                    });
+                    diffs.Add(
+                        new DiffOperation(
+                            DiffOperationType.Move,
+                            id,
+                            new { parentId = newEl.ParentId }
+                        )
+                    );
+                }
+
+                // UPDATE (state diff)
+                var stateDiff = ComputeStateDiff(
+                    oldEl.States,
+                    newEl.States);
+
+                if (stateDiff.Count > 0)
+                {
+                    diffs.Add(
+                        new DiffOperation(
+                            DiffOperationType.UpdateState,
+                            id,
+                            stateDiff
+                        )
+                    );
+                }
+
+                // UPDATE (prop diff)
+                var propDiff = ComputePropDiff(
+                    oldEl.Props,
+                    newEl.Props);
+
+                if (propDiff.Count > 0)
+                {
+                    diffs.Add(
+                        new DiffOperation(
+                            DiffOperationType.UpdateProps,
+                            id,
+                            propDiff
+                        )
+                    );
                 }
             }
 
             return diffs;
         }
 
-        private static bool DictionaryEquals(
-            Dictionary<string, object> a,
-            Dictionary<string, object> b)
+        private static Dictionary<string, object> ComputeStateDiff(
+                IReadOnlyDictionary<string, object> oldState,
+                IReadOnlyDictionary<string, object> newState)
         {
-            if (a.Count != b.Count)
-                return false;
+            Dictionary<string, object>? diff = null;
 
-            foreach (var kv in a)
+            foreach (var (key, newValue) in newState)
             {
-                if (!b.TryGetValue(kv.Key, out var v) || !Equals(v, kv.Value))
-                    return false;
+                if (!oldState.TryGetValue(key, out var oldValue) ||
+                    !Equals(oldValue, newValue))
+                {
+                    diff ??= new Dictionary<string, object>();
+                    diff[key] = newValue;
+                }
             }
 
-            return true;
+            return diff ?? EmptyDictionary;
         }
+
+        private static Dictionary<string, object> ComputePropDiff(
+                IReadOnlyDictionary<string, object> oldProp,
+                IReadOnlyDictionary<string, object> newProp)
+        {
+            Dictionary<string, object>? diff = null;
+
+            foreach (var (key, newValue) in newProp)
+            {
+                if (!oldProp.TryGetValue(key, out var oldValue) ||
+                    !Equals(oldValue, newValue))
+                {
+                    diff ??= new Dictionary<string, object>();
+                    diff[key] = newValue;
+                }
+            }
+
+            return diff ?? EmptyDictionary;
+        }
+
+        private static readonly Dictionary<string, object> EmptyDictionary
+            = new();
+
     }
 
 }

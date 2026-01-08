@@ -1,6 +1,4 @@
-﻿
-
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace UIFramework
 {
@@ -8,40 +6,54 @@ namespace UIFramework
     {
         public UICheckbox(string text, bool isChecked, bool isEnabled)
         {
-            Props["tag"] = null;
-            Props["text"] = text;
-            States["checked"] = isChecked;
-            States["enabled"] = isEnabled;
+            Tag = default;
+            Text = text;
+            Checked = isChecked;
+            Enabled = isEnabled;
         }
 
         public UICheckbox(string text, bool isChecked, bool isEnabled, string tag)
         {
-            Props["tag"] = tag;
-            Props["text"] = text;
-            States["checked"] = isChecked;
-            States["enabled"] = isEnabled;
+            Tag = tag;
+            Text = text;
+            Checked = isChecked;
+            Enabled = isEnabled;
         }
 
         public UICheckbox(string text, bool isEnabled, string tag)
         {
-            Props["tag"] = tag;
-            Props["text"] = text;
-            States["checked"] = false;
-            States["enabled"] = isEnabled;
+            Tag = tag;
+            Text = text;
+            Checked = false;
+            Enabled = isEnabled;
         }
 
+        private string _text;
+        [JsonIgnore]
+        public string Text
+        {
+            get => _text;
+            set
+            {
+                if (_text == value) return;
+                _text = value;
+                Props["text"] = value;
+                OnPropertyChanged(nameof(Text));
+            }
+        }
+
+        private bool _checked;
         [JsonIgnore]
         public bool Checked
         {
-            get => States.TryGetValue("checked", out var v) && (bool)v;
-            set { States["checked"] = value; OnPropertyChanged(nameof(Checked)); }
-        }
-
-        [JsonIgnore]
-        public bool Enabled
-        {
-            get => States.TryGetValue("enabled", out var v) && (bool)v;
-            set { States["enabled"] = value; OnPropertyChanged(nameof(Enabled)); }
+            get => _checked;
+            set 
+            { 
+                if (_checked == value) return;
+                _checked = value;
+                States["checked"] = value; 
+                OnPropertyChanged(nameof(Checked)); 
+            }
         }
     }
 

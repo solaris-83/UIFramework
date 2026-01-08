@@ -137,7 +137,7 @@ namespace UIFramework.PredefinedPages
         {
             var titleLabel = new UILabel(idStr);
             var titleStyle = new Style() { Layout = style };
-            titleLabel.SetStyle(titleStyle); // da qui evinco che è un title e quindi usa uno stile particolare
+            titleLabel.Style = titleStyle; // da qui evinco che è un title e quindi usa uno stile particolare
             Add(titleLabel);
             // OnUpdated(titleLabel.GetType());
             return titleLabel;
@@ -203,7 +203,7 @@ namespace UIFramework.PredefinedPages
         public UILabel AddBulletedItem(string idStr)
         {
             UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
-            label.SetStyle(new Style() { Layout = "list-item-unordered" });
+            label.Style = new Style() { Layout = "list-item-unordered" };
             _currentTab.Add(label);
             // OnUpdated(label.GetType());
             return label;
@@ -224,7 +224,7 @@ namespace UIFramework.PredefinedPages
         public UILabel AddOrderedItem(string idStr, int index)
         {
             UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
-            label.SetStyle(new Style() { Layout = "list-item-ordered" });
+            label.Style = new Style() { Layout = "list-item-ordered" };
             label.Tag = index;
             _currentTab.Add(label);
             // OnUpdated(label.GetType());
@@ -234,7 +234,7 @@ namespace UIFramework.PredefinedPages
         public UILabel AddOrderedItem(string idStr, string style, int index)
         {
             UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
-            label.SetStyle(new Style() { Layout = style });
+            label.Style = new Style() { Layout = style };
             label.Tag = index;
             _currentTab.Add(label);
             // OnUpdated(label.GetType());
@@ -244,7 +244,7 @@ namespace UIFramework.PredefinedPages
         public UILabel AddOrderedItem(string idStr, string style)
         {
             UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
-            label.SetStyle(new Style() { Layout = style });
+            label.Style = new Style() { Layout = style };
            // label.Tag = index;
             _currentTab.Add(label);
             // OnUpdated(label.GetType());
@@ -264,7 +264,7 @@ namespace UIFramework.PredefinedPages
         public UILabel AddParagraph(string idStr, string style, string color) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
         {
             var label = new UILabel(idStr);
-            label.SetStyle(new Style() { Layout = style, ForegroundColor = color });
+            label.Style = new Style() { Layout = style, ForegroundColor = color };
             _currentTab.Add(label);
             // OnUpdated(label.GetType());
             return label;

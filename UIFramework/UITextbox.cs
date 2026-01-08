@@ -4,26 +4,46 @@ namespace UIFramework
 {
     public class UITextbox : UIElement
     {
-        public UITextbox(string placeholder = "", string initialValue = "")
+        public UITextbox(string placeholder, string initialValue)
         {
-            Props["placeholder"] = placeholder;
-            States["value"] = initialValue;
-            States["enabled"] = true;
+            Placeholder = placeholder?? "";
+            Value = initialValue?? "";
+            Enabled = true;
         }
 
+        public UITextbox() : this("", "")
+        {
+            
+        }
+
+        private string _value;
         [JsonIgnore]
         public string Value
         {
-            get => States.ContainsKey("value")? States["value"].ToString() : "";
-            set { States["value"] = value; OnPropertyChanged(nameof(Value)); }
+            get => _value;
+            set 
+            {
+                if (_value == value) return;
+                _value = value;
+                States["value"] = value; 
+                OnPropertyChanged(nameof(Value)); 
+            }
         }
 
+        private string _placeholder;
         [JsonIgnore]
-        public bool Enabled
+        public string Placeholder
         {
-            get => States.TryGetValue("enabled", out var v) && (bool)v;
-            set => States["enabled"] = value;
+            get => _placeholder;
+            set
+            {
+                if (_placeholder == value) return;
+                _placeholder = value;
+                Props["placeholder"] = value;
+                OnPropertyChanged(nameof(Placeholder));
+            }
         }
+
     }
     public class TextPropertyChangedCommand : ICommand
     {

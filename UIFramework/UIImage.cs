@@ -6,14 +6,21 @@ namespace UIFramework
     {
         public UIImage(string src)
         {
-            States["src"] = $"/img/{src}";
+            Src = $"/img/{src}";
         }
 
+        private string _src;
         [JsonIgnore]
         public string Src
         {
-            get => States.ContainsKey("src")? States["src"].ToString() : "";
-            set { States["src"] = value; OnPropertyChanged(nameof(Src)); }
+            get => _src;
+            set 
+            {
+                if (_src == value) return;
+                _src = value;
+                States["src"] = value; 
+                OnPropertyChanged(nameof(Src)); 
+            }
         }
     }
 }
