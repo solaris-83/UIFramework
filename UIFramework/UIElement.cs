@@ -134,6 +134,36 @@ namespace UIFramework
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public class UIElementEnabledChangedCommand : ICommand
+        {
+            private readonly UIElement _element;
+
+            public UIElementEnabledChangedCommand(UIElement element)
+            {
+                _element = element;
+            }
+
+            public void Execute(object newValue)
+            {
+                _element.Enabled = Convert.ToBoolean(newValue);
+            }
+        }
+
+        public class UIElementVisibleChangedCommand : ICommand
+        {
+            private readonly UIElement _element;
+
+            public UIElementVisibleChangedCommand(UIElement element)
+            {
+                _element = element;
+            }
+
+            public void Execute(object newValue)
+            {
+                _element.Visible = Convert.ToBoolean(newValue);
+            }
+        }
     }
 
     public class Style

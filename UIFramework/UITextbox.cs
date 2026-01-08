@@ -45,7 +45,7 @@ namespace UIFramework
         }
 
     }
-    public class TextPropertyChangedCommand : ICommand
+    public class TextPropertyChangedCommand : ICommandOld
     {
         private readonly UITextbox _textBox;
         private readonly Dictionary<string, object> _states;

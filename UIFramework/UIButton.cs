@@ -49,7 +49,7 @@ namespace UIFramework
             }
         }
 
-        public class ButtonPropertyChangedCommand : ICommand
+        public class ButtonPropertyChangedCommand : ICommandOld
         {
             private readonly UIButton _button;
             private readonly Dictionary<string, object> _states;

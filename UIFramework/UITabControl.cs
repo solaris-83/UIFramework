@@ -36,7 +36,7 @@ namespace UIFramework
             } 
         } 
         
-        public class TabControlPropertyChangedCommand : ICommand
+        public class TabControlPropertyChangedCommand : ICommandOld
         { 
             private readonly UITabControl _tabControl;
             private readonly Dictionary<string, object> _states;

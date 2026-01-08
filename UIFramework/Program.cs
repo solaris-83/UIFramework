@@ -271,29 +271,7 @@ class Program
     {
         LibraryUI libraryUI = new LibraryUI();
 
-        // ==== DISCLAIMER PAGE ====
-        // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
-        var page = libraryUI.CreatePageDisclaimer();
-        var par1 = page.AddParagraph("Paragraph #1.", "paragraph", "gray");
-        var par2 = page.AddParagraph("Paragraph #2.", "paragraph", "gray");
-        page.AddBulletedItem("#1 bulletted item");
-        page.AddBulletedItem("#2 bulletted item");
-        page.AddOrderedItem("Item 1");
-        page.AddOrderedItem("Item 2");
-        page.AddOrderedItem("Item 3");
-        page.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
-        page.Remove(par2.Id);
-        page.AddImage("Screenshot.png");
-        libraryUI.ShowAndWait(page);
-
-        var par3 = page.AddParagraph("Paragraph #3 after ShowAndWait");
-
-        page.UpdateParagraph(par3.Id, "Paragraph #3 - BIS -  after ShowAndWait");
-
-        // ==== RESULT PAGE ====
-        var pageResult = libraryUI.CreatePageResult();
-        pageResult.AddParagraph("Questa è la pagina di risultato.", "result-paragraph", "blue");
-        libraryUI.ShowAndWait(pageResult);
+        
 
         // =========== MENU PAGE ===========
         // Singola selezione con checkbox
@@ -358,15 +336,28 @@ class Program
         }
 
         Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAny("Activate_Injectors"));  
-        Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAny(0));  
+        Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAny(0));
 
-        // Simulo evento JS (selezione di un tab)
-        libraryUI.SimulateJsEvent(chbx1.Id, "propertyChanged",
-            new Dictionary<string, object> { ["checked"] = true });
-        libraryUI.SimulateJsEvent(chbx2.Id, "propertyChanged",
-            new Dictionary<string, object> { ["checked"] = true });
-        libraryUI.SimulateJsEvent(chbx4.Id, "propertyChanged",
-            new Dictionary<string, object> { ["checked"] = true });
+        for (int i = 0; i <= 500; i++)
+        {
+            // Simulo evento JS (selezione di un tab)
+            libraryUI.SimulateJsEvent(chbx1.Id, "propertyChanged",
+                new Dictionary<string, object> { ["checked"] = true });
+            libraryUI.SimulateJsEvent(chbx2.Id, "propertyChanged",
+                new Dictionary<string, object> { ["checked"] = true });
+            libraryUI.SimulateJsEvent(chbx4.Id, "propertyChanged",
+                new Dictionary<string, object> { ["checked"] = true });
+            
+            Thread.Sleep(100);
+            // Simulo evento JS (selezione di un tab)
+            libraryUI.SimulateJsEvent(chbx1.Id, "propertyChanged",
+                new Dictionary<string, object> { ["checked"] = false });
+            libraryUI.SimulateJsEvent(chbx2.Id, "propertyChanged",
+                new Dictionary<string, object> { ["checked"] = false });
+            libraryUI.SimulateJsEvent(chbx4.Id, "propertyChanged",
+                new Dictionary<string, object> { ["checked"] = false });
+            Thread.Sleep(100);
+        }
 
         Console.WriteLine("HasCheckBoxes " + menuPage.HasCheckboxes);
         Console.WriteLine("IsMultipleSelection " + menuPage.IsMultipleSelection);
@@ -383,9 +374,31 @@ class Program
 
         Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAll("Activate_Injectors", "Activate_Coils", "NewCheckbox"));  // TODO non funziona capire come mai con Alberto
         Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAll(0, 1, 3));
-        
-        
-        
+
+
+        // ==== DISCLAIMER PAGE ====
+        // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
+        var page = libraryUI.CreatePageDisclaimer();
+        var par1 = page.AddParagraph("Paragraph #1.", "paragraph", "gray");
+        var par2 = page.AddParagraph("Paragraph #2.", "paragraph", "gray");
+        page.AddBulletedItem("#1 bulletted item");
+        page.AddBulletedItem("#2 bulletted item");
+        page.AddOrderedItem("Item 1");
+        page.AddOrderedItem("Item 2");
+        page.AddOrderedItem("Item 3");
+        page.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
+        page.Remove(par2.Id);
+        page.AddImage("Screenshot.png");
+        libraryUI.ShowAndWait(page);
+
+        var par3 = page.AddParagraph("Paragraph #3 after ShowAndWait");
+
+        page.UpdateParagraph(par3.Id, "Paragraph #3 - BIS -  after ShowAndWait");
+
+        // ==== RESULT PAGE ====
+        var pageResult = libraryUI.CreatePageResult();
+        pageResult.AddParagraph("Questa è la pagina di risultato.", "result-paragraph", "blue");
+        libraryUI.ShowAndWait(pageResult);
 
 
         // ==== PAGINA CUSTOM ====
@@ -456,25 +469,25 @@ class Program
         Console.ReadKey();
     }
 
-    private static void SimulateJsEvent(
-        UiCommandDispatcher dispatcher,
-        string elementId,
-        string eventType,
-        Dictionary<string, object> payload)
-    {
-        Console.WriteLine("\n>>> EVENTO JS");
-        var evt = new UiEvent
-        {
-            ElementId = elementId,
-            EventType = eventType,
-            Payload = payload
-        };
+    //private static void SimulateJsEvent(
+    //    UiCommandDispatcher dispatcher,
+    //    string elementId,
+    //    string eventType,
+    //    Dictionary<string, object> states)
+    //{
+    //    Console.WriteLine("\n>>> EVENTO JS");
+    //    var evt = new UiEvent
+    //    {
+    //        ElementId = elementId,
+    //        EventType = eventType, 
+    //        States = states
+    //    };
 
-        var diffs = dispatcher.HandleEvent(evt);
+    //    var diffs = dispatcher.HandleEvent(evt);
 
-        Console.WriteLine(">>> DIFF PRODOTTI:");
-        Console.WriteLine(JsonConvert.SerializeObject(diffs, Formatting.Indented));
-    }
+    //    Console.WriteLine(">>> DIFF PRODOTTI:");
+    //    Console.WriteLine(JsonConvert.SerializeObject(diffs, Formatting.Indented));
+    //}
     /*
 
         JS UI

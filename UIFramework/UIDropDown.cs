@@ -38,7 +38,7 @@ namespace UIFramework
         }
     }
 
-    public class DropDownPropertyChangedCommand : ICommand
+    public class DropDownPropertyChangedCommand : ICommandOld
     {
         private readonly UIDropDown _dropDown;
         private readonly Dictionary<string, object> _states;

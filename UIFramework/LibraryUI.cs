@@ -88,21 +88,18 @@ namespace UIFramework
         public void SimulateJsEvent(
                 string elementId,
                 string eventType,
-                Dictionary<string, object> payload)
+                Dictionary<string, object> states)
         {
             Console.WriteLine("\n>>> EVENTO JS");
-            var evt = new UiEvent
+            var evt = new UIEvent
             {
                 ElementId = elementId,
                 EventType = eventType,
-                Payload = payload
+                NewStates = states
             };
             Console.WriteLine(JsonConvert.SerializeObject(evt, Formatting.Indented));
 
-            var diffs = _dispatcher.HandleEvent(evt);
-
-            Console.WriteLine(">>> DIFF PRODOTTI:");
-            Console.WriteLine(JsonConvert.SerializeObject(diffs, Formatting.Indented));
+            _dispatcher.HandleEvent(evt);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Win32;
+using Newtonsoft.Json;
 using System.ComponentModel;
 using UIFramework.Helpers;
 
@@ -9,6 +10,7 @@ namespace UIFramework.PredefinedPages
         private UITabControl _tabControl;
         private UITab _currentTab;
         private const string STOP_BUTTON_TEXT = "STOP";
+
         public Page() 
         {
             _tabControl = new UITabControl();

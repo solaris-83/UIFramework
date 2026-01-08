@@ -3,11 +3,11 @@ using UIFramework.PredefinedPages;
 
 namespace UIFramework
 {
-    public class UiEvent
+    public class UIEvent
     {
-        public string ElementId { get; set; }
-        public string EventType { get; set; }   // "change", "click", ...
-        public Dictionary<string, object> Payload { get; set; }
+        public string ElementId { get; set; }  // elemento su cui è stato lanciato l'evento
+        public string EventType { get; set; }   // tipo di evento "change", ...
+        public Dictionary<string, object> NewStates { get; set; }
     }
 
     public sealed class DiffOperation
@@ -153,9 +153,9 @@ namespace UIFramework
     //    }
     //}
 
-    public static class DiffEngine
+    public class DiffEngine
     {
-        public static List<DiffOperation> Compute(
+        public List<DiffOperation> Compute(
             UISnapshot oldSnapshot,
             UISnapshot newSnapshot)
         {
@@ -243,7 +243,7 @@ namespace UIFramework
             return diffs;
         }
 
-        private static Dictionary<string, object> ComputeStateDiff(
+        private Dictionary<string, object> ComputeStateDiff(
                 IReadOnlyDictionary<string, object> oldState,
                 IReadOnlyDictionary<string, object> newState)
         {
@@ -262,7 +262,7 @@ namespace UIFramework
             return diff ?? EmptyDictionary;
         }
 
-        private static Dictionary<string, object> ComputePropDiff(
+        private Dictionary<string, object> ComputePropDiff(
                 IReadOnlyDictionary<string, object> oldProp,
                 IReadOnlyDictionary<string, object> newProp)
         {

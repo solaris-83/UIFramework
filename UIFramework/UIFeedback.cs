@@ -161,7 +161,7 @@ namespace UIFramework
         }
     }
 
-    public class FeedbackTickCommand : ICommand
+    public class FeedbackTickCommand : ICommandOld
     {
         private readonly UIFeedback _feedback;
 
@@ -179,7 +179,7 @@ namespace UIFramework
         }
     }
 
-    public class FeedbackChangedCommand : ICommand
+    public class FeedbackChangedCommand : ICommandOld
     {
         private readonly UIFeedback _feedback;
         private readonly Dictionary<string, object> _states;

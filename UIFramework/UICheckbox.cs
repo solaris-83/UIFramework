@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Win32;
+using Newtonsoft.Json;
+using System.Windows.Input;
+using System.Xml.Linq;
 
 namespace UIFramework
 {
@@ -57,12 +60,12 @@ namespace UIFramework
         }
     }
 
-    public class CheckboxPropertyChangedCommand : ICommand
+    public class CheckboxPropertyChangedCommandOld : ICommandOld
     {
         private readonly UICheckbox _checkbox;
         private readonly Dictionary<string, object> _states;
 
-        public CheckboxPropertyChangedCommand(UICheckbox checkbox, Dictionary<string, object> states)
+        public CheckboxPropertyChangedCommandOld(UICheckbox checkbox, Dictionary<string, object> states)
         {
             _checkbox = checkbox;
             _states = states;
@@ -71,6 +74,21 @@ namespace UIFramework
         public void Execute()
         {
            _checkbox.UpdateStates(_states);
+        }
+    }
+
+    public class CheckboxCheckedChangedCommand : ICommand
+    {
+        private readonly UICheckbox _checkbox;
+
+        public CheckboxCheckedChangedCommand(UICheckbox checkbox)
+        {
+            _checkbox = checkbox;
+        }
+
+        public void Execute(object newValue)
+        {
+            _checkbox.Checked = Convert.ToBoolean(newValue);
         }
     }
 }
