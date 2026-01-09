@@ -1,5 +1,4 @@
-﻿
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -80,7 +79,7 @@ namespace UIFrameworkDotNet
         private void Page_Updated(object sender, Type e)
         {
             var diffs = _dispatcher.EvaluateDiff();
-            Console.WriteLine("\n>>> EvaluateDiff");
+            Console.WriteLine("\n>>> MESSAGGIO C# -> JS");
             Console.WriteLine(PageSerializer.Serialize(diffs));
         }
 
@@ -93,7 +92,7 @@ namespace UIFrameworkDotNet
                 string eventType,
                 Dictionary<string, object> states)
         {
-            Console.WriteLine("\n>>> EVENTO JS");
+            Console.WriteLine("\n>>> EVENTO JS -> C#");
             var evt = new UIEvent
             {
                 ElementId = elementId,

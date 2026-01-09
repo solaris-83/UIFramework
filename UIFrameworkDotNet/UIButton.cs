@@ -49,22 +49,5 @@ namespace UIFrameworkDotNet
                 OnPropertyChanged(nameof(Text)); 
             }
         }
-
-        public class ButtonPropertyChangedCommand : ICommandOld
-        {
-            private readonly UIButton _button;
-            private readonly Dictionary<string, object> _states;
-
-            public ButtonPropertyChangedCommand(UIButton button, Dictionary<string, object> states)
-            {
-                _button = button;
-                _states = states;
-            }
-
-            public void Execute()
-            {
-                _button.UpdateStates(_states);
-            }
-        }
     }
 }

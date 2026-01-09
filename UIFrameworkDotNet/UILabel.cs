@@ -25,4 +25,19 @@ namespace UIFrameworkDotNet
             }
         }
     }
+
+    public class LabelTextChangedCommand : ICommand
+    {
+        private readonly UILabel _label;
+
+        public LabelTextChangedCommand(UILabel label)
+        {
+            _label = label;
+        }
+
+        public void Execute(object newValue)
+        {
+            _label.Text = newValue.ToString();
+        }
+    }
 }

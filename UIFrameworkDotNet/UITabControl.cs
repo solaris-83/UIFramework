@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 
 namespace UIFrameworkDotNet
 {
@@ -37,22 +36,20 @@ namespace UIFrameworkDotNet
                 OnPropertyChanged(nameof(ActiveTabId)); 
             } 
         } 
-        
-        public class TabControlPropertyChangedCommand : ICommandOld
-        { 
-            private readonly UITabControl _tabControl;
-            private readonly Dictionary<string, object> _states;
+    }
 
-            public TabControlPropertyChangedCommand(UITabControl tabControl, Dictionary<string, object> states)
-            {
-                _tabControl = tabControl;
-                _states = states;
-            }
+    public class TabControlActiveTabChangedCommand : ICommand
+    {
+        private readonly UITabControl _tabControl;
 
-            public void Execute()
-            {
-                _tabControl.UpdateStates(_states);
-            }
+        public TabControlActiveTabChangedCommand(UITabControl tabControl)
+        {
+            _tabControl = tabControl;
+        }
+
+        public void Execute(object newValue)
+        {
+            _tabControl.ActiveTabId = newValue.ToString();
         }
     }
 

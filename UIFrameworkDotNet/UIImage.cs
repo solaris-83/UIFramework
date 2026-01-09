@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace UIFrameworkDotNet
 {
@@ -6,21 +7,36 @@ namespace UIFrameworkDotNet
     {
         public UIImage(string src)
         {
-            Src = $"/img/{src}";
+            Source = $"/img/{src}";
         }
 
-        private string _src;
+        private string _source;
         [JsonIgnore]
-        public string Src
+        public string Source
         {
-            get => _src;
-            set 
+            get => _source;
+            set
             {
-                if (_src == value) return;
-                _src = value;
-                States["src"] = value; 
-                OnPropertyChanged(nameof(Src)); 
+                if (_source == value) return;
+                _source = value;
+                States["source"] = value;
+                OnPropertyChanged(nameof(Source));
             }
+        }
+    }
+
+    public class ImageSourceChangedCommand : ICommand
+    {
+        private readonly UIImage _image;
+
+        public ImageSourceChangedCommand(UIImage image)
+        {
+            _image = image;
+        }
+
+        public void Execute(object newValue)
+        {
+            _image.Source = newValue.ToString();
         }
     }
 }

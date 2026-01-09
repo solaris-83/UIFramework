@@ -39,19 +39,19 @@ namespace UIFrameworkDotNet
         Move = 4
     }
 
-    public class UiDiff
-    {
-        public DiffOperationType Operation { get; set; }
-        public string ElementId { get; set; }
-        public string ParentId { get; set; } // serve per Add
-        public Dictionary<string, object> Props { get; set; } 
-        public Dictionary<string, object> States { get; set; }
-    }
+    //public class UiDiff
+    //{
+    //    public DiffOperationType Operation { get; set; }
+    //    public string ElementId { get; set; }
+    //    public string ParentId { get; set; } // serve per Add
+    //    public Dictionary<string, object> Props { get; set; } 
+    //    public Dictionary<string, object> States { get; set; }
+    //}
 
-    public class PageSnapshot
-    {
-        public Dictionary<string, UIElementSnapshot> Elements { get; } = new Dictionary<string, UIElementSnapshot>();
-    }
+    //public class PageSnapshot
+    //{
+    //    public Dictionary<string, UIElementSnapshot> Elements { get; } = new Dictionary<string, UIElementSnapshot>();
+    //}
 
     public class UIElementSnapshot
     {

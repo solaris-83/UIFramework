@@ -269,9 +269,12 @@ namespace ConsoleApp
         // 3. (OK mi sembra, ricontrollare, magari servirsi della dispose?) Bisogna registrarsi agli eventi tick una sola volta per la stessa feedback
         // 4. TODO Implementare dispose (tra cui eventi) 
         // 5. TODO Implementare sequence  ( ci sono rif. a sequence nella app di tutorial e bundle update => si possono dismettere i vecchi metodi)
-        // 6. TODO C'è un problema: per UIELement che devono notificare da C# -> JS se non sono dentro una predefinedPage e quindi non c'è a disposizione l'evento Updated
-        //      abbiamo un problema perché non possiamo chiamare OnUpdated direttamente dalla Add/Update del ContainerElement. E' possibile usare INotifyPropertyChanged?
-        // 7. TODO Verificare se il nuovo metodo Update del ContainerElement può essere  riutilizzato in imepelemtazione già fatte in altro modo.
+        // 6. TODO Terminare le page (property del disclaimer es. IsScrolledToBottom)
+        // 7. TODO rimuovere Style in favore di un'unica property di nome CssClassName
+        // 8. TODO fare le ultime property e rimuovere States["..."] dai CTORs e terminare i Command
+        // 9. TODO improvement Dropdown e testarla
+        // 10. TODO testare le Textbox (cioè il two-way binding), magari ha senso una pagina con le form
+
         static void Main()
         {
             LibraryUI libraryUI = new LibraryUI();
@@ -371,13 +374,13 @@ namespace ConsoleApp
             Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAny("Activate_Injectors", "Activate_Coils"));
             Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAny(0, 1));
 
-            Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAll("Activate_Injectors", "Activate_Coils"));  // TODO non funziona capire come mai con Alberto
-            Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAll(0, 1));   // TODO non funziona capire come mai con Alberto
+            Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAll("Activate_Injectors", "Activate_Coils")); 
+            Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAll(0, 1));
 
             Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAny("NewCheckbox"));
             Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAny(3));
 
-            Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAll("Activate_Injectors", "Activate_Coils", "NewCheckbox"));  // TODO non funziona capire come mai con Alberto
+            Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAll("Activate_Injectors", "Activate_Coils", "NewCheckbox"));
             Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAll(0, 1, 3));
 
 
@@ -391,10 +394,14 @@ namespace ConsoleApp
             page.AddOrderedItem("Item 1");
             page.AddOrderedItem("Item 2");
             page.AddOrderedItem("Item 3");
+            var btn = page.AddButton("CLICK ON ME!!", true);
             page.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
             page.Remove(par2.Id);
             page.AddImage("Screenshot.png");
             libraryUI.ShowAndWait(page);
+
+            libraryUI.SimulateJsEvent(btn.Id, "propertyChanged",
+                    new Dictionary<string, object> { ["enabled"] = false });
 
             var par3 = page.AddParagraph("Paragraph #3 after ShowAndWait");
 

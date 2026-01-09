@@ -8,7 +8,7 @@ namespace UIFrameworkDotNet
         public UITextbox(string placeholder, string initialValue)
         {
             Placeholder = placeholder?? "";
-            Value = initialValue?? "";
+            Text = initialValue?? "";
             Enabled = true;
         }
 
@@ -17,17 +17,17 @@ namespace UIFrameworkDotNet
             
         }
 
-        private string _value;
+        private string _text;
         [JsonIgnore]
-        public string Value
+        public string Text
         {
-            get => _value;
+            get => _text;
             set 
             {
-                if (_value == value) return;
-                _value = value;
-                States["value"] = value; 
-                OnPropertyChanged(nameof(Value)); 
+                if (_text == value) return;
+                _text = value;
+                States["text"] = value; 
+                OnPropertyChanged(nameof(Text)); 
             }
         }
 
@@ -44,22 +44,20 @@ namespace UIFrameworkDotNet
                 OnPropertyChanged(nameof(Placeholder));
             }
         }
-
     }
-    public class TextPropertyChangedCommand : ICommandOld
+
+    public class TextboxTextChangedCommand : ICommand
     {
         private readonly UITextbox _textBox;
-        private readonly Dictionary<string, object> _states;
 
-        public TextPropertyChangedCommand(UITextbox textBox, Dictionary<string, object> states)
+        public TextboxTextChangedCommand(UITextbox textBox)
         {
             _textBox = textBox;
-            _states = states;
         }
 
-        public void Execute()
+        public void Execute(object newValue)
         {
-            _textBox.UpdateStates(_states);
+            _textBox.Text = newValue.ToString();
         }
     }
 }

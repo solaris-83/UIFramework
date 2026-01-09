@@ -190,7 +190,7 @@ namespace UIFrameworkDotNet.PredefinedPages
                // _logger.Error($"Image not found in the Working Unit {element.Source}");
             }
 
-            image.Src = ImageHelper.ConvertImageToBase64(imagePath);
+            image.Source = ImageHelper.ConvertImageToBase64(imagePath);
             _currentTab.Add(image);
             // OnUpdated(image.GetType());
             return image;
@@ -208,7 +208,7 @@ namespace UIFrameworkDotNet.PredefinedPages
                 // _logger.Error($"Image not found in the Working Unit {element.Source}");
                 return false;
             }
-            img.Src = ImageHelper.ConvertImageToBase64(imagePath);
+            img.Source = ImageHelper.ConvertImageToBase64(imagePath);
             // OnUpdated(img.GetType());
             return true;
         }
@@ -363,8 +363,7 @@ namespace UIFrameworkDotNet.PredefinedPages
             if (button is UIButton btn)
                 btn.Enabled = true;
             //button.Enabled = true;
-            // TODO Mettere un warning se non ci si è registrati all'evento
-            // OnUpdated(button.GetType());
+           
             return true;
         }
 
@@ -375,8 +374,7 @@ namespace UIFrameworkDotNet.PredefinedPages
                 return false;
             if (button is UIButton btn)
                 btn.Enabled = false;
-            // TODO Mettere un warning se non ci si è registrati all'evento
-            // OnUpdated(button.GetType());
+             
             return true;
         }
         #endregion

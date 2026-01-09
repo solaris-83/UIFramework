@@ -35,13 +35,29 @@ namespace UIFrameworkDotNet
                 nameof(UICheckbox.Checked),
                 (chk) => new CheckboxCheckedChangedCommand(chk)
             );
+            _registry.Register<UIImage>(
+               nameof(UIImage.Source),
+               (img) => new ImageSourceChangedCommand(img)
+           ); 
+            _registry.Register<UILabel>(
+               nameof(UILabel.Text),
+               (label) => new LabelTextChangedCommand(label)
+           ); 
+            _registry.Register<UITabControl>(
+               nameof(UITabControl.ActiveTabId),
+               (tbc) => new TabControlActiveTabChangedCommand(tbc)
+           );
+            _registry.Register<UITextbox>(
+              nameof(UITextbox.Text),
+              (txt) => new TextboxTextChangedCommand(txt)
+          );
         }
 
         // Usato per rispondere agli eventi generati dal JS
         public void HandleEvent(UIEvent events)
         {
             // 1. ricavo UIElement tramite Id
-            // 2. per ogni nuova property States aggiornata cerco il cmd che applica l'aggiornamento della istanza UIElement
+            // 2. per ogni nuova property States aggiornata inviata dal JS cerco il cmd che applica l'aggiornamento della istanza UIElement lato C#
             var element = _page.FindById(events.ElementId);
             foreach(var ev in events.NewStates)
             {
@@ -56,7 +72,6 @@ namespace UIFrameworkDotNet
         {
             var newSnapshot = SnapshotBuilder.From(_page);
             var diffs = _diffEngine.Compute(_lastSnapshot, newSnapshot);
-
             _lastSnapshot = newSnapshot;
             return diffs;
         }

@@ -44,7 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandFactory.cs" />
     <Compile Include="CommandRegistry.cs" />
     <Compile Include="ContainerElement.cs" />
     <Compile Include="Helpers\DataArray.cs" />
@@ -57,7 +56,6 @@
     <Compile Include="PredefinedPages\PageDisclaimer.cs" />
     <Compile Include="PredefinedPages\PageMenu.cs" />
     <Compile Include="PredefinedPages\PageResult.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UIButton.cs" />
     <Compile Include="UICheckbox.cs" />

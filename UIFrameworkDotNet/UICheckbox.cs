@@ -1,7 +1,6 @@
 ﻿
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 namespace UIFrameworkDotNet
 {
     public class UICheckbox : UIElement
@@ -56,23 +55,6 @@ namespace UIFrameworkDotNet
                 States["checked"] = value; 
                 OnPropertyChanged(nameof(Checked)); 
             }
-        }
-    }
-
-    public class CheckboxPropertyChangedCommandOld : ICommandOld
-    {
-        private readonly UICheckbox _checkbox;
-        private readonly Dictionary<string, object> _states;
-
-        public CheckboxPropertyChangedCommandOld(UICheckbox checkbox, Dictionary<string, object> states)
-        {
-            _checkbox = checkbox;
-            _states = states;
-        }
-
-        public void Execute()
-        {
-           _checkbox.UpdateStates(_states);
         }
     }
 
