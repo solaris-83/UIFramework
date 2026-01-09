@@ -40,20 +40,18 @@ namespace UIFrameworkDotNet
         }
     }
 
-    public class DropDownPropertyChangedCommand : ICommandOld
+    public class DropDownPropertyChangedCommand : ICommand
     {
         private readonly UIDropDown _dropDown;
-        private readonly Dictionary<string, object> _states;
 
-        public DropDownPropertyChangedCommand(UIDropDown dropDown, Dictionary<string, object> states)
+        public DropDownPropertyChangedCommand(UIDropDown dropDown)
         {
             _dropDown = dropDown;
-            _states = states;
         }
 
-        public void Execute()
+        public void Execute(object newValue)
         {
-            _dropDown.UpdateStates(_states);
+            throw new System.NotImplementedException();
         }
     }
 }

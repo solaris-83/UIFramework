@@ -51,6 +51,14 @@ namespace UIFrameworkDotNet
               nameof(UITextbox.Text),
               (txt) => new TextboxTextChangedCommand(txt)
           );
+            _registry.Register<UIFeedback>(
+              nameof(UIFeedback.Remaining),
+              (fb) => new FeedbackTickChangedCommand(fb)
+          );
+            _registry.Register<UIFeedback>(
+             nameof(UIFeedback.Percentage),
+             (fb) => new FeedbackTickChangedCommand(fb)
+         );
         }
 
         // Usato per rispondere agli eventi generati dal JS

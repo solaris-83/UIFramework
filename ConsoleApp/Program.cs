@@ -7,7 +7,7 @@ using UIFrameworkDotNet;
 namespace ConsoleApp
 {
 
-  
+
     /*
     class Program
     {
@@ -173,93 +173,74 @@ namespace ConsoleApp
           }
       }*/
 
-    //class Program
-    //{
-    //    static void Main()
-    //    {
-    //        var parser = new ArithmeticParser();
+    /* 
+    class Program
+    {
+        static void Main()
+        {
+            var parser = new ArithmeticParser();
 
-    //        Console.WriteLine("=== Test con formula applicata a lista di valori ===\n");
+            Console.WriteLine("=== Test con formula applicata a lista di valori ===\n");
 
-    //        // Formula: (x - 40) / 100
-    //        string formula = "(x - 40) / 100";
-    //        List<double> valori = new List<double> { 40, 50, 60, 140, 240 };
+            // Formula: (x - 40) / 100
+            string formula = "(x - 40) / 100";
+            List<double> valori = new List<double> { 40, 50, 60, 140, 240 };
 
-    //        Console.WriteLine($"Formula: {formula}");
-    //        Console.WriteLine($"Valori:  {string.Join(", ", valori)}\n");
+            Console.WriteLine($"Formula: {formula}");
+            Console.WriteLine($"Valori:  {string.Join(", ", valori)}\n");
 
-    //        List<double> risultati = parser.ParseList(formula, "x", valori);
+            List<double> risultati = parser.ParseList(formula, "x", valori);
 
-    //        Console.WriteLine("Risultati:");
-    //        for (int i = 0; i < valori.Count; i++)
-    //        {
-    //            Console.WriteLine($"  x = {valori[i],6:F1}  =>  {risultati[i]:F3}");
-    //        }
+            Console.WriteLine("Risultati:");
+            for (int i = 0; i < valori.Count; i++)
+            {
+                Console.WriteLine($"  x = {valori[i],6:F1}  =>  {risultati[i]:F3}");
+            }
 
-    //        List<double> risultati2 = parser.ParseList(formula, valori);
+            List<double> risultati2 = parser.ParseList(formula, valori);
 
-    //        Console.WriteLine("Risultati:");
-    //        for (int i = 0; i < valori.Count; i++)
-    //        {
-    //            Console.WriteLine($"  x = {valori[i],6:F1}  =>  {risultati2[i]:F3}");
-    //        }
+            Console.WriteLine("Risultati:");
+            for (int i = 0; i < valori.Count; i++)
+            {
+                Console.WriteLine($"  x = {valori[i],6:F1}  =>  {risultati2[i]:F3}");
+            }
 
 
-    //        Console.WriteLine("\n=== Altri esempi ===\n");
+            Console.WriteLine("\n=== Altri esempi ===\n");
 
-    //        // Altri esempi di formule
-    //        var esempi = new Dictionary<string, (string formula, List<double> valori)>
-    //        {
-    //            { "Conversione Fahrenheit->Celsius", ("(x - 32) * 5 / 9", new List<double> { 32, 50, 68, 86, 104 }) },
-    //            { "Percentuale", ("x / 100", new List<double> { 10, 25, 50, 75, 100 }) },
-    //            { "Quadrato + 10", ("x * x + 10", new List<double> { 1, 2, 3, 4, 5 }) }
-    //        };
+            // Altri esempi di formule
+            var esempi = new Dictionary<string, (string formula, List<double> valori)>
+            {
+                { "Conversione Fahrenheit->Celsius", ("(x - 32) * 5 / 9", new List<double> { 32, 50, 68, 86, 104 }) },
+                { "Percentuale", ("x / 100", new List<double> { 10, 25, 50, 75, 100 }) },
+                { "Quadrato + 10", ("x * x + 10", new List<double> { 1, 2, 3, 4, 5 }) }
+            };
 
-    //        foreach (var esempio in esempi)
-    //        {
-    //            Console.WriteLine($"{esempio.Key}: {esempio.Value.formula}");
-    //            var ris = parser.ParseList(esempio.Value.formula, "x", esempio.Value.valori);
-    //            for (int i = 0; i < esempio.Value.valori.Count; i++)
-    //            {
-    //                Console.WriteLine($"  x = {esempio.Value.valori[i],6:F1}  =>  {ris[i]:F3}");
-    //            }
-    //            Console.WriteLine();
-    //        }
+            foreach (var esempio in esempi)
+            {
+                Console.WriteLine($"{esempio.Key}: {esempio.Value.formula}");
+                var ris = parser.ParseList(esempio.Value.formula, "x", esempio.Value.valori);
+                for (int i = 0; i < esempio.Value.valori.Count; i++)
+                {
+                    Console.WriteLine($"  x = {esempio.Value.valori[i],6:F1}  =>  {ris[i]:F3}");
+                }
+                Console.WriteLine();
+            }
 
-    //        Console.WriteLine("\n=== Test con variabili multiple ===\n");
+            Console.WriteLine("\n=== Test con variabili multiple ===\n");
 
-    //        // Puoi anche usare più variabili contemporaneamente
-    //        var vars = new Dictionary<string, double>
-    //        {
-    //            { "x", 10 },
-    //            { "y", 20 }
-    //        };
+            // Puoi anche usare più variabili contemporaneamente
+            var vars = new Dictionary<string, double>
+            {
+                { "x", 10 },
+                { "y", 20 }
+            };
 
-    //        double risultato = parser.Parse("(x + y) * 2", vars);
-    //        Console.WriteLine($"(x + y) * 2 con x=10, y=20  =>  {risultato}");
-    //    }
-    //}
-
-    //class Program
-    //{
-    //    static void Main()
-    //    {
-
-    //        var serializer = new XmlSerializer(typeof(EslxComposer));
-    //        using var fs = File.OpenRead("config.xml");
-
-    //        var composer = (EslxComposer)serializer.Deserialize(fs);
-
-    //        var model = composer.Models.First(m => m.Name.Contains("EV"));
-
-    //        var finalSteps = StepResolver.ResolveSteps(model, composer.StepSets);
-
-    //        foreach (var step in finalSteps.Where(s => s.Enabled))
-    //        {
-    //            Console.WriteLine($"{step.Id} -> {step.Execute}");
-    //        }
-    //    }
-    //}
+            double risultato = parser.Parse("(x + y) * 2", vars);
+            Console.WriteLine($"(x + y) * 2 con x=10, y=20  =>  {risultato}");
+        }
+    }
+    */
 
     class Program
     {
@@ -301,7 +282,7 @@ namespace ConsoleApp
             Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAny("Activate_Injectors"));
             Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAny(0));
 
-            // Simulo evento JS (selezione di un tab)
+            // Simulo evento JS (selezione di una checkbox)
             libraryUI.SimulateJsEvent(chbx1.Id, "propertyChanged",
                 new Dictionary<string, object> { ["checked"] = true });
 
@@ -345,7 +326,7 @@ namespace ConsoleApp
 
             Console.WriteLine("SelectedIds " + menuPage.SelectedIds.ContainsAny("Activate_Injectors"));
             Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAny(0));
-
+            /*
             for (int i = 0; i <= 500; i++)
             {
                 // Simulo evento JS (selezione di un tab)
@@ -366,6 +347,7 @@ namespace ConsoleApp
                     new Dictionary<string, object> { ["checked"] = false });
                 Thread.Sleep(100);
             }
+            */
 
             Console.WriteLine("HasCheckBoxes " + menuPage.HasCheckboxes);
             Console.WriteLine("IsMultipleSelection " + menuPage.IsMultipleSelection);
@@ -452,7 +434,7 @@ namespace ConsoleApp
 
             // Faccio partire il countdown
             feedback.StartCountdown();
-            Thread.Sleep(5000);
+            Thread.Sleep(20000);
             feedback.StopCountdown();
 
             Thread.Sleep(5000);

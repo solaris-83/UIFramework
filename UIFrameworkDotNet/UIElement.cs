@@ -83,12 +83,12 @@ namespace UIFrameworkDotNet
         public Style Style
         {
             get => _style;
-            set 
-            { 
-                if (_style!= null && _style.Equals(value)) return;
+            set
+            {
+                if (_style != null && _style.Equals(value)) return;
                 _style = value;
-                Props["style"] = value; 
-                OnPropertyChanged(nameof(Style)); 
+                Props["style"] = value;
+                OnPropertyChanged(nameof(Style));
             }
         }
 
@@ -166,7 +166,6 @@ namespace UIFrameworkDotNet
             _element.Visible = Convert.ToBoolean(newValue);
         }
     }
-
     public class Style
     {
         public string BackgroundColor { get; set; }

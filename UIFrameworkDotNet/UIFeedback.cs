@@ -38,16 +38,16 @@ namespace UIFrameworkDotNet
         
         public UIFeedback(FeedbackMode feedbackMode, string style, string text, int ms)
         {
-            Props["tag"] = $"feedback-{style}";
+            Tag = $"feedback-{style}";
             Props["style"] = new Style
             {
                 Layout = style
             };
-            Props["mode"] = feedbackMode.ToString();
-            States["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
-            Props["totalSeconds"] = ms / 1000;
-            States["remaining"] = ms / 1000;
-            States["percentage"] = 0;
+            Mode = feedbackMode.ToString();
+            Totalseconds = ms / 1000;
+            Text = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
+            Remaining = ms / 1000;
+            Percentage = 0;
         }
 
         public UIFeedback(FeedbackMode feedbackMode, string style, string text)
@@ -56,9 +56,9 @@ namespace UIFrameworkDotNet
             {
                 Layout = style
             };
-            Props["tag"] = $"feedback-{style}";
-            Props["mode"] = feedbackMode.ToString();
-            States["text"] = text;
+            Tag = $"feedback-{style}";
+            Mode = feedbackMode.ToString();
+            Text = text;
         }
 
         public UIFeedback(FeedbackMode feedbackMode, string style, string text, int ms, bool isManual)
@@ -67,13 +67,13 @@ namespace UIFrameworkDotNet
             {
                 Layout = style
             };
-            Props["tag"] = $"feedback-{style}";
-            Props["mode"] = feedbackMode.ToString();
-            States["text"] = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
-            States["remaining"] = ms / 1000;
-            Props["totalSeconds"] = ms / 1000;
-            Props["isManual"] = isManual;
-            States["percentage"] = 0;
+            Tag = $"feedback-{style}";
+            Mode = feedbackMode.ToString();
+            Totalseconds = ms / 1000;
+            IsManual = isManual;
+            Text = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
+            Remaining = ms / 1000;
+            Percentage = 0;
         }
 
         private System.Timers.Timer _timer;
@@ -81,23 +81,24 @@ namespace UIFrameworkDotNet
         public bool StartCountdown()
         {
             _timer = new System.Timers.Timer(1000);
-            var tickCommand = new FeedbackTickCommand(this);
+            var tickCommand = new FeedbackTickChangedCommand(this);
             _timer.Start();
             _timer.Elapsed += (_, __) => Timer_Elapsed(_, __, tickCommand);
             return true;
         }
 
-        private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e, FeedbackTickCommand command = null)
+        private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e, FeedbackTickChangedCommand command = null)
         {
-            Console.WriteLine("Timer_Elapsed called");
             if (Remaining > 0)
             {
-                command?.Execute();
+                command?.Execute(default);
                 _tickElapsed?.Invoke(this, Remaining);
+                Console.WriteLine("Timer_Elapsed executed");
             }
             else
             {
                 _timer?.Stop();
+                Console.WriteLine("Timer_Elapsed stopped");
             }
         }
 
@@ -116,12 +117,32 @@ namespace UIFrameworkDotNet
             return StartCountdown();
         }
 
+        private string _mode;
+        [JsonIgnore]
+        public string Mode
+        {
+            get => _mode;
+            set
+            {
+                if (_mode == value) return;
+                _mode = value;
+                Props["mode"] = _mode;
+                OnPropertyChanged(nameof(Mode));
+            }
+        }
 
+        private double _percentage;
         [JsonIgnore]
         public double Percentage
         {
-           get => (double)States["percentage"];
-           set { States["percentage"] = 100 - Remaining * 100 / Totalseconds; OnPropertyChanged(nameof(Percentage)); }
+           get => _percentage;
+           set 
+           {
+                if (_percentage == value) return;
+                _percentage = value;
+                States["percentage"] = 100 - Remaining * 100 / Totalseconds; 
+                OnPropertyChanged(nameof(Percentage)); 
+           }
         }
 
         [JsonIgnore]
@@ -130,23 +151,46 @@ namespace UIFrameworkDotNet
             get => (int)Props["totalSeconds"] * 1000;
         }
 
+        private int _totalSeconds;
         [JsonIgnore]
         public int Totalseconds
         {
-            get => (int)Props["totalSeconds"];
+            get => _totalSeconds;
+            set
+            {
+                if (_totalSeconds == value) return;
+                _totalSeconds = value;
+                Props["totalSeconds"] = value;
+                OnPropertyChanged(nameof(Totalseconds));
+            }
         }
 
+        private bool _isManual;
         [JsonIgnore]
         public bool IsManual
         {
-            get => Props.TryGetValue("isManual", out var v) && (bool)v;
+            get => _isManual;
+            set
+            {
+                if (_isManual == value) return;
+                _isManual = value;
+                Props["isManual"] = _isManual;
+                OnPropertyChanged(nameof(IsManual));
+            }
         }
 
+        private int _remaining;
         [JsonIgnore]
         public int Remaining
         {
-            get => (int)States["remaining"];
-            set { States["remaining"] = value; OnPropertyChanged(nameof(Remaining)); }
+            get => _remaining;
+            set 
+            { 
+                if (_remaining == value) return;
+                _remaining = value;
+                States["remaining"] = value; 
+                OnPropertyChanged(nameof(Remaining)); 
+            }
         }
 
         [JsonIgnore]
@@ -155,46 +199,62 @@ namespace UIFrameworkDotNet
             get => _timer != null && _timer.Enabled;
         }
 
+        private string _text;
         [JsonIgnore]
         public string Text
         {
-            get => States.ContainsKey("text") ? States["text"].ToString() : "";
-            set { States["text"] = value; OnPropertyChanged(nameof(Text)); }
+            get => _text;
+            set 
+            {
+                if (_text == value) return;
+                _text = value;
+                States["text"] = value; 
+                OnPropertyChanged(nameof(Text)); 
+            }
         }
     }
 
-    public class FeedbackTickCommand : ICommandOld
+    public class FeedbackTickChangedCommand : ICommand
     {
         private readonly UIFeedback _feedback;
 
-        public FeedbackTickCommand(UIFeedback feedback)
+        public FeedbackTickChangedCommand(UIFeedback feedback)
         {
             _feedback = feedback;
         }
 
-        public void Execute()
+        public void Execute(object newValue)
         {
-            if (_feedback.Remaining <= 0)
-                return;
-            _feedback.Remaining--;
-            _feedback.Percentage = 100 - _feedback.Remaining * 100 / _feedback.Totalseconds;
-        }
-    }
-
-    public class FeedbackChangedCommand : ICommandOld
-    {
-        private readonly UIFeedback _feedback;
-        private readonly Dictionary<string, object> _states;
-
-        public FeedbackChangedCommand(UIFeedback feedback, Dictionary<string, object> states)
-        {
-            _feedback = feedback;
-            _states = states;
-        }
-
-        public void Execute()
-        {
-            _feedback.UpdateStates(_states);
+            // Gli aggiornamenti delle percentuali devono sempre passare un newValue
+            if (newValue != null)
+            {
+                switch (_feedback.Mode)
+                {
+                    case "Countdown":
+                        _feedback.Remaining = Convert.ToInt32(newValue);
+                        _feedback.Percentage = 100 - _feedback.Remaining * 100 / _feedback.Totalseconds;
+                        break;
+                    case "ProgressBar":
+                        _feedback.Percentage = Convert.ToDouble(newValue);
+                        break;
+                    default:
+                        throw new InvalidOperationException($"You can only use {nameof(FeedbackTickChangedCommand)} with \"Countdown\" or \"ProgressBar\" mode");
+                }
+            }
+            else
+            {   // Caso StartCountdown gestito da eslx/C#
+                switch (_feedback.Mode)
+                {
+                    case "Countdown":
+                        if (_feedback.Remaining <= 0)
+                            return;
+                        _feedback.Remaining--;
+                        _feedback.Percentage = 100 - _feedback.Remaining * 100 / _feedback.Totalseconds;
+                        break;
+                    default:
+                        throw new InvalidOperationException($"You can only use {nameof(FeedbackTickChangedCommand)} with \"Countdown\" mode");
+                }
+            }
         }
     }
 }
