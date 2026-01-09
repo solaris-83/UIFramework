@@ -41,7 +41,7 @@ namespace UIFrameworkDotNet
             Tag = $"feedback-{style}";
             Props["style"] = new Style
             {
-                Layout = style
+                Appearance = style
             };
             Mode = feedbackMode.ToString();
             Totalseconds = ms / 1000;
@@ -54,7 +54,7 @@ namespace UIFrameworkDotNet
         {
             Props["style"] = new Style
             {
-                Layout = style
+                Appearance = style
             };
             Tag = $"feedback-{style}";
             Mode = feedbackMode.ToString();
@@ -65,7 +65,7 @@ namespace UIFrameworkDotNet
         {
             Props["style"] = new Style
             {
-                Layout = style
+                Appearance = style
             };
             Tag = $"feedback-{style}";
             Mode = feedbackMode.ToString();

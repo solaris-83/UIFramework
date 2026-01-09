@@ -21,7 +21,7 @@ namespace UIFrameworkDotNet
             Enabled = enabled;
             Style = new Style
             {
-                Layout = style
+                Appearance = style
             };
         }
 
@@ -32,7 +32,7 @@ namespace UIFrameworkDotNet
             Enabled = enabled;
             Style = new Style
             {
-                Layout = style
+                Appearance = style
             };
         }
 

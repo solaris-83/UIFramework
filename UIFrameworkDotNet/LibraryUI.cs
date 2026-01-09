@@ -39,23 +39,24 @@ namespace UIFrameworkDotNet
 
         public void ShowAndWait(Page page)
         {
+            // Mi deregistro agli aggiornamenti degli UIElement della precedente page triggerati dal C# e dispose
+            if (_currentPage != null) _currentPage.DataChanged -= Page_DataChanged;
             _currentPage?.Dispose();
-            Validate(page);
+            Validate();
             page.AttachContainer(page.TabControl);
 
             _dispatcher = new UiCommandDispatcher(page);
             Console.WriteLine($"=== LOAD PAGE INIZIALE {page.GetType().Name} ===");
             Console.WriteLine(PageSerializer.Serialize(page));
 
-            // Mi registro agli aggiornamenti degli UIElement della page triggerati dal C#
-            page.Updated += Page_Updated;
-            // TODO deregistrarsi da tutti gli eventi tramite dispose alla fine
             _currentPage = page;
+            // Mi registro agli aggiornamenti degli UIElement della page triggerati dal C#
+            _currentPage.DataChanged += Page_DataChanged;
         }
 
-        private void Validate(Page page)
+        private void Validate()
         {
-            var tabControls = page.FindAllByType<UITabControl>();
+            var tabControls = _currentPage.FindAllByType<UITabControl>();
             if (!tabControls.Any())
             {
                 throw new InvalidOperationException("La pagina deve contenere almeno un UITabControl.");
@@ -68,7 +69,7 @@ namespace UIFrameworkDotNet
             // TODO (è limitazione?) Un solo UIFeedback (se continuiamo ad usare il metodo BCA.UI.UpdateFeedbackProgress / Countdown non stiamo specificando per quale UIElement altrimenti 
             // potremmo poi dire di modificare gli eslx lanciando gli update sull'istanza di UIFeedback.
 
-            var uIFeedbacks = page.FindAllByType<UIFeedback>();
+            var uIFeedbacks = _currentPage.FindAllByType<UIFeedback>();
 
             if (uIFeedbacks.Count() > 1)
             {
@@ -76,7 +77,7 @@ namespace UIFrameworkDotNet
             }
         }
 
-        private void Page_Updated(object sender, Type e)
+        private void Page_DataChanged(object sender, Type e)
         {
             var diffs = _dispatcher.EvaluateDiff();
             Console.WriteLine("\n>>> MESSAGGIO C# -> JS");

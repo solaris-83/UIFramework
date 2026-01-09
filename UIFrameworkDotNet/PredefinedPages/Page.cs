@@ -44,23 +44,23 @@ namespace UIFrameworkDotNet.PredefinedPages
         }
 
         // Backing field for the event delegate
-        private EventHandler<Type> _updated;
+        private EventHandler<Type> _dataChanged;
 
         // Custom event with controlled add/remove
-        public event EventHandler<Type> Updated
+        public event EventHandler<Type> DataChanged
         {
             add
             {
-                if (_updated != null)
+                if (_dataChanged != null)
                 {
                     throw new InvalidOperationException("Updated event already has a subscriber.");
                 }
-                _updated = value;
+                _dataChanged = value;
             }
             remove
             {
                 // Properly unsubscribe the delegate instead of overwriting it
-                _updated = value;
+                _dataChanged = value;
             }
         }
 
@@ -113,20 +113,20 @@ namespace UIFrameworkDotNet.PredefinedPages
         {
            // SendToJs(_diff.Add(parent.Id, child));
             AttachElement(child);
-            _updated?.Invoke(this, child.GetType());
+            _dataChanged?.Invoke(this, child.GetType());
         }
 
         private void OnItemRemoved(ContainerElement parent, UIElement child)
         {
             // SendToJs(_diff.Remove(child.Id));
             DetachElement(child);
-            _updated?.Invoke(this, child.GetType());
+            _dataChanged?.Invoke(this, child.GetType());
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             var element = (UIElement)sender;
-            _updated?.Invoke(this, element.GetType());
+            _dataChanged?.Invoke(this, element.GetType());
             //SendToJs(
             //    _diff.Update(
             //        element.Id,
@@ -148,7 +148,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         public UILabel SetTitle(string idStr, string style)
         {
             var titleLabel = new UILabel(idStr);
-            var titleStyle = new Style() { Layout = style };
+            var titleStyle = new Style() { Appearance = style };
             titleLabel.Style = titleStyle; // da qui evinco che è un title e quindi usa uno stile particolare
             Add(titleLabel);
             // OnUpdated(titleLabel.GetType());
@@ -216,7 +216,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         public UILabel AddBulletedItem(string idStr)
         {
             UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
-            label.Style = new Style() { Layout = "list-item-unordered" };
+            label.Style = new Style() { Appearance = "list-item-unordered" };
             _currentTab.Add(label);
             // OnUpdated(label.GetType());
             return label;
@@ -237,7 +237,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         public UILabel AddOrderedItem(string idStr, int index)
         {
             UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
-            label.Style = new Style() { Layout = "list-item-ordered" };
+            label.Style = new Style() { Appearance = "list-item-ordered" };
             label.Tag = index;
             _currentTab.Add(label);
             // OnUpdated(label.GetType());
@@ -247,7 +247,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         public UILabel AddOrderedItem(string idStr, string style, int index)
         {
             UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
-            label.Style = new Style() { Layout = style };
+            label.Style = new Style() { Appearance = style };
             label.Tag = index;
             _currentTab.Add(label);
             // OnUpdated(label.GetType());
@@ -257,7 +257,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         public UILabel AddOrderedItem(string idStr, string style)
         {
             UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
-            label.Style = new Style() { Layout = style };
+            label.Style = new Style() { Appearance = style };
            // label.Tag = index;
             _currentTab.Add(label);
             // OnUpdated(label.GetType());
@@ -277,7 +277,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         public UILabel AddParagraph(string idStr, string style, string color) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
         {
             var label = new UILabel(idStr);
-            label.Style = new Style() { Layout = style, ForegroundColor = color };
+            label.Style = new Style() { Appearance = style, ForegroundColor = color };
             _currentTab.Add(label);
             // OnUpdated(label.GetType());
             return label;
@@ -294,7 +294,7 @@ namespace UIFrameworkDotNet.PredefinedPages
             if (paragraph == null || !(paragraph is UILabel label))
                 return false;
             if (!string.IsNullOrEmpty(style))  // TODO vedere se migliorabile ( minimizzare le OnPropertyChanged e quindi la generazione di messaggi verso JS)
-                label.Style.Layout = style;
+                label.Style.Appearance = style;
             if (!string.IsNullOrEmpty(color))
                 label.Style.ForegroundColor = color;
             label.Text = newIdStr;

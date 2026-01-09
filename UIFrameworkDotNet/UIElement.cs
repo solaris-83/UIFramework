@@ -170,17 +170,19 @@ namespace UIFrameworkDotNet
     {
         public string BackgroundColor { get; set; }
         public string ForegroundColor { get; set; }
-        public string FontFamily { get; set; }
-        public int FontSize { get; set; }
-        public string Layout { get; set; }
+      //  public string FontFamily { get; set; }
+      //  public int FontSize { get; set; }
+        public string Appearance { get; set; }
+        public string CssClassName { get; set; } // L'idea è che CssClassName possa fare override di Appearance e ForegroundColor. Da decidere se usare una stringa che permetta di concatenare tramite spazio vuoto le varie classi css.
 
         public Style()
         {
-            Layout = "";
+            Appearance = "";
             BackgroundColor = ""; // "#FFFFFF";
             ForegroundColor = ""; //"#000000";
-            FontFamily = ""; //"Arial";
-            FontSize = 12;
+            CssClassName = "";
+           // FontFamily = ""; //"Arial";
+           // FontSize = 12;
         }
 
         public override bool Equals(object obj)
@@ -188,9 +190,10 @@ namespace UIFrameworkDotNet
             return obj is Style style &&
                    BackgroundColor == style.BackgroundColor &&
                    ForegroundColor == style.ForegroundColor &&
-                   FontFamily == style.FontFamily &&
-                   FontSize == style.FontSize &&
-                   Layout == style.Layout;
+                   // FontFamily == style.FontFamily &&
+                   // FontSize == style.FontSize &&
+                   Appearance == style.Appearance &&
+                   CssClassName == style.CssClassName;
         }
 
         public override int GetHashCode()
@@ -200,9 +203,10 @@ namespace UIFrameworkDotNet
                 int hash = 17;
                 hash = hash * 23 + (BackgroundColor != null ? BackgroundColor.GetHashCode() : 0);
                 hash = hash * 23 + (ForegroundColor != null ? ForegroundColor.GetHashCode() : 0);
-                hash = hash * 23 + (FontFamily != null ? FontFamily.GetHashCode() : 0);
-                hash = hash * 23 + FontSize.GetHashCode();
-                hash = hash * 23 + (Layout != null ? Layout.GetHashCode() : 0);
+                hash = hash * 23 + (CssClassName != null ? CssClassName.GetHashCode() : 0);
+                //   hash = hash * 23 + (FontFamily != null ? FontFamily.GetHashCode() : 0);
+                //  hash = hash * 23 + FontSize.GetHashCode();
+                hash = hash * 23 + (Appearance != null ? Appearance.GetHashCode() : 0);
                 return hash;
             }
         }
