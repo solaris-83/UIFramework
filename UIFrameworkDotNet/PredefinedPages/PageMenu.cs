@@ -4,7 +4,7 @@ using UIFrameworkDotNet.Helpers;
 
 namespace UIFrameworkDotNet.PredefinedPages
 {
-    public sealed class PageMenu : Page
+    public sealed class PageMenu : PredefinedPage
     {
         private readonly UICheckBoxGroup _checkboxgroup;
 
@@ -59,8 +59,9 @@ namespace UIFrameworkDotNet.PredefinedPages
         }
 
 
-        public PageMenu() : base()
+        public PageMenu() : base("menu")
         {
+            // TODO correggere
             var tab = AddTab("menu", 1, 1);
             AddButton("EXIT", true, "danger");
             AddButton("CONTINUE", false);

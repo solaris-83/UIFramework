@@ -17,11 +17,8 @@ namespace UIFrameworkDotNet
         {
             get => _text;
             set 
-            { 
-                if (_text == value) return;
-                _text = value;
-                States["text"] = value; 
-                OnPropertyChanged(nameof(Text)); 
+            {
+                SetStatesProperty(ref _text, value, nameof(Text));
             }
         }
     }

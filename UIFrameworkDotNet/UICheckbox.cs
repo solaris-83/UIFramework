@@ -29,6 +29,7 @@ namespace UIFrameworkDotNet
             Enabled = isEnabled;
         }
 
+        #region Props
         private string _text;
         [JsonIgnore]
         public string Text
@@ -36,12 +37,13 @@ namespace UIFrameworkDotNet
             get => _text;
             set
             {
-                if (_text == value) return;
-                _text = value;
-                Props["text"] = value;
-                OnPropertyChanged(nameof(Text));
+                SetPropsProperty(ref _text, value, nameof(Text));
             }
         }
+
+        #endregion
+
+        #region States
 
         private bool _checked;
         [JsonIgnore]
@@ -50,12 +52,11 @@ namespace UIFrameworkDotNet
             get => _checked;
             set 
             { 
-                if (_checked == value) return;
-                _checked = value;
-                States["checked"] = value; 
-                OnPropertyChanged(nameof(Checked)); 
+                SetStatesProperty(ref _checked, value,  nameof(Checked));
             }
         }
+
+        #endregion
     }
 
     public class CheckboxCheckedChangedCommand : ICommand

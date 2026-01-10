@@ -11,45 +11,84 @@ namespace UIFrameworkDotNet
     {
         private UiCommandDispatcher _dispatcher = null;
         private Page _currentPage = null;
+        private CommandRegistry _registry;
 
-        public PageDisclaimer CreatePageDisclaimer()
+        public LibraryUI() 
         {
-            return new PageDisclaimer();
+            _registry = new CommandRegistry();
+        
+            _registry.Register<UIElement>(
+                nameof(UIElement.Enabled),
+                (el) => new UIElementEnabledChangedCommand(el)
+            );
+            _registry.Register<UIElement>(
+                nameof(UIElement.Visible),
+                (chk) => new UIElementVisibleChangedCommand(chk)
+            );
+            _registry.Register<UICheckbox>(
+                nameof(UICheckbox.Checked),
+                (chk) => new CheckboxCheckedChangedCommand(chk)
+            );
+            _registry.Register<UIImage>(
+               nameof(UIImage.Source),
+               (img) => new ImageSourceChangedCommand(img)
+           );
+            _registry.Register<UILabel>(
+               nameof(UILabel.Text),
+               (label) => new LabelTextChangedCommand(label)
+           );
+            _registry.Register<UITabControl>(
+               nameof(UITabControl.ActiveTabId),
+               (tbc) => new TabControlActiveTabChangedCommand(tbc)
+           );
+            _registry.Register<UITextbox>(
+              nameof(UITextbox.Text),
+              (txt) => new TextboxTextChangedCommand(txt)
+            );
+            _registry.Register<UIFeedback>(
+                nameof(UIFeedback.Remaining),
+                (fb) => new FeedbackTickChangedCommand(fb)
+            );
+            _registry.Register<UIFeedback>(
+                nameof(UIFeedback.Percentage),
+                (fb) => new FeedbackTickChangedCommand(fb)
+            );
         }
 
-        public PageResult CreatePageResult()
-        {
-            return new PageResult();
-        }
+        public PageDisclaimer CreatePageDisclaimer() => new PageDisclaimer();
 
-        public PageMenu CreatePageMenu()
-        {
-            return new PageMenu();
-        }
+        public PageResult CreatePageResult() => new PageResult();
 
-        public Page CreatePage()
-        {
-            return new Page();
-        }
+        // TODO Putroppo che anche questa firma (nello SCROF e qualche altra app)
+        [Obsolete]
+        public PageResult CreateResult() => CreatePageResult();
 
-        public UISequence CreateSequence()
-        {
-            return new UISequence();
-        }
+        public PageMenu CreatePageMenu() => new PageMenu();
+
+        public Page CreatePage() => new Page();
+
+        public UISection CreateSectionDocument() => new UISection();
+
+        public UISection CreateSection() => new UISection();
+
+
+        public UISequence CreateSequence() => new UISequence();
 
         public void ShowAndWait(Page page)
         {
             // Mi deregistro agli aggiornamenti degli UIElement della precedente page triggerati dal C# e dispose
             if (_currentPage != null) _currentPage.DataChanged -= Page_DataChanged;
             _currentPage?.Dispose();
+            _currentPage = null;
+            _currentPage = page;
             Validate();
+            page.AttachContainer(page.LateralArea);
             page.AttachContainer(page.TabControl);
 
-            _dispatcher = new UiCommandDispatcher(page);
+            _dispatcher = new UiCommandDispatcher(page, _registry);
             Console.WriteLine($"=== LOAD PAGE INIZIALE {page.GetType().Name} ===");
             Console.WriteLine(PageSerializer.Serialize(page));
 
-            _currentPage = page;
             // Mi registro agli aggiornamenti degli UIElement della page triggerati dal C#
             _currentPage.DataChanged += Page_DataChanged;
         }

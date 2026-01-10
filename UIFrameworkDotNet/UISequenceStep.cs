@@ -11,39 +11,38 @@ namespace UIFrameworkDotNet
     {
         public UISequenceStep(string tag, string text)
         {
-            Tag= tag;
+            Tag = tag;
             Text = text;
             //  States["subtitle"]
             Status = "inactive";
         }
 
+        #region Props
         private string _text;
         [JsonIgnore]
         public string Text
         {
             get => _text;
-            set 
-            { 
-                if (_text == value) return;
-                _text = value;
-                Props["text"] = value; 
-                OnPropertyChanged(nameof(Text)); 
+            set
+            {
+                SetPropsProperty(ref _text, value, nameof(Text));
             }
         }
+        #endregion
 
+        #region States
         private string _status;
         [JsonIgnore]
         public string Status
         {
             get => _status;
-            set 
-            { 
-                if (_status == value) return;
-                _status = value;
-                States["status"] = value; 
-                OnPropertyChanged(nameof(Status)); 
+            set
+            {
+                SetStatesProperty(ref _status, value, nameof(Status));
             }
         }
+
+        #endregion
 
         public override bool Equals(object obj)
         {
@@ -128,21 +127,18 @@ namespace UIFrameworkDotNet
             return true;
         }
 
+        #region States
         private UISequenceStep _currentStep;
         [JsonIgnore]
         public UISequenceStep CurrentStep
         {
-            get 
+            get => _currentStep;
+            set
             {
-                return _currentStep;
-            }
-            set 
-            { 
-                if (_currentStep.Equals(value)) return;
-                _currentStep = value;
-                States["currentStep"] = value; 
-                OnPropertyChanged(nameof(CurrentStep)); 
+                SetStatesProperty(ref _currentStep, value, nameof(CurrentStep));
             }
         }
+
+        #endregion
     }
 }

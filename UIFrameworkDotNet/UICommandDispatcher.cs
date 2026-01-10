@@ -12,53 +12,12 @@ namespace UIFrameworkDotNet
         private readonly DiffEngine _diffEngine;
         private readonly CommandRegistry _registry;
 
-        public UiCommandDispatcher(Page page)
+        public UiCommandDispatcher(Page page, CommandRegistry registry)
         {
             _page = page;
-            _registry = new CommandRegistry();
+            _registry = registry;
             _lastSnapshot = SnapshotBuilder.From(page);
             _diffEngine = new DiffEngine();
-            RegisterCommands();
-        }
-
-        private void RegisterCommands()
-        {
-            _registry.Register<UIElement>(
-                nameof(UIElement.Enabled),
-                (el) => new UIElementEnabledChangedCommand(el)
-            );
-            _registry.Register<UIElement>(
-                nameof(UIElement.Visible),
-                (chk) => new UIElementVisibleChangedCommand(chk)
-            );
-            _registry.Register<UICheckbox>(
-                nameof(UICheckbox.Checked),
-                (chk) => new CheckboxCheckedChangedCommand(chk)
-            );
-            _registry.Register<UIImage>(
-               nameof(UIImage.Source),
-               (img) => new ImageSourceChangedCommand(img)
-           ); 
-            _registry.Register<UILabel>(
-               nameof(UILabel.Text),
-               (label) => new LabelTextChangedCommand(label)
-           ); 
-            _registry.Register<UITabControl>(
-               nameof(UITabControl.ActiveTabId),
-               (tbc) => new TabControlActiveTabChangedCommand(tbc)
-           );
-            _registry.Register<UITextbox>(
-              nameof(UITextbox.Text),
-              (txt) => new TextboxTextChangedCommand(txt)
-          );
-            _registry.Register<UIFeedback>(
-              nameof(UIFeedback.Remaining),
-              (fb) => new FeedbackTickChangedCommand(fb)
-          );
-            _registry.Register<UIFeedback>(
-             nameof(UIFeedback.Percentage),
-             (fb) => new FeedbackTickChangedCommand(fb)
-         );
         }
 
         // Usato per rispondere agli eventi generati dal JS
@@ -67,6 +26,8 @@ namespace UIFrameworkDotNet
             // 1. ricavo UIElement tramite Id
             // 2. per ogni nuova property States aggiornata inviata dal JS cerco il cmd che applica l'aggiornamento della istanza UIElement lato C#
             var element = _page.FindById(events.ElementId);
+            if (element == null)
+                return;
             foreach(var ev in events.NewStates)
             {
                 var cmd = _registry.Resolve(element, ev.Key);

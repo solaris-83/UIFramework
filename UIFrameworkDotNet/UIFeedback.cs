@@ -117,6 +117,7 @@ namespace UIFrameworkDotNet
             return StartCountdown();
         }
 
+        #region Props
         private string _mode;
         [JsonIgnore]
         public string Mode
@@ -124,31 +125,8 @@ namespace UIFrameworkDotNet
             get => _mode;
             set
             {
-                if (_mode == value) return;
-                _mode = value;
-                Props["mode"] = _mode;
-                OnPropertyChanged(nameof(Mode));
+                SetPropsProperty(ref _mode, value, nameof(Mode));
             }
-        }
-
-        private double _percentage;
-        [JsonIgnore]
-        public double Percentage
-        {
-           get => _percentage;
-           set 
-           {
-                if (_percentage == value) return;
-                _percentage = value;
-                States["percentage"] = 100 - Remaining * 100 / Totalseconds; 
-                OnPropertyChanged(nameof(Percentage)); 
-           }
-        }
-
-        [JsonIgnore]
-        public int Milliseconds
-        {
-            get => (int)Props["totalSeconds"] * 1000;
         }
 
         private int _totalSeconds;
@@ -158,10 +136,7 @@ namespace UIFrameworkDotNet
             get => _totalSeconds;
             set
             {
-                if (_totalSeconds == value) return;
-                _totalSeconds = value;
-                Props["totalSeconds"] = value;
-                OnPropertyChanged(nameof(Totalseconds));
+                SetPropsProperty(ref _totalSeconds, value, nameof(Totalseconds));
             }
         }
 
@@ -172,11 +147,29 @@ namespace UIFrameworkDotNet
             get => _isManual;
             set
             {
-                if (_isManual == value) return;
-                _isManual = value;
-                Props["isManual"] = _isManual;
-                OnPropertyChanged(nameof(IsManual));
+                SetPropsProperty(ref _isManual, value, nameof(IsManual));
             }
+        }
+        #endregion
+
+        #region States
+
+
+        private double _percentage;
+        [JsonIgnore]
+        public double Percentage
+        {
+           get => _percentage;
+           set 
+           {
+                SetProperty(ref _percentage, value, () => States["percentage"] = 100 - Remaining * 100 / Totalseconds, nameof(Percentage));
+           }
+        }
+
+        [JsonIgnore]
+        public int Milliseconds
+        {
+            get => (int)Props["totalSeconds"] * 1000;
         }
 
         private int _remaining;
@@ -185,11 +178,8 @@ namespace UIFrameworkDotNet
         {
             get => _remaining;
             set 
-            { 
-                if (_remaining == value) return;
-                _remaining = value;
-                States["remaining"] = value; 
-                OnPropertyChanged(nameof(Remaining)); 
+            {
+                SetStatesProperty(ref _remaining, value, nameof(Remaining));
             }
         }
 
@@ -206,12 +196,11 @@ namespace UIFrameworkDotNet
             get => _text;
             set 
             {
-                if (_text == value) return;
-                _text = value;
-                States["text"] = value; 
-                OnPropertyChanged(nameof(Text)); 
+                SetStatesProperty(ref _text, value, nameof(Text));
             }
         }
+
+        #endregion
     }
 
     public class FeedbackTickChangedCommand : ICommand

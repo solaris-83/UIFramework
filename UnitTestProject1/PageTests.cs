@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using UIFrameworkDotNet;
 using UIFrameworkDotNet.Helpers;
+using UIFrameworkDotNet.PredefinedPages;
 
 namespace UnitTestProject1
 {
     [TestClass]
-    public class MenuPageTests
+    public class PageTests
     {
         [TestMethod]
         public void SingleSelection_SelectsSingleItemAndUpdatesSelectedProperties()
@@ -190,6 +191,29 @@ namespace UnitTestProject1
             Assert.IsTrue(el is UILabel);
             label = (UILabel)el;
             Assert.AreEqual("Paragraph #3 - BIS -  after ShowAndWait", label.Text);
+        }
+
+        [TestMethod]
+
+        public void Page_UITab_UISection_Composition()
+        {
+            LibraryUI libraryUI = new LibraryUI();
+            var page = libraryUI.CreatePage();
+            var myTab = page.AddTab("tab", 2, 2);
+            var mySection1 = libraryUI.CreateSectionDocument();
+            // prevedo una section 1x1 visto che non specifico nient'altro
+            mySection1.AddParagraph("Sono un paragraph");
+            var mySection2 = libraryUI.CreateSectionDocument(); // prevedo una section 1x1 visto che non specifico nient'altro
+            mySection2.AddImage("Screenshot.png");
+            var mySection3 = libraryUI.CreateSectionDocument(); // prevedo una section 1x1 visto che non specifico nient'altro mySection3.AddChart()
+            myTab.Add(mySection1, 0, 0); // (quadrante in alto sx)
+            myTab.Add(mySection2, 0, 1); // (quadranti superiori)
+            mySection3.ColumnSpan = 2;
+            mySection3.Rows = 1;
+            mySection3.Columns = 3;
+            myTab.Add(mySection3, 1, 0); // mySection3 è posizionato alla riga di indice 1 e colonna di indice 0 per un Colspan pari a 2
+
+            libraryUI.ShowAndWait(page);
         }
     }
 }

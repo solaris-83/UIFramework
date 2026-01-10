@@ -2,12 +2,12 @@
 
 namespace UIFrameworkDotNet.PredefinedPages
 {
-    public sealed class PageResult : Page
+    public sealed class PageResult : PredefinedPage
     {
-        public PageResult() : base()
+        public PageResult() : base("disclaimer")
         {
-            SetTitle("Result", "result");
-            AddTab("disclaimer", 1, 1);
+            SetTitle("title", "Result", "result");
+           // AddTab("disclaimer", 1, 1);
             AddButton("EXIT", true, "danger");
         }
     }

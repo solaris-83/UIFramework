@@ -3,22 +3,33 @@
 namespace UIFrameworkDotNet.PredefinedPages
 {
     // TODO quali metodi mettiamo a diposizione? derivare dall'intera Page è troppo?
-    public sealed class PageDisclaimer : Page
+    public sealed class PageDisclaimer : PredefinedPage
     {
+        private UIButton _buttonContinue;
+
+        private bool _requiresCompleteRead;
         [JsonIgnore]
         public bool RequiresCompleteRead
         {
-            get => Props.TryGetValue("requiresCompleteRead", out var v) && (bool)v;
-            set => Props["requiresCompleteRead"] = value;
+            get => _requiresCompleteRead;
+            set
+            {
+                SetProperty(ref _requiresCompleteRead, value, () =>
+                    {
+                        _buttonContinue.Enabled = !_requiresCompleteRead;
+                        Props["requiresCompleteRead"] = _requiresCompleteRead;
+                    },
+                nameof(RequiresCompleteRead));
+            }
         }
 
-        public PageDisclaimer() : base()
+        public PageDisclaimer() : base("disclaimer")
         {
-            RequiresCompleteRead = false;
-            SetTitle("Information", "info");
-            AddTab("disclaimer", 1, 1);
+            SetTitle("title", "Information", "info");
+          //  AddTab("disclaimer", 1, 1);
             AddButton("EXIT_WITHOUT_REPORT", true, "danger");
-            AddButton("CONTINUE", false);
+            _buttonContinue = AddButton("CONTINUE", true);
+            RequiresCompleteRead = false;
         }
 
         // TODO gestire l'evento di lettura del disclaimer

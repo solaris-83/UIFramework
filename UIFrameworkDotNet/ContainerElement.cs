@@ -7,7 +7,7 @@ namespace UIFrameworkDotNet
     // Un ContainerElement è un UIElement che può contenere altri UIElement come figli che si chiamano Children.
     public class ContainerElement : UIElement
     {
-        protected ContainerElement()
+        public ContainerElement()
         {
         }
         private readonly List<UIElement> _children = new List<UIElement>();

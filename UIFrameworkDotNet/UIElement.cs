@@ -17,22 +17,42 @@ namespace UIFrameworkDotNet
             Enabled = true;
         }
 
+        protected bool SetStatesProperty<T>(ref T field, T value, string propertyName)
+        {
+            return SetProperty<T>(ref field, value, () => States[propertyName] = value, propertyName);
+        }
+
+        protected bool SetProperty<T>(ref T field, T value, Action actionBeforeNotify, string propertyName)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value) && States.ContainsKey(propertyName))
+                return false;
+
+            field = value;
+            actionBeforeNotify?.Invoke();
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+
+
+        protected bool SetPropsProperty<T>(ref T field, T value, string propertyName)
+        {
+            return SetProperty<T>(ref field, value, () => Props[propertyName] = value, propertyName);
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [JsonIgnore]
         public string ParentId { get; internal set; }
 
+        #region Props
         private object _tag;
         [JsonIgnore]
         public object Tag
         {
             get => _tag;
             set  
-            { 
-                if (_tag == value) return;
-                _tag = value;
-                Props["tag"] = value; 
-                OnPropertyChanged(nameof(Tag)); 
+            {
+                SetPropsProperty(ref _tag, value, nameof(Tag));
             }
         }
 
@@ -43,38 +63,7 @@ namespace UIFrameworkDotNet
             get => _type;
             set
             {
-                if (_type == value) return;
-                _type = value;
-                Props["type"] = value;
-                OnPropertyChanged(nameof(Type));
-            }
-        }
-
-        private bool _enabled;
-        [JsonIgnore]
-        public bool Enabled
-        {
-            get => _enabled; 
-            set
-            {
-                if (_enabled == value) return;
-                _enabled = value;
-                States["enabled"] = value; 
-                OnPropertyChanged(nameof(Enabled)); 
-            }
-        }
-
-        private bool _visible;
-        [JsonIgnore]
-        public bool Visible
-        {
-            get => _visible;
-            set 
-            { 
-                if (_visible == value) return;
-                _visible = value;
-                States["visible"] = value; 
-                OnPropertyChanged(nameof(Visible)); 
+                SetPropsProperty(ref _type, value, nameof(Type));
             }
         }
 
@@ -85,51 +74,77 @@ namespace UIFrameworkDotNet
             get => _style;
             set
             {
-                if (_style != null && _style.Equals(value)) return;
-                _style = value;
-                Props["style"] = value;
-                OnPropertyChanged(nameof(Style));
+                SetPropsProperty(ref _style, value, nameof(Style));
             }
         }
+
+        #endregion
+
+
+        #region States
+
+        private bool _enabled;
+        [JsonIgnore]
+        public bool Enabled
+        {
+            get => _enabled; 
+            set
+            {
+                SetStatesProperty(ref _enabled, value, nameof(Enabled));
+            }
+        }
+
+        private bool _visible;
+        [JsonIgnore]
+        public bool Visible
+        {
+            get => _visible;
+            set 
+            {
+                SetStatesProperty(ref _visible, value, nameof(Visible));
+            }
+        }
+
+        #endregion
 
         public string Id { get; } = Guid.NewGuid().ToString();
 
         public Dictionary<string, object> Props { get; } = new Dictionary<string, object>();
         public Dictionary<string, object> States { get; } = new Dictionary<string, object>();
 
-        public virtual void UpdateStates(Dictionary<string, object> newStates)
-        {
-            if (newStates == null)
-                return;
+        //public virtual void UpdateStates(Dictionary<string, object> newStates)
+        //{
+        //    if (newStates == null)
+        //        return;
 
-            UpdateStates(states =>
-            {
-                foreach (var kv in newStates)
-                    States[kv.Key] = kv.Value;
-            });
-        }
+        //    UpdateStates(states =>
+        //    {
+        //        foreach (var kv in newStates)
+        //            States[kv.Key] = kv.Value;
+        //    });
+        //}
 
-        public virtual void UpdateStates(Action<Dictionary<string, object>> updater)
-        {
-            updater(States);
-        }
+        //public virtual void UpdateStates(Action<Dictionary<string, object>> updater)
+        //{
+        //    updater(States);
+        //}
 
-        public virtual void UpdateProps(Dictionary<string, object> newProps)
-        {
-            if (newProps == null)
-                return;
+        //public virtual void UpdateProps(Dictionary<string, object> newProps)
+        //{
+        //    if (newProps == null)
+        //        return;
 
-            UpdateProps(props =>
-            {
-                foreach (var kv in newProps)
-                    props[kv.Key] = kv.Value;
-            });
-        }
+        //    UpdateProps(props =>
+        //    {
+        //        foreach (var kv in newProps)
+        //            props[kv.Key] = kv.Value;
+        //    });
+        //}
 
-        public virtual void UpdateProps(Action<Dictionary<string, object>> updater)
-        {
-            updater(Props);
-        }
+        //public virtual void UpdateProps(Action<Dictionary<string, object>> updater)
+        //{
+        //    updater(Props);
+        //}
 
         protected virtual void OnPropertyChanged(string propertyName)
         {

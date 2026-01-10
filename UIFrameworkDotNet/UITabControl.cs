@@ -5,9 +5,21 @@ namespace UIFrameworkDotNet
 {
     public class UITabControl : ContainerElement
     {
+        private UITab _currentTab;
+        [JsonIgnore]
+        public UITab CurrentTab
+        {
+            get
+            {
+                //if (_currentTab == null)
+                //    _currentTab = new UITab("mytab", 1, 1);
+                return _currentTab;
+            }
+            set => _currentTab = value;
+        }
+
         public UITabControl()
         {
-            
         }
 
         public new void Add(UIElement element)
@@ -23,6 +35,7 @@ namespace UIFrameworkDotNet
             }
         }
 
+        #region States
         private string _activeTabId;
         [JsonIgnore]
         public string ActiveTabId
@@ -30,12 +43,11 @@ namespace UIFrameworkDotNet
             get => _activeTabId;
             set 
             { 
-                if (_activeTabId == value) return;
-                _activeTabId = value;
-                States["activeTabId"] = value; 
-                OnPropertyChanged(nameof(ActiveTabId)); 
+                SetStatesProperty(ref _activeTabId, value, nameof(ActiveTabId));
             } 
-        } 
+        }
+
+        #endregion
     }
 
     public class TabControlActiveTabChangedCommand : ICommand
@@ -53,61 +65,6 @@ namespace UIFrameworkDotNet
         }
     }
 
-    public class UITab : ContainerElement
-    {
-        public UITab(int rows, int cols)
-        {
-            Grid = new Grid(rows, cols);
-        }
+    
 
-        public UITab(string tag, int rows, int cols)
-        {
-            Tag = tag;
-            Grid = new Grid(rows, cols);
-        }
-
-        private Grid _grid;
-        [JsonIgnore]
-        public Grid Grid
-        {
-            get => _grid;
-            set
-            {
-                if (_grid != null && _grid.Equals(value)) return; 
-                _grid = value;
-                Props["grid"] = value;
-                OnPropertyChanged(nameof(Grid));
-            }
-        }
-    }
-
-    public class Grid
-    {
-        public Grid(int rows, int cols)
-        {
-            Rows = rows;
-            Cols = cols;
-        }
-
-        public int Rows { get; set; }
-        public int Cols { get; set; }
-
-        public override bool Equals(object obj)
-        {
-            return obj is Grid grid &&
-                   Rows == grid.Rows &&
-                   Cols == grid.Cols;
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hash = 17;
-                hash = hash * 23 + Rows.GetHashCode();
-                hash = hash * 23 + Cols.GetHashCode();
-                return hash;
-            }
-        }
-    }
 }

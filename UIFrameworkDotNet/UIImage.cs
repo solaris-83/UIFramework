@@ -10,6 +10,7 @@ namespace UIFrameworkDotNet
             Source = $"/img/{src}";
         }
 
+        #region States
         private string _source;
         [JsonIgnore]
         public string Source
@@ -17,12 +18,11 @@ namespace UIFrameworkDotNet
             get => _source;
             set
             {
-                if (_source == value) return;
-                _source = value;
-                States["source"] = value;
-                OnPropertyChanged(nameof(Source));
+                SetStatesProperty(ref _source, value, nameof(Source));
             }
         }
+
+        #endregion
     }
 
     public class ImageSourceChangedCommand : ICommand

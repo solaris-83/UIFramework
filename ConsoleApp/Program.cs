@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UIFrameworkDotNet;
+using UIFrameworkDotNet.Helpers;
 
 
 namespace ConsoleApp
@@ -252,15 +254,62 @@ namespace ConsoleApp
         // 5. TODO Implementare sequence  ( ci sono rif. a sequence nella app di tutorial e bundle update => si possono dismettere i vecchi metodi)
         // 6. TODO Terminare le page (property del disclaimer es. IsScrolledToBottom)
         // 7. TODO rimuovere Style in favore di un'unica property di nome CssClassName
-        // 8. TODO fare le ultime property e rimuovere States["..."] dai CTORs e terminare i Command
+        // 8. TODO introdurre gli ultimi SetProperty<T> e rimuovere States["..."]/Props["..."] dai CTORs e terminare i Command
         // 9. TODO improvement Dropdown e testarla
         // 10. TODO testare le Textbox (cioè il two-way binding), magari ha senso una pagina con le form
 
         static void Main()
         {
             LibraryUI libraryUI = new LibraryUI();
+            var newCustomPage = libraryUI.CreatePage();
+            // === CUSTOM PAGE WITH SECTIONS ===
+            var myTab = newCustomPage.AddTab("tab", 2, 2);
+            var mySection1 = libraryUI.CreateSectionDocument();
+            // prevedo una section 1x1 visto che non specifico nient'altro
+            mySection1.AddParagraph("Sono un paragraph");
+            var mySection2 = libraryUI.CreateSectionDocument(); // prevedo una section 1x1 visto che non specifico nient'altro
+            mySection2.AddImage("Screenshot.png");
+            var mySection3 = libraryUI.CreateSectionDocument(); // prevedo una section 1x1 visto che non specifico nient'altro mySection3.AddChart()
+            myTab.Add(mySection1, 0, 0); // (quadrante in alto sx)
+            myTab.Add(mySection2, 0, 1); // (quadranti superiori)
+            mySection3.ColumnSpan = 2;
+            mySection3.Rows = 1;
+            mySection3.Columns = 3;
+            myTab.Add(mySection3, 1, 0); // mySection3 è posizionato alla riga di indice 1 e colonna di indice 0 per un Colspan pari a 2
+
+            libraryUI.ShowAndWait(newCustomPage);
+
+            // ==== DISCLAIMER PAGE ====
+            // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
+            var page = libraryUI.CreatePageDisclaimer();
+            var buttons = page.FindAllByType<UIButton>();
+            var continueBtn = buttons.Single(b => b.Tag.ToString() == "CONTINUE");
+            page.RequiresCompleteRead = true;
+            var par1 = page.AddParagraph("Paragraph #1.", "paragraph", "gray");
+            var par2 = page.AddParagraph("Paragraph #2.", "paragraph", "gray");
+            page.AddBulletedItem("#1 bulletted item");
+            page.AddBulletedItem("#2 bulletted item");
+            page.AddOrderedItem("Item 1");
+            page.AddOrderedItem("Item 2");
+            page.AddOrderedItem("Item 3");
+            var btn = page.AddButton("CLICK ON ME!!", true);
+            page.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
+            page.Remove(par2.Id);
+            page.AddImage("Screenshot.png");
+            libraryUI.ShowAndWait(page);
+
+            libraryUI.SimulateJsEvent(continueBtn.Id, "propertyChanged",
+                    new Dictionary<string, object> { ["Enabled"] = true });
+
+            var par3 = page.AddParagraph("Paragraph #3 after ShowAndWait");
+
+            page.UpdateParagraph(par3.Id, "Paragraph #3 - BIS -  after ShowAndWait");
 
 
+            // ==== RESULT PAGE ====
+            var pageResult = libraryUI.CreatePageResult();
+            pageResult.AddParagraph("Questa è la pagina di risultato.", "result-paragraph", "blue");
+            libraryUI.ShowAndWait(pageResult);
 
             // =========== MENU PAGE ===========
             // Singola selezione con checkbox
@@ -366,35 +415,7 @@ namespace ConsoleApp
             Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAll(0, 1, 3));
 
 
-            // ==== DISCLAIMER PAGE ====
-            // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
-            var page = libraryUI.CreatePageDisclaimer();
-            var par1 = page.AddParagraph("Paragraph #1.", "paragraph", "gray");
-            var par2 = page.AddParagraph("Paragraph #2.", "paragraph", "gray");
-            page.AddBulletedItem("#1 bulletted item");
-            page.AddBulletedItem("#2 bulletted item");
-            page.AddOrderedItem("Item 1");
-            page.AddOrderedItem("Item 2");
-            page.AddOrderedItem("Item 3");
-            var btn = page.AddButton("CLICK ON ME!!", true);
-            page.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
-            page.Remove(par2.Id);
-            page.AddImage("Screenshot.png");
-            libraryUI.ShowAndWait(page);
-
-            libraryUI.SimulateJsEvent(btn.Id, "propertyChanged",
-                    new Dictionary<string, object> { ["enabled"] = false });
-
-            var par3 = page.AddParagraph("Paragraph #3 after ShowAndWait");
-
-            page.UpdateParagraph(par3.Id, "Paragraph #3 - BIS -  after ShowAndWait");
-
-            // ==== RESULT PAGE ====
-            var pageResult = libraryUI.CreatePageResult();
-            pageResult.AddParagraph("Questa è la pagina di risultato.", "result-paragraph", "blue");
-            libraryUI.ShowAndWait(pageResult);
-
-
+            
             // ==== PAGINA CUSTOM ====
             // Istanzio pagina
             var customPage = libraryUI.CreatePage();
@@ -404,8 +425,12 @@ namespace ConsoleApp
             customPage.Title = "Demo UIFramework C#";
             // Aggiungo un tab
             var firstTab = customPage.AddTab("mytab", 1, 1);
-            // Aggiungo paragrafo e bottoni
-            customPage.AddParagraph("Questa è una demo di UIFramework in C#.", "paragraph", "gray");
+            // Aggiungo una section
+            var section = libraryUI.CreateSectionDocument();
+            // Aggiungo paragrafo alla section e bottone di STOP
+            section.AddParagraph("Questa è una demo di UIFramework in C#.", "paragraph", "gray");
+            firstTab.Add(section, 0, 0);
+
             customPage.AddButtonStop(true);
             var continueButton = customPage.AddButton("CONTINUE", true);
             // Recupero il tabcontrol creato nel CTOR di page per agganciarci altri 2 tab

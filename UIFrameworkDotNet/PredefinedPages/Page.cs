@@ -10,13 +10,22 @@ namespace UIFrameworkDotNet.PredefinedPages
     public class Page : ContainerElement, IDisposable
     {
         private UITabControl _tabControl;
-        private UITab _currentTab;
         private const string STOP_BUTTON_TEXT = "STOP";
+        private UILateralArea _lateralArea;
+
+        [JsonIgnore]
+        public UILateralArea LateralArea
+        {
+            get => _lateralArea;
+            set => _lateralArea = value;
+        }
 
         public Page()
         {
-            _tabControl = new UITabControl();
-            Add(_tabControl);
+            _lateralArea = new UILateralArea();
+            TabControl = new UITabControl();
+            Add(TabControl);
+            Add(_lateralArea);
         }
 
         private string _title;
@@ -28,7 +37,7 @@ namespace UIFrameworkDotNet.PredefinedPages
             {
                 if (value == null)
                     value = "Information";
-                SetTitle(value, "info");
+                SetTitle("title", value, "info");
                 _title = value;
             }
         }
@@ -36,11 +45,8 @@ namespace UIFrameworkDotNet.PredefinedPages
         [JsonIgnore]
         public UITabControl TabControl
         {
-            get { 
-                if (_tabControl == null)
-                    _tabControl = new UITabControl();
-                 return _tabControl;
-             }
+            get  => _tabControl;
+            set => _tabControl = value;
         }
 
         // Backing field for the event delegate
@@ -111,14 +117,12 @@ namespace UIFrameworkDotNet.PredefinedPages
 
         private void OnItemAdded(ContainerElement parent, UIElement child)
         {
-           // SendToJs(_diff.Add(parent.Id, child));
             AttachElement(child);
             _dataChanged?.Invoke(this, child.GetType());
         }
 
         private void OnItemRemoved(ContainerElement parent, UIElement child)
         {
-            // SendToJs(_diff.Remove(child.Id));
             DetachElement(child);
             _dataChanged?.Invoke(this, child.GetType());
         }
@@ -139,20 +143,18 @@ namespace UIFrameworkDotNet.PredefinedPages
             //);
         }
 
-        // Protected helper to allow derived classes to raise the event
-        //protected virtual void OnUpdated(Type updatedType)
-        //{
-        //    _updated?.Invoke(this, updatedType);
-        //}
-
-        public UILabel SetTitle(string idStr, string style)
+        public UILabel SetTitle (string tag, string idStr, string style)
         {
             var titleLabel = new UILabel(idStr);
             var titleStyle = new Style() { Appearance = style };
+            titleLabel.Tag = tag;
             titleLabel.Style = titleStyle; // da qui evinco che è un title e quindi usa uno stile particolare
             Add(titleLabel);
-            // OnUpdated(titleLabel.GetType());
             return titleLabel;
+        }
+        public UILabel SetTitle(string idStr, string style)
+        {
+            return SetTitle("title", idStr, style);
         }
 
         //// Per creare il titolo di una page creo una sezione e ci aggiungo una label
@@ -168,18 +170,18 @@ namespace UIFrameworkDotNet.PredefinedPages
         //    return true;
         //}
 
-        // TODO UITab o bool?? Devo creare section?
         // TODO Il tab deve avere come primo parametro lo stile.
         // TODO non esiste la possibilità di mettere l'header?
         public UITab AddTab(string title, int rows, int cols)  // TODO UITab o bool?? Devo creare section?
         {
-            _currentTab = new UITab(title, rows, cols);
-            _tabControl.Add(_currentTab);
-            _tabControl.ActiveTabId = _currentTab.Id;
+            _tabControl.CurrentTab = new UITab(title, rows, cols);
+            _tabControl.Add(_tabControl.CurrentTab);
+            _tabControl.ActiveTabId = _tabControl.CurrentTab.Id;
             // non so se serve l'evento, per il momento non lo mettiamo
-            return _currentTab;
+            return _tabControl.CurrentTab;
         }
         
+        /*
         public UIImage AddImage(string imageName)
         {
             var image = new UIImage(imageName);
@@ -191,7 +193,7 @@ namespace UIFrameworkDotNet.PredefinedPages
             }
 
             image.Source = ImageHelper.ConvertImageToBase64(imagePath);
-            _currentTab.Add(image);
+            _tabControl.CurrentTab.Add(image);
             // OnUpdated(image.GetType());
             return image;
         }
@@ -209,7 +211,6 @@ namespace UIFrameworkDotNet.PredefinedPages
                 return false;
             }
             img.Source = ImageHelper.ConvertImageToBase64(imagePath);
-            // OnUpdated(img.GetType());
             return true;
         }
 
@@ -217,8 +218,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         {
             UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
             label.Style = new Style() { Appearance = "list-item-unordered" };
-            _currentTab.Add(label);
-            // OnUpdated(label.GetType());
+            _tabControl.CurrentTab.Add(label);
             return label;
         }
 
@@ -228,19 +228,17 @@ namespace UIFrameworkDotNet.PredefinedPages
             if (item == null || !(item is UILabel label))
                 return false;
             label.Text = newIdStr;
-            // OnUpdated(label.GetType());
             return true;
         }
 
-        // "list-item-ordered" è in Style.Layout
+        // "list-item-ordered" è in Style.Appearance
         // index è in Tag
         public UILabel AddOrderedItem(string idStr, int index)
         {
             UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
             label.Style = new Style() { Appearance = "list-item-ordered" };
             label.Tag = index;
-            _currentTab.Add(label);
-            // OnUpdated(label.GetType());
+            _tabControl.CurrentTab.Add(label);
             return label;
         }
 
@@ -249,8 +247,7 @@ namespace UIFrameworkDotNet.PredefinedPages
             UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
             label.Style = new Style() { Appearance = style };
             label.Tag = index;
-            _currentTab.Add(label);
-            // OnUpdated(label.GetType());
+            _tabControl.CurrentTab.Add(label);
             return label;
         }
 
@@ -258,9 +255,8 @@ namespace UIFrameworkDotNet.PredefinedPages
         {
             UILabel label = new UILabel(idStr); // TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
             label.Style = new Style() { Appearance = style };
-           // label.Tag = index;
-            _currentTab.Add(label);
-            // OnUpdated(label.GetType());
+            // label.Tag = index;
+            _tabControl.CurrentTab.Add(label);
             return label;
         }
 
@@ -278,8 +274,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         {
             var label = new UILabel(idStr);
             label.Style = new Style() { Appearance = style, ForegroundColor = color };
-            _currentTab.Add(label);
-            // OnUpdated(label.GetType());
+            _tabControl.CurrentTab.Add(label);
             return label;
         }
 
@@ -298,48 +293,48 @@ namespace UIFrameworkDotNet.PredefinedPages
             if (!string.IsNullOrEmpty(color))
                 label.Style.ForegroundColor = color;
             label.Text = newIdStr;
-            // OnUpdated(label.GetType());
             return true;
-        }
+        }*/
 
-        #region ADD BUTTON 
+        #region ADD BUTTON  
+        // TODO Fare un AddButton che overrida il futuro AddButton, ecc... di una PageBase
         public UIButton AddButton(string id)
         {
             var button = new UIButton(id, false, ""); // non c'è uno stile per il default??
-            _currentTab.Add(button);
-            // OnUpdated(button.GetType());
+           // _currentTab.Add(button);
+           _lateralArea.Add(button);
             return button;
         }
 
         public UIButton AddButton(string id, bool isEnabled, string style)
         {
             var button = new UIButton(id, isEnabled, style);
-            _currentTab.Add(button);
-            // OnUpdated(button.GetType());
+           // _currentTab.Add(button);
+            _lateralArea.Add(button);
             return button;
         }
 
         public UIButton AddButton(string id, bool isEnabled)
         {
             var button = new UIButton(id, isEnabled, "");
-            _currentTab.Add(button);
-            // OnUpdated(button.GetType());
+            // _currentTab.Add(button);
+            _lateralArea.Add(button);
             return button;
         }
 
         public UIButton AddButton(string id, string text)
         {
             var button = new UIButton(id, false, "", text);
-            _currentTab.Add(button);
-            // OnUpdated(button.GetType());
+            // _currentTab.Add(button);
+            _lateralArea.Add(button);
             return button;
         }
 
         public UIButton AddButton(string id, string text, bool isEnabled)
         {
             var button = new UIButton(id, isEnabled, "standard", text);
-            _currentTab.Add(button);
-            // OnUpdated(button.GetType());
+            // _currentTab.Add(button);
+            _lateralArea.Add(button);
             return button;
         }
         #endregion
@@ -362,7 +357,6 @@ namespace UIFrameworkDotNet.PredefinedPages
                 return false;
             if (button is UIButton btn)
                 btn.Enabled = true;
-            //button.Enabled = true;
            
             return true;
         }
@@ -379,7 +373,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         }
         #endregion
 
-
+        // TODO capire come gestire lo shortcut
         #region FEEDBACK
         public UIFeedback AddFeedbackCountdown(int ms)
         {
@@ -388,7 +382,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         public UIFeedback AddFeedbackCountdown(int ms, bool isManual)
         {
             var feedback = new UIFeedback(FeedbackMode.Countdown, "countdown", (ms * 1000).ToString() /* BasicLibraries.UTILITY.FormatDuration(ms * 1000)*/, ms, isManual);
-            _currentTab.Add(feedback);
+            _tabControl.CurrentTab.Add(feedback);
             // OnUpdated(feedback.GetType());
             feedback.TickElapsed += Feedback_TickElapsed; // TODO Bisogna desottoscriversi
             if (!isManual)
@@ -415,7 +409,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         public UIFeedback AddFeedbackProgress(int perc)
         {
             var feedback = new UIFeedback(FeedbackMode.ProgressBar, "progress", "", perc);
-            _currentTab.Add(feedback);
+            _tabControl.CurrentTab.Add(feedback);
             // OnUpdated(feedback.GetType());
             return feedback;
         }
@@ -461,8 +455,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         {
             //msg = TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(msg);
             var feedback = new UIFeedback(FeedbackMode.Message, "message", msg);
-            _currentTab.Add(feedback);
-            // OnUpdated(feedback.GetType());
+            _tabControl.CurrentTab.Add(feedback);
             return feedback;
         }
 

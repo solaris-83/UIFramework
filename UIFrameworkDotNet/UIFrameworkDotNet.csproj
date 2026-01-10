@@ -46,9 +46,10 @@
   <ItemGroup>
     <Compile Include="CommandRegistry.cs" />
     <Compile Include="ContainerElement.cs" />
+    <Compile Include="GridPosition.cs" />
     <Compile Include="Helpers\DataArray.cs" />
     <Compile Include="Helpers\ImageHelper.cs" />
-    <Compile Include="Helpers\PageExtension.cs" />
+    <Compile Include="Helpers\ContainerElementExtensions.cs" />
     <Compile Include="Helpers\PageSerializer.cs" />
     <Compile Include="ICommand.cs" />
     <Compile Include="LibraryUI.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="PredefinedPages\PageDisclaimer.cs" />
     <Compile Include="PredefinedPages\PageMenu.cs" />
     <Compile Include="PredefinedPages\PageResult.cs" />
+    <Compile Include="PredefinedPages\PredefinedPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UIButton.cs" />
     <Compile Include="UICheckbox.cs" />
@@ -67,8 +69,10 @@
     <Compile Include="UIFeedback.cs" />
     <Compile Include="UIImage.cs" />
     <Compile Include="UILabel.cs" />
+    <Compile Include="UILateralArea.cs" />
     <Compile Include="UISection.cs" />
     <Compile Include="UISequenceStep.cs" />
+    <Compile Include="UITab.cs" />
     <Compile Include="UITabControl.cs" />
     <Compile Include="UITextbox.cs" />
   </ItemGroup>

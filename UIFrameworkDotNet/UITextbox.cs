@@ -17,6 +17,7 @@ namespace UIFrameworkDotNet
             
         }
 
+        #region States
         private string _text;
         [JsonIgnore]
         public string Text
@@ -24,12 +25,13 @@ namespace UIFrameworkDotNet
             get => _text;
             set 
             {
-                if (_text == value) return;
-                _text = value;
-                States["text"] = value; 
-                OnPropertyChanged(nameof(Text)); 
+                SetStatesProperty(ref _text, value, nameof(Text));
             }
         }
+
+        #endregion
+
+        #region
 
         private string _placeholder;
         [JsonIgnore]
@@ -38,12 +40,11 @@ namespace UIFrameworkDotNet
             get => _placeholder;
             set
             {
-                if (_placeholder == value) return;
-                _placeholder = value;
-                Props["placeholder"] = value;
-                OnPropertyChanged(nameof(Placeholder));
+                SetPropsProperty(ref _placeholder, value, nameof(Placeholder));
             }
         }
+
+        #endregion
     }
 
     public class TextboxTextChangedCommand : ICommand

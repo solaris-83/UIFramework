@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using UIFrameworkDotNet.PredefinedPages;
 
 namespace UIFrameworkDotNet.Helpers
 {
-    public static class PageExtensions
+    public static class ContainerElementExtensions
     {
-        public static UIElement FindById(this Page page, string id)
+        public static UIElement FindById(this ContainerElement containerElement, string id)
         {
-            foreach (var el in page.Children)
+            foreach (var el in containerElement.Children)
             {
                 var found = FindRecursive(el, id);
                 if (found != null)
@@ -35,14 +34,14 @@ namespace UIFrameworkDotNet.Helpers
             return null;
         }
 
-        public static IEnumerable<T> FindAllByType<T>(this Page page) where T : UIElement
+        public static IEnumerable<T> FindAllByType<T>(this ContainerElement container) where T : UIElement
         {
-            if (page == null)
-                throw new ArgumentNullException(nameof(page));
+            if (container == null)
+                throw new ArgumentNullException(nameof(container));
 
             var results = new List<T>();
 
-            foreach (var el in page.Children)
+            foreach (var el in container.Children)
             {
                 CollectRecursive(el, results);
             }
