@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
+using ScriptLibraries.Data.Interfaces;
 using System;
-using System.Collections.Generic;
 
 namespace UIFrameworkDotNet
 {
@@ -14,7 +14,7 @@ namespace UIFrameworkDotNet
     // TODO createsectioncountdown si può rimuovere e usare AddFeedbackCountdown? diciamo di farlo?
     // TODO CreatePageCountdown si può rimuovere? Usata solo in GENERIC_ASK_WRITING(snippet)
 
-    public class UIFeedback : UIElement
+    public class UIFeedback : UITextElement
     {
         // Backing field for the event delegate
         private EventHandler<int> _tickElapsed;
@@ -36,7 +36,7 @@ namespace UIFrameworkDotNet
             }
         }
         
-        public UIFeedback(FeedbackMode feedbackMode, string style, string text, int ms)
+        public UIFeedback(FeedbackMode feedbackMode, string style, string text, int ms) : base(text)
         {
             Tag = $"feedback-{style}";
             Props["style"] = new Style
@@ -45,12 +45,12 @@ namespace UIFrameworkDotNet
             };
             Mode = feedbackMode.ToString();
             Totalseconds = ms / 1000;
-            Text = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
+           // Text = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
             Remaining = ms / 1000;
             Percentage = 0;
         }
 
-        public UIFeedback(FeedbackMode feedbackMode, string style, string text)
+        public UIFeedback(FeedbackMode feedbackMode, string style, string text) : base(text)
         {
             Props["style"] = new Style
             {
@@ -58,10 +58,10 @@ namespace UIFrameworkDotNet
             };
             Tag = $"feedback-{style}";
             Mode = feedbackMode.ToString();
-            Text = text;
+         //   Text = text;
         }
 
-        public UIFeedback(FeedbackMode feedbackMode, string style, string text, int ms, bool isManual)
+        public UIFeedback(FeedbackMode feedbackMode, string style, string text, int ms, bool isManual) : base(text)
         {
             Props["style"] = new Style
             {
@@ -71,7 +71,7 @@ namespace UIFrameworkDotNet
             Mode = feedbackMode.ToString();
             Totalseconds = ms / 1000;
             IsManual = isManual;
-            Text = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
+          //  Text = feedbackMode == FeedbackMode.Countdown ? (int)Math.Round(ms / 1000d) + " seconds remaining" : text;
             Remaining = ms / 1000;
             Percentage = 0;
         }
@@ -206,7 +206,6 @@ namespace UIFrameworkDotNet
     public class FeedbackTickChangedCommand : ICommand
     {
         private readonly UIFeedback _feedback;
-
         public FeedbackTickChangedCommand(UIFeedback feedback)
         {
             _feedback = feedback;

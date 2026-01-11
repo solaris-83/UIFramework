@@ -1,23 +1,18 @@
-﻿
-
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 
 namespace UIFrameworkDotNet
 {
-    public class UIButton : UIElement
+    public class UIButton : UITextElement
     {
-        public UIButton(string tag, bool enabled)
+        public UIButton(string tag, bool enabled) : base(tag)
         {
             Tag = tag;
-            Text = tag;
             Enabled = enabled;
         }
 
-        public UIButton(string tag,  bool enabled, string style)
+        public UIButton(string tag,  bool enabled, string style) : base(tag)
         {
             Tag = tag;
-            Text = tag;
             Enabled = enabled;
             Style = new Style
             {
@@ -25,10 +20,9 @@ namespace UIFrameworkDotNet
             };
         }
 
-        public UIButton(string tag, bool enabled, string style, string translation)
+        public UIButton(string tag, bool enabled, string style, string translation) : base(translation)
         {
             Tag = tag;
-            Text = translation;
             Enabled = enabled;
             Style = new Style
             {
@@ -37,16 +31,7 @@ namespace UIFrameworkDotNet
         }
 
         #region Props
-        private string _text;
-        [JsonIgnore]
-        public string Text
-        {
-            get => _text;
-            set 
-            {
-                SetPropsProperty(ref _text, value, nameof(Text));
-            }
-        }
+        
 
         #endregion
     }

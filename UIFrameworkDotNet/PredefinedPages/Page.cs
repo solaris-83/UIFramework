@@ -9,6 +9,7 @@ namespace UIFrameworkDotNet.PredefinedPages
 {
     public class Page : ContainerElement, IDisposable
     {
+        private readonly IUIContext _uiContext;
         private UITabControl _tabControl;
         private const string STOP_BUTTON_TEXT = "STOP";
         private UILateralArea _lateralArea;
@@ -20,8 +21,9 @@ namespace UIFrameworkDotNet.PredefinedPages
             set => _lateralArea = value;
         }
 
-        public Page()
+        public Page(IUIContext uicontext)
         {
+            _uiContext = uicontext;
             _lateralArea = new UILateralArea();
             TabControl = new UITabControl();
             Add(TabControl);
@@ -82,6 +84,8 @@ namespace UIFrameworkDotNet.PredefinedPages
         private void AttachElement(UIElement element)
         {
             element.PropertyChanged += OnPropertyChanged;
+            if (element is UITextElement textElement)
+                textElement.AttachContext(_uiContext);
 
             if (element is ContainerElement c)
                 AttachContainer(c);

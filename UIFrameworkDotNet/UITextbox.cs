@@ -1,14 +1,13 @@
 ﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+using ScriptLibraries.Data.Interfaces;
 
 namespace UIFrameworkDotNet
 {
-    public class UITextbox : UIElement
+    public class UITextbox : UITextElement
     {
-        public UITextbox(string placeholder, string initialValue)
+        public UITextbox(string placeholder, string initialValue) : base(initialValue)
         {
             Placeholder = placeholder?? "";
-            Text = initialValue?? "";
             Enabled = true;
         }
 
@@ -18,16 +17,6 @@ namespace UIFrameworkDotNet
         }
 
         #region States
-        private string _text;
-        [JsonIgnore]
-        public string Text
-        {
-            get => _text;
-            set 
-            {
-                SetStatesProperty(ref _text, value, nameof(Text));
-            }
-        }
 
         #endregion
 
@@ -45,20 +34,5 @@ namespace UIFrameworkDotNet
         }
 
         #endregion
-    }
-
-    public class TextboxTextChangedCommand : ICommand
-    {
-        private readonly UITextbox _textBox;
-
-        public TextboxTextChangedCommand(UITextbox textBox)
-        {
-            _textBox = textBox;
-        }
-
-        public void Execute(object newValue)
-        {
-            _textBox.Text = newValue.ToString();
-        }
     }
 }

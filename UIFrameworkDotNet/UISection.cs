@@ -127,7 +127,7 @@ namespace UIFrameworkDotNet
             var item = this.FindById(itemId);
             if (item == null || !(item is UILabel label))
                 return false;
-            label.Text = newIdStr;
+            label.UpdateText(newIdStr);
             return true;
         }
 
@@ -185,7 +185,7 @@ namespace UIFrameworkDotNet
                 label.Style.Appearance = style;
             if (!string.IsNullOrEmpty(color))
                 label.Style.ForegroundColor = color;
-            label.Text = newIdStr;
+            label.UpdateText(newIdStr);
             return true;
         }
 

@@ -3,43 +3,31 @@ using Newtonsoft.Json;
 using System;
 namespace UIFrameworkDotNet
 {
-    public class UICheckbox : UIElement
+    public class UICheckbox : UITextElement
     {
-        public UICheckbox(string text, bool isChecked, bool isEnabled)
+        public UICheckbox(string text, bool isChecked, bool isEnabled) : base(text)
         {
             Tag = default;
-            Text = text;
             Checked = isChecked;
             Enabled = isEnabled;
         }
 
-        public UICheckbox(string text, bool isChecked, bool isEnabled, string tag)
+        public UICheckbox(string text, bool isChecked, bool isEnabled, string tag) : base(text)
         {
             Tag = tag;
-            Text = text;
             Checked = isChecked;
             Enabled = isEnabled;
         }
 
-        public UICheckbox(string text, bool isEnabled, string tag)
+        public UICheckbox(string text, bool isEnabled, string tag) : base(text)
         {
             Tag = tag;
-            Text = text;
             Checked = false;
             Enabled = isEnabled;
         }
 
         #region Props
-        private string _text;
-        [JsonIgnore]
-        public string Text
-        {
-            get => _text;
-            set
-            {
-                SetPropsProperty(ref _text, value, nameof(Text));
-            }
-        }
+       
 
         #endregion
 

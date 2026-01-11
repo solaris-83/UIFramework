@@ -12,14 +12,19 @@ namespace UIFrameworkDotNet
         private UiCommandDispatcher _dispatcher = null;
         private Page _currentPage = null;
         private CommandRegistry _registry;
-
+        private IUIContext _uiContext;
         public LibraryUI() 
         {
+            _uiContext = new UIContext(new FakeTranslationService());
             _registry = new CommandRegistry();
         
             _registry.Register<UIElement>(
                 nameof(UIElement.Enabled),
                 (el) => new UIElementEnabledChangedCommand(el)
+            );
+            _registry.Register<UITextElement>(
+                nameof(UITextElement.Text),
+                (el) => new UITextElementTextChangedCommand(el, _uiContext.Translator)
             );
             _registry.Register<UIElement>(
                 nameof(UIElement.Visible),
@@ -33,18 +38,10 @@ namespace UIFrameworkDotNet
                nameof(UIImage.Source),
                (img) => new ImageSourceChangedCommand(img)
            );
-            _registry.Register<UILabel>(
-               nameof(UILabel.Text),
-               (label) => new LabelTextChangedCommand(label)
-           );
             _registry.Register<UITabControl>(
                nameof(UITabControl.ActiveTabId),
                (tbc) => new TabControlActiveTabChangedCommand(tbc)
            );
-            _registry.Register<UITextbox>(
-              nameof(UITextbox.Text),
-              (txt) => new TextboxTextChangedCommand(txt)
-            );
             _registry.Register<UIFeedback>(
                 nameof(UIFeedback.Remaining),
                 (fb) => new FeedbackTickChangedCommand(fb)
@@ -55,17 +52,17 @@ namespace UIFrameworkDotNet
             );
         }
 
-        public PageDisclaimer CreatePageDisclaimer() => new PageDisclaimer();
+        public PageDisclaimer CreatePageDisclaimer() => new PageDisclaimer(_uiContext);
 
-        public PageResult CreatePageResult() => new PageResult();
+        public PageResult CreatePageResult() => new PageResult(_uiContext);
 
         // TODO Putroppo che anche questa firma (nello SCROF e qualche altra app)
         [Obsolete]
         public PageResult CreateResult() => CreatePageResult();
 
-        public PageMenu CreatePageMenu() => new PageMenu();
+        public PageMenu CreatePageMenu() => new PageMenu(_uiContext);
 
-        public Page CreatePage() => new Page();
+        public Page CreatePage() => new Page(_uiContext);
 
         public UISection CreateSectionDocument() => new UISection();
 

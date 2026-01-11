@@ -23,7 +23,7 @@ namespace UIFrameworkDotNet.PredefinedPages
             }
         }
 
-        public PageDisclaimer() : base("disclaimer")
+        public PageDisclaimer(IUIContext uicontext) : base("disclaimer", uicontext)
         {
             SetTitle("title", "Information", "info");
           //  AddTab("disclaimer", 1, 1);

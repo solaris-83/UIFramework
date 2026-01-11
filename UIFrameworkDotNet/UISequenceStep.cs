@@ -7,27 +7,17 @@ namespace UIFrameworkDotNet
 {
     // TODO c'è del lavoro da fare anche a livello ESLX non solo JS (cambiamenti ma non ci sono app che la usano mi sa).
     // TODO gestire gli Equals
-    public class UISequenceStep : UIElement
+    public class UISequenceStep : UITextElement
     {
-        public UISequenceStep(string tag, string text)
+        public UISequenceStep(string tag, string text) : base(text)
         {
             Tag = tag;
-            Text = text;
             //  States["subtitle"]
             Status = "inactive";
         }
 
         #region Props
-        private string _text;
-        [JsonIgnore]
-        public string Text
-        {
-            get => _text;
-            set
-            {
-                SetPropsProperty(ref _text, value, nameof(Text));
-            }
-        }
+       
         #endregion
 
         #region States

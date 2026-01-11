@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using ScriptLibraries.Data.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -43,9 +44,11 @@ namespace UIFrameworkDotNet
     public class DropDownPropertyChangedCommand : ICommand
     {
         private readonly UIDropDown _dropDown;
+        private readonly ITranslationService _translationService;
 
-        public DropDownPropertyChangedCommand(UIDropDown dropDown)
+        public DropDownPropertyChangedCommand(UIDropDown dropDown, ITranslationService translationService)
         {
+            _translationService = translationService;
             _dropDown = dropDown;
         }
 

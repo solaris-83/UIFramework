@@ -59,7 +59,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         }
 
 
-        public PageMenu() : base("menu")
+        public PageMenu(IUIContext uicontext) : base("menu", uicontext)
         {
             AddButton("EXIT", true, "danger");
             AddButton("CONTINUE", false);
