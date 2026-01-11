@@ -1,20 +1,18 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using UIFrameworkDotNet.Helpers;
 
 namespace UIFrameworkDotNet
 {
     // TODO capire se le sections servono e dove piazzarle come contenitori logici di altri elementi
-    public class UISection : ContainerElement
+    public class UISection : GridPositionContainerElement
     {
-        private Dictionary<string, GridPosition> _layout;
 
         public UISection(int rows, int columns)
         {
-            Rows = rows;
-            Columns = columns;
+            Grid = new Grid(rows, columns);
+            GridPosition = new GridPosition(0, 0, 1, 1);
         }
 
         public UISection() : this (1, 1)
@@ -28,45 +26,45 @@ namespace UIFrameworkDotNet
 
         public void Add(UIElement child, int row, int column)
         {
-           if ( _layout == null)
-                _layout = new Dictionary<string, GridPosition>();
+            //if (_layout == null)
+            //    _layout = new Dictionary<string, GridPosition>();
             base.Add(child);
-            _layout[child.Id] = new GridPosition(row, column);
+            //_layout[child.Id] = new GridPosition(row, column);
         }
 
         #region Props
 
-        private int _rows;
-        [JsonIgnore]
-        public int Rows
-        {
-            get => _rows;
-            set => SetPropsProperty(ref _rows, value, nameof(Rows));
-        }
+        //private int _rows;
+        //[JsonIgnore]
+        //public int Rows
+        //{
+        //    get => _rows;
+        //    set => SetPropsProperty(ref _rows, value, nameof(Rows));
+        //}
 
-        private int _columns;
-        [JsonIgnore]
-        public int Columns
-        {
-            get => _columns;
-            set => SetPropsProperty(ref _columns, value, nameof(Columns));
-        }
+        //private int _columns;
+        //[JsonIgnore]
+        //public int Columns
+        //{
+        //    get => _columns;
+        //    set => SetPropsProperty(ref _columns, value, nameof(Columns));
+        //}
 
-        private int _rowSpan;
-        [JsonIgnore]
-        public int RowSpan
-        {
-            get => _rows;
-            set => SetPropsProperty(ref _rowSpan, value, nameof(RowSpan));
-        }
+        //private int _rowSpan = 1;
+        //[JsonIgnore]
+        //public int RowSpan
+        //{
+        //    get => _rows;
+        //    set => SetPropsProperty(ref _rowSpan, value, nameof(RowSpan));
+        //}
 
-        private int _columnSpan;
-        [JsonIgnore]
-        public int ColumnSpan
-        {
-            get => _columnSpan;
-            set => SetPropsProperty(ref _columnSpan, value, nameof(ColumnSpan));
-        }
+        //private int _columnSpan = 1;
+        //[JsonIgnore]
+        //public int ColumnSpan
+        //{
+        //    get => _columnSpan;
+        //    set => SetPropsProperty(ref _columnSpan, value, nameof(ColumnSpan));
+        //}
 
         private string _title;
         [JsonIgnore]

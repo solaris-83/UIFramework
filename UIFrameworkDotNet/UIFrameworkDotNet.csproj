@@ -46,7 +46,10 @@
   <ItemGroup>
     <Compile Include="CommandRegistry.cs" />
     <Compile Include="ContainerElement.cs" />
+    <Compile Include="Grid.cs" />
+    <Compile Include="GridContainerElement.cs" />
     <Compile Include="GridPosition.cs" />
+    <Compile Include="GridPositionContainerElement.cs" />
     <Compile Include="Helpers\DataArray.cs" />
     <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Helpers\ContainerElementExtensions.cs" />

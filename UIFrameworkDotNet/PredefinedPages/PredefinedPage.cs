@@ -8,51 +8,53 @@ namespace UIFrameworkDotNet.PredefinedPages
     // Vengono utilizzate dalle Pagine custom es disclaimer, menu, result, ecc...
     public class PredefinedPage : Page
     {
+        private UISection _singleSection;
         public PredefinedPage(string identifier) : base()
         {
             var tab = new UITab(identifier, 1, 1);
             base.TabControl.Add(tab);
             base.TabControl.CurrentTab = tab;
-            UISection section = new UISection(1, 1);
-            base.TabControl.CurrentTab.Add(section);
-            base.TabControl.CurrentTab.CurrentSection = section;
+            _singleSection = new UISection(1, 1);
+            base.TabControl.CurrentTab.Add(_singleSection);
         }
+
+        protected UISection GetSection() => _singleSection;
 
         public UIImage AddImage(string imageName)
         {
-            return base.TabControl.CurrentTab.CurrentSection.AddImage(imageName);
+            return _singleSection.AddImage(imageName);
         }
 
         public bool UpdateImage(string imageId, string newImageName)
         {
-            return base.TabControl.CurrentTab.CurrentSection.UpdateImage(imageId, newImageName);
+            return _singleSection.UpdateImage(imageId, newImageName);
         }
 
         public UILabel AddBulletedItem(string idStr)
         {
-            return base.TabControl.CurrentTab.CurrentSection.AddBulletedItem(idStr);
+            return _singleSection.AddBulletedItem(idStr);
         }
 
         public bool UpdateBulletedItem(string itemId, string newIdStr)
         {
-            return base.TabControl.CurrentTab.CurrentSection.UpdateBulletedItem(itemId, newIdStr);
+            return _singleSection.UpdateBulletedItem(itemId, newIdStr);
         }
 
         // "list-item-ordered" è in Style.Appearance
         // index è in Tag
         public UILabel AddOrderedItem(string idStr, int index)
         {
-            return base.TabControl.CurrentTab.CurrentSection.AddOrderedItem(idStr, index);
+            return _singleSection.AddOrderedItem(idStr, index);
         }
 
         public UILabel AddOrderedItem(string idStr, string style, int index)
         {
-            return base.TabControl.CurrentTab.CurrentSection.AddOrderedItem(idStr, style, index);
+            return _singleSection.AddOrderedItem(idStr, style, index);
         }
 
         public UILabel AddOrderedItem(string idStr, string style)
         {
-            return base.TabControl.CurrentTab.CurrentSection.AddOrderedItem(idStr, style);
+            return _singleSection.AddOrderedItem(idStr, style);
         }
 
         public UILabel AddOrderedItem(string idStr)
@@ -67,17 +69,17 @@ namespace UIFrameworkDotNet.PredefinedPages
 
         public UILabel AddParagraph(string idStr, string style, string color) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
         {
-            return base.TabControl.CurrentTab.CurrentSection.AddParagraph(idStr, style, color);
+            return _singleSection.AddParagraph(idStr, style, color);
         }
 
         public bool UpdateParagraph(string paragraphId, string newIdStr) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
         {
-            return base.TabControl.CurrentTab.CurrentSection.UpdateParagraph(paragraphId, newIdStr);
+            return _singleSection.UpdateParagraph(paragraphId, newIdStr);
         }
 
         public bool UpdateParagraph(string paragraphId, string newIdStr, string style, string color) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
         {
-            return base.TabControl.CurrentTab.CurrentSection.UpdateParagraph(paragraphId, newIdStr, style, color);
+            return _singleSection.UpdateParagraph(paragraphId, newIdStr, style, color);
         }
     }
 }

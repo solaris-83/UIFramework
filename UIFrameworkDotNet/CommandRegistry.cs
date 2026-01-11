@@ -17,7 +17,7 @@ namespace UIFrameworkDotNet
         {
             _rules.Add((element, prop) =>
             {
-                if (element is T typed && prop.Equals(property))
+                if (element is T typed && prop.ToLowerInvariant().Equals(property, StringComparison.InvariantCultureIgnoreCase))
                     return factory(typed);
 
                 return null;

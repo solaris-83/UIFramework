@@ -25,7 +25,7 @@ namespace UIFrameworkDotNet.PredefinedPages
             _lateralArea = new UILateralArea();
             TabControl = new UITabControl();
             Add(TabControl);
-            Add(_lateralArea);
+            Add(LateralArea);
         }
 
         private string _title;

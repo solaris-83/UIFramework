@@ -262,19 +262,24 @@ namespace ConsoleApp
         {
             LibraryUI libraryUI = new LibraryUI();
             var newCustomPage = libraryUI.CreatePage();
+            newCustomPage.AddButton("CONTINUE", true);
+            newCustomPage.Title = "This is a title";
             // === CUSTOM PAGE WITH SECTIONS ===
             var myTab = newCustomPage.AddTab("tab", 2, 2);
             var mySection1 = libraryUI.CreateSectionDocument();
+            mySection1.Tag = nameof(mySection1);
             // prevedo una section 1x1 visto che non specifico nient'altro
             mySection1.AddParagraph("Sono un paragraph");
             var mySection2 = libraryUI.CreateSectionDocument(); // prevedo una section 1x1 visto che non specifico nient'altro
+            mySection2.Tag = nameof(mySection2);
             mySection2.AddImage("Screenshot.png");
             var mySection3 = libraryUI.CreateSectionDocument(); // prevedo una section 1x1 visto che non specifico nient'altro mySection3.AddChart()
+            mySection3.Tag = nameof(mySection3);
             myTab.Add(mySection1, 0, 0); // (quadrante in alto sx)
             myTab.Add(mySection2, 0, 1); // (quadranti superiori)
-            mySection3.ColumnSpan = 2;
-            mySection3.Rows = 1;
-            mySection3.Columns = 3;
+            mySection3.GridPosition.ColumnSpan = 2;
+            mySection3.Grid.Rows = 1;
+            mySection3.Grid.Columns = 3;
             myTab.Add(mySection3, 1, 0); // mySection3 è posizionato alla riga di indice 1 e colonna di indice 0 per un Colspan pari a 2
 
             libraryUI.ShowAndWait(newCustomPage);
@@ -299,7 +304,7 @@ namespace ConsoleApp
             libraryUI.ShowAndWait(page);
 
             libraryUI.SimulateJsEvent(continueBtn.Id, "propertyChanged",
-                    new Dictionary<string, object> { ["Enabled"] = true });
+                    new Dictionary<string, object> { ["enabled"] = true });
 
             var par3 = page.AddParagraph("Paragraph #3 after ShowAndWait");
 

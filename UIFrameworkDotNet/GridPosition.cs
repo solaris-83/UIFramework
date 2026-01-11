@@ -4,18 +4,17 @@ namespace UIFrameworkDotNet
 {
     public sealed class GridPosition
     {
-        public int Row { get; }
-        public int Column { get; }
-        public int RowSpan { get; }
-        public int ColSpan { get; }
+        public int RowIndex { get; set; }
+        public int ColumnIndex { get; set; }
+        public int RowSpan { get; set; }
+        public int ColumnSpan { get; set; }
 
-        public GridPosition(int row, int column, int rowSpan = 1, int colSpan = 1)
+        public GridPosition(int rowIndex, int columnIndex, int rowSpan = 1, int colSpan = 1)
         {
-            Row = row;
-            Column = column;
+            RowIndex = rowIndex;
+            ColumnIndex = columnIndex;
             RowSpan = rowSpan;
-            ColSpan = colSpan;
+            ColumnSpan = colSpan;
         }
     }
-
 }

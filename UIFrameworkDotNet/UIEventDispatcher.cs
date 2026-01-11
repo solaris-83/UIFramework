@@ -9,6 +9,7 @@ namespace UIFrameworkDotNet
     {
         public string ElementId { get; set; }  // elemento su cui è stato lanciato l'evento
         public string EventType { get; set; }   // tipo di evento "change", ...
+        public bool NotifyBack { get; set; } = true;
         public Dictionary<string, object> NewStates { get; set; }
     }
 

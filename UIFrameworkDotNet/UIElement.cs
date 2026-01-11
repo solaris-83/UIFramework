@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Xml.Linq;
 
 namespace UIFrameworkDotNet
 {
@@ -19,7 +20,8 @@ namespace UIFrameworkDotNet
 
         protected bool SetStatesProperty<T>(ref T field, T value, string propertyName)
         {
-            return SetProperty<T>(ref field, value, () => States[propertyName] = value, propertyName);
+            var propertyNameToCamelCase = Char.ToLowerInvariant(propertyName[0]) + propertyName.Substring(1);
+            return SetProperty<T>(ref field, value, () => States[propertyNameToCamelCase] = value, propertyName);
         }
 
         protected bool SetProperty<T>(ref T field, T value, Action actionBeforeNotify, string propertyName)
@@ -36,7 +38,8 @@ namespace UIFrameworkDotNet
 
         protected bool SetPropsProperty<T>(ref T field, T value, string propertyName)
         {
-            return SetProperty<T>(ref field, value, () => Props[propertyName] = value, propertyName);
+            var propertyNameToCamelCase = Char.ToLowerInvariant(propertyName[0]) + propertyName.Substring(1);
+            return SetProperty<T>(ref field, value, () => Props[propertyNameToCamelCase] = value, propertyName);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -61,21 +61,17 @@ namespace UIFrameworkDotNet.PredefinedPages
 
         public PageMenu() : base("menu")
         {
-            // TODO correggere
-            var tab = AddTab("menu", 1, 1);
             AddButton("EXIT", true, "danger");
             AddButton("CONTINUE", false);
-            var section = new UISection();
+            var section = GetSection();
             _checkboxgroup = new UICheckBoxGroup();
             section.Add(_checkboxgroup);
-            tab.Add(section);   
         }
 
         public UICheckbox AddItem(string tag, string idStr)
         {
             var chkbox = new UICheckbox(idStr, isChecked: false, isEnabled: true, tag);
             _checkboxgroup.Add(chkbox);
-          //  OnUpdated(chkbox.GetType());
             return chkbox;
         }
 
