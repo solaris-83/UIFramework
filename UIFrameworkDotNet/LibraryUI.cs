@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using log4net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace UIFrameworkDotNet
 {
     public class LibraryUI
     {
+        private static readonly ILog logger = LogManager.GetLogger(typeof(LibraryUI));
+
         private UiCommandDispatcher _dispatcher = null;
         private Page _currentPage = null;
         private CommandRegistry _registry;

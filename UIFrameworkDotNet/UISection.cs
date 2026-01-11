@@ -5,7 +5,6 @@ using UIFrameworkDotNet.Helpers;
 
 namespace UIFrameworkDotNet
 {
-    // TODO capire se le sections servono e dove piazzarle come contenitori logici di altri elementi
     public class UISection : GridPositionContainerElement
     {
 
@@ -140,7 +139,7 @@ namespace UIFrameworkDotNet
 
         public UILabel AddOrderedItem(string idStr, string style, int index)
         {
-            UILabel label = new UILabel(idStr); // TODO TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(idStr);
+            UILabel label = new UILabel(idStr);
             label.Style = new Style() { Appearance = style };
             if (index > -1)
                 label.Tag = index;
@@ -190,7 +189,7 @@ namespace UIFrameworkDotNet
         }
 
         #region ADD BUTTON  
-        // TODO Fare un AddButton che overrida il futuro AddButton, ecc... di una PageBase
+        
         public UIButton AddButton(string id)
         {
             var button = new UIButton(id, false, ""); // non c'è uno stile per il default??

@@ -260,7 +260,15 @@ namespace ConsoleApp
 
         static void Main()
         {
-            LibraryUI libraryUI = new LibraryUI();
+            var libraryUI = new LibraryUI();
+            var page1 = libraryUI.CreatePageDisclaimer();
+            var par111 = page1.AddParagraph(FakeStrings.PAR1, "paragraph", "gray");
+            libraryUI.ShowAndWait(page1);
+            libraryUI.SimulateJsEvent(par111.Id, "propertyChanged", new Dictionary<string, object> { ["text"] = "__NOTFOUND__" });
+
+           
+
+
             var newCustomPage = libraryUI.CreatePage();
             newCustomPage.AddButton("CONTINUE", true);
             newCustomPage.Title = "This is a title";
@@ -420,7 +428,8 @@ namespace ConsoleApp
             Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAll(0, 1, 3));
 
 
-            
+            // TODO caso interessante, portarlo in uno unit test: verificare che la composizione di UITabe e UISection sia quella attesa
+
             // ==== PAGINA CUSTOM ====
             // Istanzio pagina
             var customPage = libraryUI.CreatePage();
@@ -438,20 +447,21 @@ namespace ConsoleApp
 
             customPage.AddButtonStop(true);
             var continueButton = customPage.AddButton("CONTINUE", true);
-            // Recupero il tabcontrol creato nel CTOR di page per agganciarci altri 2 tab
-            // Automaticamente viene settato come attivo l'ultimo tab creato
-            var tabControl = customPage.TabControl;
-            var tab1 = new UITab("Generale", 1, 1);
-            tab1.Add(new UIButton("Salva", enabled: true));  // TODO mettiamo per forza una section o direttamente dentro il tab?
-            var tab2 = new UITab("Avanzate", 1, 1);
-            tab2.Add(new UILabel("Opzioni avanzate"));
-            customPage.TabControl.Add(tab1);
-            customPage.TabControl.Add(tab2);
+            
+            var tab1 = customPage.AddTab("Generale", 1, 1);
+            // Aggiungo una section
+            var section2 = libraryUI.CreateSection();
+            section2.AddOrderedItem("pippo");
+            var tab2 = customPage.AddTab("Avanzate", 1, 1);
+            // Aggiungo una section
+            var section3 = libraryUI.CreateSection();
+            section3.AddOrderedItem("Opzioni avanzate");
+           
             var feedback = customPage.AddFeedbackCountdown(15000);  // 15 secondi, non parte automaticamente
             libraryUI.ShowAndWait(customPage);
 
             // Simulo evento JS (selezione di un tab)
-            libraryUI.SimulateJsEvent(tabControl.Id, "propertyChanged",
+            libraryUI.SimulateJsEvent(page.TabControl.Id, "propertyChanged",
                 new Dictionary<string, object> { ["activeTabId"] = firstTab.Id });
 
             // Simulo evento JS (enable/disable di un button)

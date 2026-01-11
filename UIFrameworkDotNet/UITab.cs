@@ -7,15 +7,6 @@ namespace UIFrameworkDotNet
     public class UITab : GridContainerElement  // TODO su Tab ci vuole Title
     {
 
-        //private UISection _currentSection;
-
-        //[JsonIgnore]
-        //public UISection CurrentSection
-        //{
-        //    get => _currentSection; 
-        //    set => _currentSection = value; 
-        //}
-
         #region Props
 
         

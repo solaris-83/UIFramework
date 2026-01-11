@@ -161,22 +161,9 @@ namespace UIFrameworkDotNet.PredefinedPages
             return SetTitle("title", idStr, style);
         }
 
-        //// Per creare il titolo di una page creo una sezione e ci aggiungo una label
-        //public bool SetTitle(string idStr, string style)
-        //{
-        //    var section = new UISection();
-        //    var titleStyle = new Style() { Layout = style };
-        //    section.SetStyle(titleStyle);
-        //    var titleLabel = new UILabel(idStr);
-        //    titleLabel.SetStyle(titleStyle); // da qui evinco che è un title e quindi usa uno stile particolare
-        //    section.Add(titleLabel);
-        //    Add(section);
-        //    return true;
-        //}
-
         // TODO Il tab deve avere come primo parametro lo stile.
         // TODO non esiste la possibilità di mettere l'header?
-        public UITab AddTab(string title, int rows, int cols)  // TODO UITab o bool?? Devo creare section?
+        public UITab AddTab(string title, int rows, int cols)
         {
             _tabControl.CurrentTab = new UITab(title, rows, cols);
             _tabControl.Add(_tabControl.CurrentTab);
@@ -377,7 +364,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         }
         #endregion
 
-        // TODO capire come gestire lo shortcut
+        // TODO capire come gestire lo shortcut e quindi il poterlo richiamare direttamente da Page come avviene purtroppo in ESLX. Ora si dovrebbe cercare la UITab e la section corrente. Se non esistono crearle prima di aggiungere l'elemento UIElement?
         #region FEEDBACK
         public UIFeedback AddFeedbackCountdown(int ms)
         {

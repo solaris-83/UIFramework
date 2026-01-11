@@ -2,7 +2,6 @@
 
 namespace UIFrameworkDotNet.PredefinedPages
 {
-    // TODO quali metodi mettiamo a diposizione? derivare dall'intera Page è troppo?
     public sealed class PageDisclaimer : PredefinedPage
     {
         private UIButton _buttonContinue;
@@ -32,7 +31,7 @@ namespace UIFrameworkDotNet.PredefinedPages
             RequiresCompleteRead = false;
         }
 
-        // TODO gestire l'evento di lettura del disclaimer
+        // TODO Direi che non serve più gestire l'evento di lettura del disclaimer. E' il JS che mi manda un messaggio di update della page
         public override void ReceiveUpdate(object message)
         {
             if (message != null)

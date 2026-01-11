@@ -1,7 +1,5 @@
 ﻿
 
-using System.Security.Cryptography;
-
 namespace UIFrameworkDotNet.PredefinedPages
 {
     // Le PredefinedPage sono pagine un po' più avanzate della Page standard: viene automaticamente creato uno UITab e una unica sezione all'interno del CurrentTab.
