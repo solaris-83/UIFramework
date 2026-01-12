@@ -265,6 +265,10 @@ namespace ConsoleApp
             var page = libraryUI.CreatePage();
             var titolo = page.SetTitle("TITOLO", "information");
             page.Title = "TITOLO2";
+            var tab = page.AddTab("tab", 1, 1);
+            tab.Title = "TITOLO DEL TAB";
+
+
             libraryUI.ShowAndWait(page);
 
             page.Title = "TITOLO3";
