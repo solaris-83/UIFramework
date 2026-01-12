@@ -1,7 +1,6 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using log4net.Config;
 
 [assembly: AssemblyTitle("UnitTestProject1")]
 [assembly: AssemblyDescription("")]
@@ -21,4 +20,4 @@ using log4net.Config;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
 
-[assembly: XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
+//[assembly: XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]

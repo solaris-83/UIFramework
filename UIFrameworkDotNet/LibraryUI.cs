@@ -82,8 +82,11 @@ namespace UIFrameworkDotNet
             _currentPage = null;
             _currentPage = page;
             Validate();
-            page.AttachContainer(page.LateralArea);
-            page.AttachContainer(page.TabControl);
+            //page.AttachContainer(page.BottomArea);
+            //page.AttachContainer(page.LateralArea);
+            //page.AttachContainer(page.TabControl);
+
+            page.AttachContainer(page);
 
             _dispatcher = new UiCommandDispatcher(page, _registry);
             Console.WriteLine($"=== LOAD PAGE INIZIALE {page.GetType().Name} ===");
@@ -105,14 +108,28 @@ namespace UIFrameworkDotNet
             {
                 throw new InvalidOperationException("La pagina deve contenere un solo UITabControl.");
             }
-            // TODO (è limitazione?) Un solo UIFeedback (se continuiamo ad usare il metodo BCA.UI.UpdateFeedbackProgress / Countdown non stiamo specificando per quale UIElement altrimenti 
-            // potremmo poi dire di modificare gli eslx lanciando gli update sull'istanza di UIFeedback.
 
-            var uIFeedbacks = _currentPage.FindAllByType<UIFeedback>();
+            var lateralAreaElements = _currentPage.FindAllByType<UILateralArea>();
+            if (lateralAreaElements.Count() != 1)
+                throw new InvalidOperationException("La pagina deve contenere una sola LateralArea.");
 
-            if (uIFeedbacks.Count() > 1)
+            var lateralArea = lateralAreaElements.First();
+            if (lateralArea.Children.All(c => c.Type == nameof(UIButton)) == false)
             {
-                throw new InvalidOperationException("La pagina può contenere un solo UIFeedback.");
+                throw new InvalidOperationException("Nella LateralArea si possono aggiungere solo UIButton.");
+            }
+
+            var bottomAreaElements = _currentPage.FindAllByType<UIBottomArea>();
+            if (bottomAreaElements.Count() > 1)
+                throw new InvalidOperationException("La pagina può contenere una sola BottomArea.");
+
+            if (bottomAreaElements.Any())
+            {
+                var bottomArea = bottomAreaElements.First();
+                if (bottomArea.Children.All(c => c.Type == nameof(UIFeedback)) == false)
+                {
+                    throw new InvalidOperationException("Nella BottomArea si possono aggiungere solo UIFeedback.");
+                }
             }
         }
 

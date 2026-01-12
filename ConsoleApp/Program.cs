@@ -261,6 +261,40 @@ namespace ConsoleApp
         static void Main()
         {
             var libraryUI = new LibraryUI();
+
+            var page = libraryUI.CreatePage();
+            var titolo = page.SetTitle("TITOLO", "information");
+            page.Title = "TITOLO2";
+            libraryUI.ShowAndWait(page);
+
+            page.Title = "TITOLO3";
+            libraryUI.SimulateJsEvent(titolo.Id, "propertyChanged", new Dictionary<string, object> { ["text"] = "__NOTFOUND__" });
+
+
+            page = libraryUI.CreatePage();
+            page.SetTitle("TITOLO", "information");
+            var myTab = page.AddTab("tab", 2, 2);
+            var mySection111 = libraryUI.CreateSectionDocument();
+            // prevedo una section 1x1 visto che non specifico nient'altro
+            mySection111.AddParagraph("Sono un paragraph");
+            var mySection222 = libraryUI.CreateSectionDocument(); // prevedo una section 1x1 visto che non specifico nient'altro
+            mySection222.AddImage("Screenshot.png");
+            var mySection333 = libraryUI.CreateSectionDocument(); // prevedo una section 1x1 visto che non specifico nient'altro mySection3.AddChart()
+            myTab.Add(mySection111, 0, 0); // (quadrante in alto sx)
+            myTab.Add(mySection222, 0, 1); // (quadrante in alto sx)
+            mySection333.GridPosition.ColumnSpan = 2;
+            mySection333.Grid.Rows = 1;
+            mySection333.Grid.Columns = 3;
+            myTab.Add(mySection333, 1, 0); // mySection3 è posizionato alla riga di indice 1 e colonna di indice 0 per un Colspan pari a 2
+
+            libraryUI.ShowAndWait(page);
+
+            var numSections = page.FindAllByType<UISection>();
+
+            var numTabs = page.FindAllByType<UITab>();
+
+            var numTabControls = page.FindAllByType<UITabControl>();
+
             var page1 = libraryUI.CreatePageDisclaimer();
             var par111 = page1.AddParagraph(FakeStrings.PAR1, "paragraph", "gray");
             libraryUI.ShowAndWait(page1);
@@ -273,7 +307,7 @@ namespace ConsoleApp
             newCustomPage.AddButton("CONTINUE", true);
             newCustomPage.Title = "This is a title";
             // === CUSTOM PAGE WITH SECTIONS ===
-            var myTab = newCustomPage.AddTab("tab", 2, 2);
+            myTab = newCustomPage.AddTab("tab", 2, 2);
             var mySection1 = libraryUI.CreateSectionDocument();
             mySection1.Tag = nameof(mySection1);
             // prevedo una section 1x1 visto che non specifico nient'altro
@@ -294,29 +328,31 @@ namespace ConsoleApp
 
             // ==== DISCLAIMER PAGE ====
             // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
-            var page = libraryUI.CreatePageDisclaimer();
-            var buttons = page.FindAllByType<UIButton>();
+            var pageDisclaimer = libraryUI.CreatePageDisclaimer();
+            var buttons = pageDisclaimer.FindAllByType<UIButton>();
             var continueBtn = buttons.Single(b => b.Tag.ToString() == "CONTINUE");
-            page.RequiresCompleteRead = true;
-            var par1 = page.AddParagraph("Paragraph #1.", "paragraph", "gray");
-            var par2 = page.AddParagraph("Paragraph #2.", "paragraph", "gray");
-            page.AddBulletedItem("#1 bulletted item");
-            page.AddBulletedItem("#2 bulletted item");
-            page.AddOrderedItem("Item 1");
-            page.AddOrderedItem("Item 2");
-            page.AddOrderedItem("Item 3");
-            var btn = page.AddButton("CLICK ON ME!!", true);
-            page.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
-            page.Remove(par2.Id);
-            page.AddImage("Screenshot.png");
-            libraryUI.ShowAndWait(page);
+            pageDisclaimer.RequiresCompleteRead = true;
+            var par1 = pageDisclaimer.AddParagraph("Paragraph #1.", "paragraph", "gray");
+            var par2 = pageDisclaimer.AddParagraph("Paragraph #2.", "paragraph", "gray");
+            pageDisclaimer.AddBulletedItem("#1 bulletted item");
+            pageDisclaimer.AddBulletedItem("#2 bulletted item");
+            pageDisclaimer.AddOrderedItem("Item 1");
+            pageDisclaimer.AddOrderedItem("Item 2");
+            pageDisclaimer.AddOrderedItem("Item 3");
+            var btn = pageDisclaimer.AddButton("CLICK ON ME!!", true);
+            pageDisclaimer.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
+            pageDisclaimer.Remove(par2.Id);
+            pageDisclaimer.AddImage("Screenshot.png");
+            libraryUI.ShowAndWait(pageDisclaimer);
+
+            // il js ha preparato un json e io l'ho parsificato
 
             libraryUI.SimulateJsEvent(continueBtn.Id, "propertyChanged",
                     new Dictionary<string, object> { ["enabled"] = true });
 
-            var par3 = page.AddParagraph("Paragraph #3 after ShowAndWait");
+            var par3 = pageDisclaimer.AddParagraph("Paragraph #3 after ShowAndWait");
 
-            page.UpdateParagraph(par3.Id, "Paragraph #3 - BIS -  after ShowAndWait");
+            pageDisclaimer.UpdateParagraph(par3.Id, "Paragraph #3 - BIS -  after ShowAndWait");
 
 
             // ==== RESULT PAGE ====

@@ -9,7 +9,14 @@ namespace UIFrameworkDotNet
 
         #region Props
 
-        
+        private string _title;
+        [JsonIgnore]
+
+        public string Title
+        {
+            get => _title;
+            set => SetPropsProperty(ref _title, value, nameof(Title));
+        }        
 
         #endregion
 

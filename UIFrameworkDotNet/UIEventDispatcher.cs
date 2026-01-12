@@ -15,17 +15,17 @@ namespace UIFrameworkDotNet
 
     public sealed class DiffOperation
     {
-        public DiffOperationType Operation { get; }
-        public string TargetId { get; }
+        public DiffOperationType OperationType { get; }
+        public string ElementId { get; }
         public object Payload { get; }
 
         public DiffOperation(
-            DiffOperationType operation,
-            string targetId,
+            DiffOperationType operationType,
+            string elementId,
             object payload)
         {
-            Operation = operation;
-            TargetId = targetId;
+            OperationType = operationType;
+            ElementId = elementId;
             Payload = payload;
         }
     }

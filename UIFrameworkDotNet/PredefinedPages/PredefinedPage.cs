@@ -9,6 +9,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         private UISection _singleSection;
         public PredefinedPage(string identifier, IUIContext uContext) : base(uContext)
         {
+            Tag = identifier;
             var tab = new UITab(identifier, 1, 1);
             base.TabControl.Add(tab);
             base.TabControl.CurrentTab = tab;

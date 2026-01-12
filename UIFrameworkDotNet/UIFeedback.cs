@@ -189,16 +189,16 @@ namespace UIFrameworkDotNet
             get => _timer != null && _timer.Enabled;
         }
 
-        private string _text;
-        [JsonIgnore]
-        public string Text
-        {
-            get => _text;
-            set 
-            {
-                SetStatesProperty(ref _text, value, nameof(Text));
-            }
-        }
+        //private string _text;
+        //[JsonIgnore]
+        //public string Text
+        //{
+        //    get => _text;
+        //    set 
+        //    {
+        //        SetStatesProperty(ref _text, value, nameof(Text));
+        //    }
+        //}
 
         #endregion
     }

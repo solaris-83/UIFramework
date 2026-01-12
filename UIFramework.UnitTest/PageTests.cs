@@ -5,7 +5,7 @@ using System.Linq;
 using UIFrameworkDotNet;
 using UIFrameworkDotNet.Helpers;
 
-namespace UnitTestProject1
+namespace UIFramework.UnitTest
 {
     [TestClass]
     public class PageTests

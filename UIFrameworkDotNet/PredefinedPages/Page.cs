@@ -1,8 +1,7 @@
-﻿
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
-using System.IO;
+using System.Linq;
 using UIFrameworkDotNet.Helpers;
 
 namespace UIFrameworkDotNet.PredefinedPages
@@ -13,6 +12,10 @@ namespace UIFrameworkDotNet.PredefinedPages
         private UITabControl _tabControl;
         private const string STOP_BUTTON_TEXT = "STOP";
         private UILateralArea _lateralArea;
+        private UIBottomArea _bottomArea;
+        private UITitleArea _titleArea;
+        //private UITab _implicitTab;
+        //private UISection _implicitSection;
 
         [JsonIgnore]
         public UILateralArea LateralArea
@@ -21,14 +24,34 @@ namespace UIFrameworkDotNet.PredefinedPages
             set => _lateralArea = value;
         }
 
+        [JsonIgnore]
+        public UIBottomArea BottomArea
+        {
+            get => _bottomArea;
+            set => _bottomArea = value;
+        }
+
+        [JsonIgnore]
+        public UITitleArea TitleArea
+        {
+            get => _titleArea;
+            set => _titleArea = value;// SetStatesProperty(ref _titleArea, value, nameof(TitleArea));
+        }
+
         public Page(IUIContext uicontext)
         {
             _uiContext = uicontext;
-            _lateralArea = new UILateralArea();
+            LateralArea = new UILateralArea();
             TabControl = new UITabControl();
+            BottomArea = new UIBottomArea();
+            TitleArea = new UITitleArea();
             Add(TabControl);
             Add(LateralArea);
+            Add(BottomArea);
+            Add(TitleArea);
         }
+
+        #region States
 
         private string _title;
         [JsonIgnore]
@@ -40,9 +63,10 @@ namespace UIFrameworkDotNet.PredefinedPages
                 if (value == null)
                     value = "Information";
                 SetTitle("title", value, "info");
-                _title = value;
             }
         }
+
+        #endregion
 
         [JsonIgnore]
         public UITabControl TabControl
@@ -80,8 +104,8 @@ namespace UIFrameworkDotNet.PredefinedPages
             foreach (var child in container.Children)
                 AttachElement(child);   
         }
-        
-        private void AttachElement(UIElement element)
+
+        public void AttachElement(UIElement element)
         {
             element.PropertyChanged += OnPropertyChanged;
             if (element is UITextElement textElement)
@@ -147,31 +171,130 @@ namespace UIFrameworkDotNet.PredefinedPages
             //);
         }
 
-        public UILabel SetTitle (string tag, string idStr, string style)
+        public UILabel SetTitle(string tag, string idStr, string style)
         {
-            var titleLabel = new UILabel(idStr);
-            var titleStyle = new Style() { Appearance = style };
-            titleLabel.Tag = tag;
-            titleLabel.Style = titleStyle; // da qui evinco che è un title e quindi usa uno stile particolare
-            Add(titleLabel);
-            return titleLabel;
+            return CreateOrUpdateTitle(tag, idStr, style);
         }
+
         public UILabel SetTitle(string idStr, string style)
         {
             return SetTitle("title", idStr, style);
+        }
+
+        private UILabel CreateOrUpdateTitle(string tag, string idStr, string style)
+        {
+            UILabel titlePresent = TitleArea.FindAllByType<UILabel>().FirstOrDefault();
+            if (titlePresent == null)
+            {
+                var label = new UILabel(idStr);
+                label.Tag = tag;
+                label.Style = new Style() { Appearance = style };
+                TitleArea.Add(label);
+                return label;
+            }
+            else
+            {
+                titlePresent.UpdateText(idStr);
+                titlePresent.Tag = tag;
+                titlePresent.Style.Appearance = style;
+                return titlePresent;
+            }
         }
 
         // TODO Il tab deve avere come primo parametro lo stile.
         // TODO non esiste la possibilità di mettere l'header?
         public UITab AddTab(string title, int rows, int cols)
         {
+            //// Se esiste già il tab implicito lo riconfiguro
+            //if (_implicitTab != null)
+            //{
+            //    _implicitTab.Tag = title;
+            //    _implicitTab.Grid = new Grid(rows, cols);
+            //    return _implicitTab;
+            //}
             _tabControl.CurrentTab = new UITab(title, rows, cols);
             _tabControl.Add(_tabControl.CurrentTab);
             _tabControl.ActiveTabId = _tabControl.CurrentTab.Id;
-            // non so se serve l'evento, per il momento non lo mettiamo
             return _tabControl.CurrentTab;
         }
-        
+
+        //protected UISection EnsureImplicitSection()
+        //{
+        //    if (_implicitSection != null)
+        //        return _implicitSection;
+        //    // Creo tab implicito
+        //    _implicitTab = new UITab("default", rows: 1, columns: 1);
+        //    TabControl.Add(_implicitTab);
+        //    TabControl.ActiveTabId = _implicitTab.Id;
+        //    TabControl.CurrentTab = _implicitTab;
+        //    // Crea section implicita
+        //    _implicitSection = new UISection();
+        //    _implicitTab.Add(_implicitSection, 0, 0);
+
+        //    return _implicitSection;
+        //}
+        //public UIImage AddImage(string imageName)
+        //{
+        //    return EnsureImplicitSection().AddImage(imageName);
+        //}
+
+        //public bool UpdateImage(string imageId, string newImageName)
+        //{
+        //    return EnsureImplicitSection().UpdateImage(imageId, newImageName);
+        //}
+
+        //public UILabel AddBulletedItem(string idStr)
+        //{
+        //    return EnsureImplicitSection().AddBulletedItem(idStr);
+        //}
+
+        //public bool UpdateBulletedItem(string itemId, string newIdStr)
+        //{
+        //    return EnsureImplicitSection().UpdateBulletedItem(itemId, newIdStr);
+        //}
+
+        //// "list-item-ordered" è in Style.Appearance
+        //// index è in Tag
+        //public UILabel AddOrderedItem(string idStr, int index)
+        //{
+        //    return EnsureImplicitSection().AddOrderedItem(idStr, index);
+        //}
+
+        //public UILabel AddOrderedItem(string idStr, string style, int index)
+        //{
+        //    return EnsureImplicitSection().AddOrderedItem(idStr, style, index);
+        //}
+
+        //public UILabel AddOrderedItem(string idStr, string style)
+        //{
+        //    return EnsureImplicitSection().AddOrderedItem(idStr, style);
+        //}
+
+        //public UILabel AddOrderedItem(string idStr)
+        //{
+        //    return AddOrderedItem(idStr, "");
+        //}
+
+        //public UILabel AddParagraph(string idStr)
+        //{
+        //    return AddParagraph(idStr, "paragraph", "");
+        //}
+
+        //public UILabel AddParagraph(string idStr, string style, string color) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
+        //{
+        //    return EnsureImplicitSection().AddParagraph(idStr, style, color);
+        //}
+
+        //public bool UpdateParagraph(string paragraphId, string newIdStr) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
+        //{
+        //    return EnsureImplicitSection().UpdateParagraph(paragraphId, newIdStr);
+        //}
+
+        //public bool UpdateParagraph(string paragraphId, string newIdStr, string style, string color) // TODO capire dove inserire l'informazione "paragraph" utile per il JS
+        //{
+        //    return EnsureImplicitSection().UpdateParagraph(paragraphId, newIdStr, style, color);
+        //}
+
         /*
         public UIImage AddImage(string imageName)
         {
@@ -180,7 +303,7 @@ namespace UIFrameworkDotNet.PredefinedPages
             string imagePath = Path.Combine("Helpers", "imgs", imageName);
             if (!File.Exists(imagePath))
             {
-               // _logger.Error($"Image not found in the Working Unit {element.Source}");
+                // _logger.Error($"Image not found in the Working Unit {element.Source}");
             }
 
             image.Source = ImageHelper.ConvertImageToBase64(imagePath);
@@ -218,7 +341,7 @@ namespace UIFrameworkDotNet.PredefinedPages
             var item = this.FindById(itemId);
             if (item == null || !(item is UILabel label))
                 return false;
-            label.Text = newIdStr;
+            label.UpdateText(newIdStr);
             return true;
         }
 
@@ -253,7 +376,7 @@ namespace UIFrameworkDotNet.PredefinedPages
 
         public UILabel AddOrderedItem(string idStr)
         {
-            return AddOrderedItem(idStr, "");
+            return AddOrderedItem(idStr, "list-item-ordered");
         }
 
         public UILabel AddParagraph(string idStr)
@@ -283,49 +406,44 @@ namespace UIFrameworkDotNet.PredefinedPages
                 label.Style.Appearance = style;
             if (!string.IsNullOrEmpty(color))
                 label.Style.ForegroundColor = color;
-            label.Text = newIdStr;
+            label.UpdateText(newIdStr);
             return true;
-        }*/
+        }
+        */
 
         #region ADD BUTTON  
-        // TODO Fare un AddButton che overrida il futuro AddButton, ecc... di una PageBase
         public UIButton AddButton(string id)
         {
             var button = new UIButton(id, false, ""); // non c'è uno stile per il default??
-           // _currentTab.Add(button);
-           _lateralArea.Add(button);
+           LateralArea.Add(button);
             return button;
         }
 
         public UIButton AddButton(string id, bool isEnabled, string style)
         {
             var button = new UIButton(id, isEnabled, style);
-           // _currentTab.Add(button);
-            _lateralArea.Add(button);
+            LateralArea.Add(button);
             return button;
         }
 
         public UIButton AddButton(string id, bool isEnabled)
         {
             var button = new UIButton(id, isEnabled, "");
-            // _currentTab.Add(button);
-            _lateralArea.Add(button);
+            LateralArea.Add(button);
             return button;
         }
 
         public UIButton AddButton(string id, string text)
         {
             var button = new UIButton(id, false, "", text);
-            // _currentTab.Add(button);
-            _lateralArea.Add(button);
+            LateralArea.Add(button);
             return button;
         }
 
         public UIButton AddButton(string id, string text, bool isEnabled)
         {
             var button = new UIButton(id, isEnabled, "standard", text);
-            // _currentTab.Add(button);
-            _lateralArea.Add(button);
+            LateralArea.Add(button);
             return button;
         }
         #endregion
@@ -374,7 +492,6 @@ namespace UIFrameworkDotNet.PredefinedPages
         {
             var feedback = new UIFeedback(FeedbackMode.Countdown, "countdown", (ms * 1000).ToString() /* BasicLibraries.UTILITY.FormatDuration(ms * 1000)*/, ms, isManual);
             _tabControl.CurrentTab.Add(feedback);
-            // OnUpdated(feedback.GetType());
             feedback.TickElapsed += Feedback_TickElapsed; // TODO Bisogna desottoscriversi
             if (!isManual)
                 feedback.StartCountdown();
@@ -388,7 +505,6 @@ namespace UIFrameworkDotNet.PredefinedPages
                 return false;
 
             uIFeedback.Remaining = ms;
-            // OnUpdated(uIFeedback.GetType());
             return true;
         }
 
@@ -401,7 +517,6 @@ namespace UIFrameworkDotNet.PredefinedPages
         {
             var feedback = new UIFeedback(FeedbackMode.ProgressBar, "progress", "", perc);
             _tabControl.CurrentTab.Add(feedback);
-            // OnUpdated(feedback.GetType());
             return feedback;
         }
 
@@ -411,9 +526,8 @@ namespace UIFrameworkDotNet.PredefinedPages
             if (feedback == null || !(feedback is UIFeedback uIFeedback))
                 return false;
 
-            uIFeedback.Text = msg;
+            uIFeedback.UpdateText(msg);
             uIFeedback.Percentage = perc;
-            // OnUpdated(uIFeedback.GetType());
             return true;
         }
 
@@ -456,8 +570,7 @@ namespace UIFrameworkDotNet.PredefinedPages
             if (feedback == null || !(feedback is UIFeedback uIFeedback))
                 return false;
 
-            uIFeedback.Text = msg;
-            // OnUpdated(uIFeedback.GetType());
+            uIFeedback.UpdateText(msg);
             return true;
         }
 

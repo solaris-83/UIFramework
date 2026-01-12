@@ -73,6 +73,7 @@
     <Compile Include="PredefinedPages\PredefinedPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FakeTranslations.cs" />
+    <Compile Include="UIBottomArea.cs" />
     <Compile Include="UIButton.cs" />
     <Compile Include="UICheckbox.cs" />
     <Compile Include="UICheckBoxGroup.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="UITabControl.cs" />
     <Compile Include="UITextbox.cs" />
     <Compile Include="UITextElement.cs" />
+    <Compile Include="UITitleArea.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="dll\ScriptLibraries.Data.Interfaces.dll">
