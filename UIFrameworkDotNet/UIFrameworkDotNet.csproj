@@ -83,6 +83,9 @@
     <Compile Include="UIElement.cs" />
     <Compile Include="UIEventDispatcher.cs" />
     <Compile Include="UIFeedback.cs" />
+    <Compile Include="UIFeedbackCountdown.cs" />
+    <Compile Include="UIFeedbackMessage.cs" />
+    <Compile Include="UIFeedbackProgress.cs" />
     <Compile Include="UIImage.cs" />
     <Compile Include="UILabel.cs" />
     <Compile Include="UILateralArea.cs" />

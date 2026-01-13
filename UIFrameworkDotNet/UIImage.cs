@@ -25,18 +25,18 @@ namespace UIFrameworkDotNet
         #endregion
     }
 
-    public class ImageSourceChangedCommand : ICommand
-    {
-        private readonly UIImage _image;
+    //public class ImageSourceChangedCommand : ICommand
+    //{
+    //    private readonly UIImage _image;
 
-        public ImageSourceChangedCommand(UIImage image)
-        {
-            _image = image;
-        }
+    //    public ImageSourceChangedCommand(UIImage image)
+    //    {
+    //        _image = image;
+    //    }
 
-        public void Execute(object newValue)
-        {
-            _image.Source = newValue.ToString();
-        }
-    }
+    //    public void Execute(object newValue)
+    //    {
+    //        _image.Source = newValue.ToString();
+    //    }
+    //}
 }

@@ -50,20 +50,20 @@ namespace UIFrameworkDotNet
         #endregion
     }
 
-    public class TabControlActiveTabChangedCommand : ICommand
-    {
-        private readonly UITabControl _tabControl;
+    //public class TabControlActiveTabChangedCommand : ICommand
+    //{
+    //    private readonly UITabControl _tabControl;
 
-        public TabControlActiveTabChangedCommand(UITabControl tabControl)
-        {
-            _tabControl = tabControl;
-        }
+    //    public TabControlActiveTabChangedCommand(UITabControl tabControl)
+    //    {
+    //        _tabControl = tabControl;
+    //    }
 
-        public void Execute(object newValue)
-        {
-            _tabControl.ActiveTabId = newValue.ToString();
-        }
-    }
+    //    public void Execute(object newValue)
+    //    {
+    //        _tabControl.ActiveTabId = newValue.ToString();
+    //    }
+    //}
 
     
 

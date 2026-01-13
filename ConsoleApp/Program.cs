@@ -252,7 +252,6 @@ namespace ConsoleApp
         // 3. (OK mi sembra, ricontrollare, magari servirsi della dispose?) Bisogna registrarsi agli eventi tick una sola volta per la stessa feedback
         // 4. TODO Implementare dispose (tra cui eventi) 
         // 5. TODO Implementare sequence  ( ci sono rif. a sequence nella app di tutorial e bundle update => si possono dismettere i vecchi metodi)
-        // 6. TODO Terminare le page (property del disclaimer es. IsScrolledToBottom)
         // 7. TODO rimuovere Style in favore di un'unica property di nome CssClassName
         // 8. TODO introdurre gli ultimi SetProperty<T> e rimuovere States["..."]/Props["..."] dai CTORs e terminare i Command
         // 9. TODO improvement Dropdown e testarla
@@ -261,6 +260,54 @@ namespace ConsoleApp
         static void Main()
         {
             var libraryUI = new LibraryUI();
+
+            // ==== DISCLAIMER PAGE ====
+            // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
+            var pageDisclaimer = libraryUI.CreatePageDisclaimer();
+            var buttons = pageDisclaimer.FindAllByType<UIButton>();
+            var sectionTarget = pageDisclaimer.FindAllByType<UISection>().Single();
+            var continueBtn = buttons.Single(b => b.Tag.ToString() == "CONTINUE");
+            pageDisclaimer.RequiresCompleteRead = true;
+            var par1 = pageDisclaimer.AddParagraph("Paragraph #1.", "paragraph", "gray");
+            var par2 = pageDisclaimer.AddParagraph("Paragraph #2.", "paragraph", "gray");
+            pageDisclaimer.AddBulletedItem("#1 bulletted item");
+            pageDisclaimer.AddBulletedItem("#2 bulletted item");
+            pageDisclaimer.AddOrderedItem("Item 1");
+            pageDisclaimer.AddOrderedItem("Item 2");
+            pageDisclaimer.AddOrderedItem("Item 3");
+            var btn = pageDisclaimer.AddButton("CLICK ON ME!!", true);
+            pageDisclaimer.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
+            pageDisclaimer.Remove(par2.Id);
+            pageDisclaimer.AddImage("Screenshot.png");
+            libraryUI.ShowAndWait(pageDisclaimer);
+
+            // il js ha preparato un json e io l'ho parsificato
+
+            libraryUI.SyncModelAndNotifyUI(new UIEvent(sectionTarget.Id, continueBtn.Id, UIEventType.OnScrollToEnd, true,
+                    new Dictionary<string, object> { ["enabled"] = true }));
+
+            var par3 = pageDisclaimer.AddParagraph("Paragraph #3 after ShowAndWait");
+
+            pageDisclaimer.UpdateParagraph(par3.Id, "Paragraph #3 - BIS -  after ShowAndWait");
+
+            // Nascondo paragraph
+            libraryUI.SyncModelAndNotifyUI(new UIEvent(par3.Id, UIEventType.OnPropertyChanged, true,
+                    new Dictionary<string, object> { ["visible"] = false }));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             var page = libraryUI.CreatePage();
             var titolo = page.SetTitle("TITOLO", "information");
@@ -272,7 +319,7 @@ namespace ConsoleApp
             libraryUI.ShowAndWait(page);
 
             page.Title = "TITOLO3";
-            libraryUI.SimulateJsEvent(titolo.Id, "propertyChanged", new Dictionary<string, object> { ["text"] = "__NOTFOUND__" });
+            libraryUI.SyncModelAndNotifyUI(new UIEvent(titolo.Id, UIEventType.OnPropertyChanged, true, new Dictionary<string, object> { ["text"] = "__NOTFOUND__" }));
 
 
             page = libraryUI.CreatePage();
@@ -302,7 +349,7 @@ namespace ConsoleApp
             var page1 = libraryUI.CreatePageDisclaimer();
             var par111 = page1.AddParagraph(FakeStrings.PAR1, "paragraph", "gray");
             libraryUI.ShowAndWait(page1);
-            libraryUI.SimulateJsEvent(par111.Id, "propertyChanged", new Dictionary<string, object> { ["text"] = "__NOTFOUND__" });
+            libraryUI.SyncModelAndNotifyUI(new UIEvent(par111.Id, UIEventType.OnPropertyChanged, true, new Dictionary<string, object> { ["text"] = "__NOTFOUND__" }));
 
            
 
@@ -330,33 +377,7 @@ namespace ConsoleApp
 
             libraryUI.ShowAndWait(newCustomPage);
 
-            // ==== DISCLAIMER PAGE ====
-            // Istanzio disclaimer che crea 2 buttons EXIT_WITHOUT_REPORT e CONTINUE e un tab
-            var pageDisclaimer = libraryUI.CreatePageDisclaimer();
-            var buttons = pageDisclaimer.FindAllByType<UIButton>();
-            var continueBtn = buttons.Single(b => b.Tag.ToString() == "CONTINUE");
-            pageDisclaimer.RequiresCompleteRead = true;
-            var par1 = pageDisclaimer.AddParagraph("Paragraph #1.", "paragraph", "gray");
-            var par2 = pageDisclaimer.AddParagraph("Paragraph #2.", "paragraph", "gray");
-            pageDisclaimer.AddBulletedItem("#1 bulletted item");
-            pageDisclaimer.AddBulletedItem("#2 bulletted item");
-            pageDisclaimer.AddOrderedItem("Item 1");
-            pageDisclaimer.AddOrderedItem("Item 2");
-            pageDisclaimer.AddOrderedItem("Item 3");
-            var btn = pageDisclaimer.AddButton("CLICK ON ME!!", true);
-            pageDisclaimer.UpdateParagraph(par1.Id, "Paragraph #1 - UPDATED.");
-            pageDisclaimer.Remove(par2.Id);
-            pageDisclaimer.AddImage("Screenshot.png");
-            libraryUI.ShowAndWait(pageDisclaimer);
-
-            // il js ha preparato un json e io l'ho parsificato
-
-            libraryUI.SimulateJsEvent(continueBtn.Id, "propertyChanged",
-                    new Dictionary<string, object> { ["enabled"] = true });
-
-            var par3 = pageDisclaimer.AddParagraph("Paragraph #3 after ShowAndWait");
-
-            pageDisclaimer.UpdateParagraph(par3.Id, "Paragraph #3 - BIS -  after ShowAndWait");
+            
 
 
             // ==== RESULT PAGE ====
@@ -385,8 +406,8 @@ namespace ConsoleApp
             Console.WriteLine("SelectedIndexes " + menuPage.SelectedIndexes.ContainsAny(0));
 
             // Simulo evento JS (selezione di una checkbox)
-            libraryUI.SimulateJsEvent(chbx1.Id, "propertyChanged",
-                new Dictionary<string, object> { ["checked"] = true });
+            libraryUI.SyncModelAndNotifyUI(new UIEvent(chbx1.Id, UIEventType.OnPropertyChanged, true,
+                new Dictionary<string, object> { ["checked"] = true }));
 
             Console.WriteLine("HasCheckBoxes " + menuPage.HasCheckboxes);
             Console.WriteLine("IsMultipleSelection " + menuPage.IsMultipleSelection);
@@ -501,16 +522,16 @@ namespace ConsoleApp
             libraryUI.ShowAndWait(customPage);
 
             // Simulo evento JS (selezione di un tab)
-            libraryUI.SimulateJsEvent(page.TabControl.Id, "propertyChanged",
-                new Dictionary<string, object> { ["activeTabId"] = firstTab.Id });
+            libraryUI.SyncModelAndNotifyUI(new UIEvent( page.TabControl.Id, UIEventType.OnPropertyChanged, true,
+                new Dictionary<string, object> { ["activeTabId"] = firstTab.Id }));
 
             // Simulo evento JS (enable/disable di un button)
-            libraryUI.SimulateJsEvent(continueButton.Id, "propertyChanged",
-                new Dictionary<string, object> { ["enabled"] = false });
+            libraryUI.SyncModelAndNotifyUI(new UIEvent(continueButton.Id, UIEventType.OnPropertyChanged, true,
+                new Dictionary<string, object> { ["enabled"] = false }));
 
             // Simulo evento JS (visibilità di un button)
-            libraryUI.SimulateJsEvent(continueButton.Id, "propertyChanged",
-                new Dictionary<string, object> { ["visible"] = false });
+            libraryUI.SyncModelAndNotifyUI(new UIEvent(continueButton.Id, UIEventType.OnPropertyChanged, true,
+                new Dictionary<string, object> { ["visible"] = false }));
 
             // Faccio partire il countdown
             feedback.StartCountdown();

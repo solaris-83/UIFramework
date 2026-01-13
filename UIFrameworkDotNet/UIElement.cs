@@ -3,6 +3,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
+using UIFrameworkDotNet.Helpers;
 
 namespace UIFrameworkDotNet
 {
@@ -37,8 +39,7 @@ namespace UIFrameworkDotNet
 
         protected bool SetPropsProperty<T>(ref T field, T value, string propertyName)
         {
-            var propertyNameToCamelCase = Char.ToLowerInvariant(propertyName[0]) + propertyName.Substring(1);
-            return SetProperty<T>(ref field, value, () => Props[propertyNameToCamelCase] = value, propertyName);
+            return SetProperty<T>(ref field, value, () => Props[propertyName.ToCamelCase()] = value, propertyName);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -109,27 +110,58 @@ namespace UIFrameworkDotNet
 
         #endregion
 
+        #region Events
+
+        public void SetCustomEvents(string eventType, List<UIEvent> events)
+        {
+            if (CustomEvents == null)
+                CustomEvents = new Dictionary<string, List<UIEvent>>();
+            CustomEvents.Add(eventType, events);
+        }
+
+        #endregion
         public string Id { get; } = Guid.NewGuid().ToString();
 
         public Dictionary<string, object> Props { get; } = new Dictionary<string, object>();
         public Dictionary<string, object> States { get; } = new Dictionary<string, object>();
+        public Dictionary<string, List<UIEvent>> CustomEvents { get; private set; }
 
-        //public virtual void UpdateStates(Dictionary<string, object> newStates)
-        //{
-        //    if (newStates == null)
-        //        return;
+        public virtual void UpdateStates(Dictionary<string, object> newStates)
+        {
+            if (newStates == null)
+                return;
 
-        //    UpdateStates(states =>
-        //    {
-        //        foreach (var kv in newStates)
-        //            States[kv.Key] = kv.Value;
-        //    });
-        //}
+            UpdateStates(states =>
+            {
+                //foreach (var kv in newStates)
+                //    States[kv.Key] = kv.Value;
+                var elementType = this.GetType();
 
-        //public virtual void UpdateStates(Action<Dictionary<string, object>> updater)
-        //{
-        //    updater(States);
-        //}
+                foreach (var kvp in newStates)
+                {
+                    var property = elementType.GetProperty(kvp.Key.ToPascalCase(),
+                        BindingFlags.Public | BindingFlags.Instance);
+
+                    if (property != null && property.CanWrite)
+                    {
+                        try
+                        {
+                            var convertedValue = Convert.ChangeType(kvp.Value, property.PropertyType);
+                            property.SetValue(this, convertedValue);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Errore nell'aggiornare {kvp.Key}: {ex.Message}");
+                        }
+                    }
+                }
+            });
+        }
+
+        public virtual void UpdateStates(Action<Dictionary<string, object>> updater)
+        {
+            updater(States);
+        }
 
         //public virtual void UpdateProps(Dictionary<string, object> newProps)
         //{
@@ -154,35 +186,35 @@ namespace UIFrameworkDotNet
         }
     }
 
-    public class UIElementEnabledChangedCommand : ICommand
-    {
-        private readonly UIElement _element;
+    //public class UIElementEnabledChangedCommand : ICommand
+    //{
+    //    private readonly UIElement _element;
 
-        public UIElementEnabledChangedCommand(UIElement element)
-        {
-            _element = element;
-        }
+    //    public UIElementEnabledChangedCommand(UIElement element)
+    //    {
+    //        _element = element;
+    //    }
 
-        public void Execute(object newValue)
-        {
-            _element.Enabled = Convert.ToBoolean(newValue);
-        }
-    }
+    //    public void Execute(object newValue)
+    //    {
+    //        _element.Enabled = Convert.ToBoolean(newValue);
+    //    }
+    //}
 
-    public class UIElementVisibleChangedCommand : ICommand
-    {
-        private readonly UIElement _element;
+    //public class UIElementVisibleChangedCommand : ICommand
+    //{
+    //    private readonly UIElement _element;
 
-        public UIElementVisibleChangedCommand(UIElement element)
-        {
-            _element = element;
-        }
+    //    public UIElementVisibleChangedCommand(UIElement element)
+    //    {
+    //        _element = element;
+    //    }
 
-        public void Execute(object newValue)
-        {
-            _element.Visible = Convert.ToBoolean(newValue);
-        }
-    }
+    //    public void Execute(object newValue)
+    //    {
+    //        _element.Visible = Convert.ToBoolean(newValue);
+    //    }
+    //}
     public class Style
     {
         public string BackgroundColor { get; set; }

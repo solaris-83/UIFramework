@@ -21,19 +21,39 @@ namespace UIFrameworkDotNet
         }
 
         // Usato per rispondere agli eventi generati dal JS
-        public void HandleEvent(UIEvent events)
+        public void HandleEvent(UIEvent incomingEvent)
         {
             // 1. ricavo UIElement tramite Id
             // 2. per ogni nuova property States aggiornata inviata dal JS cerco il cmd che applica l'aggiornamento della istanza UIElement lato C#
-            var element = _page.FindById(events.ElementId);
-            if (element == null)
-                return;
-            foreach(var ev in events.NewStates)
+            UIElement element = default;
+            if (!string.IsNullOrEmpty(incomingEvent.TargetId))
             {
-                var cmd = _registry.Resolve(element, ev.Key);
-                if (cmd != null)
-                    cmd.Execute(ev.Value);
+                if (incomingEvent.SourceId == incomingEvent.TargetId)
+                    element = _page.FindById(incomingEvent.SourceId);
+                else
+                    element = _page.FindById(incomingEvent.TargetId);
+                if (element == null)
+                    return;
             }
+            else
+                element = _page.FindById(incomingEvent.SourceId);
+            var cmd = _registry.Resolve(element, incomingEvent.EventType);
+            if (cmd != null)
+                cmd.Execute(incomingEvent.NewStates);
+                //foreach (var ev in customEvent.Value)
+                //{
+                //    var cmd = _registry.Resolve(element, ev.EventType.ToString());
+                //    if (cmd != null)
+                //    cmd.Execute(ev.NewStates);
+                //}
+           
+         
+            //foreach(var ev in incomingEvent.NewStates)  // TODO MIGLIORARE
+            //{
+            //    var cmd = _registry.Resolve(element, ev.Key);
+            //    if (cmd != null)
+            //        cmd.Execute(incomingEvent.NewStates);
+            //}
         }
 
         // Usato per mandare al JS solo le parti modificate dal C#

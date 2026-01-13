@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using ScriptLibraries.Data.Interfaces;
 using System;
 
 namespace UIFrameworkDotNet
@@ -14,6 +13,7 @@ namespace UIFrameworkDotNet
     // TODO createsectioncountdown si può rimuovere e usare AddFeedbackCountdown? diciamo di farlo?
     // TODO CreatePageCountdown si può rimuovere? Usata solo in GENERIC_ASK_WRITING(snippet)
 
+    // TODO completare gestione Feedback
     public class UIFeedback : UITextElement
     {
         // Backing field for the event delegate
@@ -35,6 +35,8 @@ namespace UIFrameworkDotNet
                 _tickElapsed = value;
             }
         }
+
+        public UIFeedback(string text) : base(text) { }
         
         public UIFeedback(FeedbackMode feedbackMode, string style, string text, int ms) : base(text)
         {

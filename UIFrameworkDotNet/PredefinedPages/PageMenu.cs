@@ -7,7 +7,7 @@ namespace UIFrameworkDotNet.PredefinedPages
     public sealed class PageMenu : PredefinedPage
     {
         private readonly UICheckBoxGroup _checkboxgroup;
-
+        // TODO Modificare usando SetPropsProperty
         [JsonIgnore]
         public bool HasCheckboxes
         {

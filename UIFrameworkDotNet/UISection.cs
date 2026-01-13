@@ -228,4 +228,19 @@ namespace UIFrameworkDotNet
 
         #endregion
     }
+
+    //public class UISectionChangedCommand : ICommand
+    //{
+    //    public readonly UISection _section;
+    //    public UISectionChangedCommand(UISection section)
+    //    {
+    //        _section = section;
+    //    }
+
+    //    public void Execute(object newValue)
+    //    {
+    //        // Trovo il primo UILateralArea salendo a ritroso da section e cerco il bottone continue e  
+    //        throw new System.NotImplementedException();
+    //    }
+    //}
 }

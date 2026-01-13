@@ -44,8 +44,8 @@ namespace UIFramework.UnitTest
             Assert.IsFalse(menuPage.SelectedIndexes.ContainsAny(0));
 
             // Act - simulate JS checking the first checkbox
-            libraryUI.SimulateJsEvent(chbx1.Id, "propertyChanged",
-                new Dictionary<string, object> { ["checked"] = true });
+            libraryUI.SyncModelAndNotifyUI(new UIEvent(chbx1.Id, UIEventType.OnPropertyChanged, true,
+                new Dictionary<string, object> { ["checked"] = true }));
 
             // Assert
             Assert.IsTrue(menuPage.HasCheckboxes);
@@ -81,12 +81,12 @@ namespace UIFramework.UnitTest
             Assert.IsFalse(menuPage.SelectedIndexes.ContainsAny(0));
 
             // Act - simulate JS checking multiple items
-            libraryUI.SimulateJsEvent(chbx1.Id, "propertyChanged",
-                new Dictionary<string, object> { ["checked"] = true });
-            libraryUI.SimulateJsEvent(chbx2.Id, "propertyChanged",
-                new Dictionary<string, object> { ["checked"] = true });
-            libraryUI.SimulateJsEvent(chbx4.Id, "propertyChanged",
-                new Dictionary<string, object> { ["checked"] = true });
+            libraryUI.SyncModelAndNotifyUI(new UIEvent(chbx1.Id, UIEventType.OnPropertyChanged, true,
+                new Dictionary<string, object> { ["checked"] = true }));
+            libraryUI.SyncModelAndNotifyUI(new UIEvent(chbx2.Id,  UIEventType.OnPropertyChanged, true,
+                new Dictionary<string, object> { ["checked"] = true }));
+            libraryUI.SyncModelAndNotifyUI(new UIEvent(chbx4.Id,  UIEventType.OnPropertyChanged, true,
+                new Dictionary<string, object> { ["checked"] = true }));
 
             // Assert
             Assert.IsTrue(menuPage.HasCheckboxes);
@@ -194,8 +194,8 @@ namespace UIFramework.UnitTest
             Assert.AreNotEqual("", image.Source);
 
 
-            libraryUI.SimulateJsEvent(btn.Id, "propertyChanged",
-                    new Dictionary<string, object> { ["enabled"] = false });
+            libraryUI.SyncModelAndNotifyUI(new UIEvent( btn.Id, UIEventType.OnPropertyChanged, true,
+                    new Dictionary<string, object> { ["enabled"] = false }));
 
             el = page.FindById(btn.Id);
             Assert.IsTrue(el != null);
@@ -260,7 +260,7 @@ namespace UIFramework.UnitTest
             var page = libraryUI.CreatePageDisclaimer();
             var par1 = page.AddParagraph(FakeStrings.PAR1, "paragraph", "gray");
             libraryUI.ShowAndWait(page);
-            libraryUI.SimulateJsEvent(par1.Id, "propertyChanged", new Dictionary<string, object> { ["text"] = "__NOTFOUND__" });
+            libraryUI.SyncModelAndNotifyUI(new UIEvent( par1.Id, UIEventType.OnPropertyChanged, true , new Dictionary<string, object> { ["text"] = "__NOTFOUND__" }));
 
             var el = page.FindById(par1.Id);
             Assert.IsTrue(el != null);

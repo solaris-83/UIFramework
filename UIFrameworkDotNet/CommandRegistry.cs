@@ -8,25 +8,25 @@ namespace UIFrameworkDotNet
 {
     public sealed class CommandRegistry
     {
-        private readonly List<Func<UIElement, string, ICommand>> _rules = new List<Func<UIElement, string, ICommand>>();
+        private readonly List<Func<UIElement, UIEventType, ICommand2>> _rules = new List<Func<UIElement, UIEventType, ICommand2>>();
 
-        public void Register<T>(
+        public void Register<TTarget>(
             string property,
-            Func<T, ICommand> factory)
-            where T : UIElement
+            Func<TTarget, ICommand2> factory)
+            where TTarget : UIElement
         {
             _rules.Add((element, prop) =>
             {
-                if (element is T typed && prop.ToLowerInvariant().Equals(property, StringComparison.InvariantCultureIgnoreCase))
+                if (element is TTarget typed && prop.ToString().ToLowerInvariant().Equals(property, StringComparison.InvariantCultureIgnoreCase))
                     return factory(typed);
 
                 return null;
             });
         }
 
-        public ICommand Resolve(
+        public ICommand2 Resolve(
             UIElement element,
-            string property)
+            UIEventType property)
         {
             return _rules
                 .Select(rule => rule(element, property))

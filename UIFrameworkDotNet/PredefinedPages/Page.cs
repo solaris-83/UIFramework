@@ -186,9 +186,11 @@ namespace UIFrameworkDotNet.PredefinedPages
             UILabel titlePresent = TitleArea.FindAllByType<UILabel>().FirstOrDefault();
             if (titlePresent == null)
             {
-                var label = new UILabel(idStr);
-                label.Tag = tag;
-                label.Style = new Style() { Appearance = style };
+                var label = new UILabel(idStr)
+                {
+                    Tag = tag,
+                    Style = new Style() { Appearance = style }
+                };
                 TitleArea.Add(label);
                 return label;
             }
@@ -483,7 +485,7 @@ namespace UIFrameworkDotNet.PredefinedPages
         #endregion
 
         // TODO capire come gestire lo shortcut e quindi il poterlo richiamare direttamente da Page come avviene purtroppo in ESLX. Ora si dovrebbe cercare la UITab e la section corrente. Se non esistono crearle prima di aggiungere l'elemento UIElement?
-        #region FEEDBACK
+        #region BOTTOM AREA FEEDBACK
         public UIFeedback AddFeedbackCountdown(int ms)
         {
             return AddFeedbackCountdown(ms, true); // default is manual
@@ -491,7 +493,8 @@ namespace UIFrameworkDotNet.PredefinedPages
         public UIFeedback AddFeedbackCountdown(int ms, bool isManual)
         {
             var feedback = new UIFeedback(FeedbackMode.Countdown, "countdown", (ms * 1000).ToString() /* BasicLibraries.UTILITY.FormatDuration(ms * 1000)*/, ms, isManual);
-            _tabControl.CurrentTab.Add(feedback);
+            BottomArea.Add(feedback);
+            //_tabControl.CurrentTab.Add(feedback);
             feedback.TickElapsed += Feedback_TickElapsed; // TODO Bisogna desottoscriversi
             if (!isManual)
                 feedback.StartCountdown();
@@ -516,7 +519,8 @@ namespace UIFrameworkDotNet.PredefinedPages
         public UIFeedback AddFeedbackProgress(int perc)
         {
             var feedback = new UIFeedback(FeedbackMode.ProgressBar, "progress", "", perc);
-            _tabControl.CurrentTab.Add(feedback);
+            //_tabControl.CurrentTab.Add(feedback);
+            BottomArea.Add(feedback);
             return feedback;
         }
 
@@ -559,8 +563,9 @@ namespace UIFrameworkDotNet.PredefinedPages
         public UIFeedback AddFeedbackMessage(string msg)
         {
             //msg = TranslationsService.Instance.CurrentTranslations.GetLocalOrDefault(msg);
-            var feedback = new UIFeedback(FeedbackMode.Message, "message", msg);
-            _tabControl.CurrentTab.Add(feedback);
+            var feedback = new UIFeedbackMessage(msg);
+            //_tabControl.CurrentTab.Add(feedback);
+            BottomArea.Add(feedback);
             return feedback;
         }
 
@@ -577,11 +582,16 @@ namespace UIFrameworkDotNet.PredefinedPages
         #endregion
 
         // TODO sostituire con il tipo corretto di messaggio
-        public virtual void ReceiveUpdate(object message) { }
+        //public virtual void ReceiveUpdate(object message) { }
 
         public void Dispose()
         {
-            DetachContainer(TabControl);
+            DetachContainer(this);
+        }
+
+        public void Attach()
+        {
+            AttachContainer(this);
         }
     }
 }

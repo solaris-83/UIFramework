@@ -1,14 +1,44 @@
 ﻿
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using UIFrameworkDotNet.PredefinedPages;
 
 namespace UIFrameworkDotNet
 {
+    public enum UIEventType
+    {
+        [Description("onScrollToEnd")]
+        OnScrollToEnd = 0,
+        [Description("onPropertyChanged")]
+        OnPropertyChanged = 1,
+        [Description("onChecked")]
+        OnChecked = 2,
+    }
+
     public class UIEvent
     {
-        public string ElementId { get; set; }  // elemento su cui è stato lanciato l'evento
-        public string EventType { get; set; }   // tipo di evento "change", ...
+        public UIEvent(string sourceId, string targetId, UIEventType eventType, bool notifyBack, Dictionary<string, object> newStates)
+        {
+            SourceId = sourceId;
+            TargetId = targetId;
+            EventType = eventType;
+            NotifyBack = notifyBack;
+            NewStates = newStates;
+        }
+
+        public UIEvent(string sourceId,UIEventType eventType, bool notifyBack, Dictionary<string, object> newStates)
+        {
+            SourceId = sourceId;
+            TargetId = null;
+            EventType = eventType;
+            NotifyBack = notifyBack;
+            NewStates = newStates;
+        }
+
+        public string SourceId { get; set; }  // elemento su cui è configurato l'evento
+        public string TargetId { get; set; } // elemento su cui va agire l'evento
+        public UIEventType EventType { get; set; }  // tipo di evento
         public bool NotifyBack { get; set; } = true;
         public Dictionary<string, object> NewStates { get; set; }
     }
@@ -35,8 +65,8 @@ namespace UIFrameworkDotNet
     {
         Add = 0,
         Remove = 1,
-        UpdateProps = 2,
-        UpdateState = 3, 
+        UpdateState = 2,
+        UpdateProps = 3,
         Move = 4
     }
 

@@ -20,39 +20,54 @@ namespace UIFrameworkDotNet
         {
             _uiContext = new UIContext(new FakeTranslationService());
             _registry = new CommandRegistry();
-        
+            // Registro un command per la gestione dell'evento OnScrollToEnd relativo a un UIButton (target)
+            _registry.Register<UIButton>(
+                UIEventType.OnScrollToEnd.ToString(),// "onScrollToEnd"
+                (el) => new UpdateValueCommand<UIButton>(el)
+            );
+            // Registro un command per gli update delle property relative ad un oggetto UIElement
             _registry.Register<UIElement>(
-                nameof(UIElement.Enabled),
-                (el) => new UIElementEnabledChangedCommand(el)
-            );
-            _registry.Register<UITextElement>(
-                nameof(UITextElement.Text),
-                (el) => new UITextElementTextChangedCommand(el, _uiContext.Translator)
-            );
-            _registry.Register<UIElement>(
-                nameof(UIElement.Visible),
-                (chk) => new UIElementVisibleChangedCommand(chk)
-            );
-            _registry.Register<UICheckbox>(
-                nameof(UICheckbox.Checked),
-                (chk) => new CheckboxCheckedChangedCommand(chk)
-            );
-            _registry.Register<UIImage>(
-               nameof(UIImage.Source),
-               (img) => new ImageSourceChangedCommand(img)
+              UIEventType.OnPropertyChanged.ToString(), //  "onPropertyChanged",
+               (el) => new UpdateValueCommand<UIElement>(el)
            );
+
             _registry.Register<UITabControl>(
-               nameof(UITabControl.ActiveTabId),
-               (tbc) => new TabControlActiveTabChangedCommand(tbc)
-           );
-            _registry.Register<UIFeedback>(
-                nameof(UIFeedback.Remaining),
-                (fb) => new FeedbackTickChangedCommand(fb)
+               UIEventType.OnPropertyChanged.ToString(), // nameof(UITabControl.ActiveTabId),
+                (tbc) => new UpdateValueCommand<UITabControl>(tbc)
             );
-            _registry.Register<UIFeedback>(
-                nameof(UIFeedback.Percentage),
-                (fb) => new FeedbackTickChangedCommand(fb)
-            );
+            // _registry.Register<UISection>(
+            //     "onScrollToEnd",
+            //     (el) => new UISectionChangedCommand(el)
+            // );
+
+            // _registry.Register<UIElement>(
+            //     nameof(UIElement.Enabled),
+            //     (el) => new UIElementEnabledChangedCommand(el)
+            // );
+            // _registry.Register<UITextElement>(
+            //     nameof(UITextElement.Text),
+            //     (el) => new UITextElementTextChangedCommand(el)
+            // );
+            // _registry.Register<UIElement>(
+            //     nameof(UIElement.Visible),
+            //     (chk) => new UIElementVisibleChangedCommand(chk)
+            // );
+            // _registry.Register<UIImage>(
+            //    nameof(UIImage.Source),
+            //    (img) => new ImageSourceChangedCommand(img)
+            //);
+            // _registry.Register<UITabControl>(
+            //    nameof(UITabControl.ActiveTabId),
+            //    (tbc) => new TabControlActiveTabChangedCommand(tbc)
+            //);
+            // _registry.Register<UIFeedback>(
+            //     nameof(UIFeedback.Remaining),
+            //     (fb) => new FeedbackTickChangedCommand(fb)
+            // );
+            // _registry.Register<UIFeedback>(
+            //     nameof(UIFeedback.Percentage),
+            //     (fb) => new FeedbackTickChangedCommand(fb)
+            // );
         }
 
         public PageDisclaimer CreatePageDisclaimer() => new PageDisclaimer(_uiContext);
@@ -85,12 +100,12 @@ namespace UIFrameworkDotNet
             //page.AttachContainer(page.BottomArea);
             //page.AttachContainer(page.LateralArea);
             //page.AttachContainer(page.TabControl);
+            _currentPage.Attach();
+            //page.AttachContainer(page);
 
-            page.AttachContainer(page);
-
-            _dispatcher = new UiCommandDispatcher(page, _registry);
-            Console.WriteLine($"=== LOAD PAGE INIZIALE {page.GetType().Name} ===");
-            Console.WriteLine(PageSerializer.Serialize(page));
+            _dispatcher = new UiCommandDispatcher(_currentPage, _registry);
+            Console.WriteLine($"=== LOAD PAGE INIZIALE {_currentPage.GetType().Name} ===");
+            Console.WriteLine(PageSerializer.Serialize(_currentPage));
 
             // Mi registro agli aggiornamenti degli UIElement della page triggerati dal C#
             _currentPage.DataChanged += Page_DataChanged;
@@ -126,9 +141,35 @@ namespace UIFrameworkDotNet
             if (bottomAreaElements.Any())
             {
                 var bottomArea = bottomAreaElements.First();
-                if (bottomArea.Children.All(c => c.Type == nameof(UIFeedback)) == false)
+                if (bottomArea.Children.Any(c => c.Type != nameof(UIFeedback)))
                 {
                     throw new InvalidOperationException("Nella BottomArea si possono aggiungere solo UIFeedback.");
+                }
+            }
+
+            var tabs = _currentPage.FindAllByType<UITab>();
+            foreach (var tab in tabs)
+            {
+                if(tab.Children.Any(c => c.Type != nameof(UISection)))
+                    throw new InvalidOperationException("Ad un tab si possono aggiungere solo UISection.");  // TOGLIERE LA POSSIBILITA' DI AGGIUNGERE SECCHE UNA UILABEL. USARE VIA TITLEAREA
+            }
+
+            foreach (var tab in tabs)
+            {
+                if (tab.Children.Any(c => c.Type != nameof(UISection)))
+                    throw new InvalidOperationException("Ad un tab si possono aggiungere solo UISection.");  // TOGLIERE LA POSSIBILITA' DI AGGIUNGERE SECCHE UNA UILABEL. USARE VIA TITLEAREA
+            }
+
+            var titleAreaElements = _currentPage.FindAllByType<UITitleArea>();
+            if (titleAreaElements.Count() > 1)
+                throw new InvalidOperationException("La pagina può contenere una sola TitleArea.");
+
+            if (titleAreaElements.Any())
+            {
+                var titleArea = titleAreaElements.First();
+                if (titleArea.Children.Any(c => c.Type != nameof(UILabel)))
+                {
+                    throw new InvalidOperationException("Nella TitleArea si possono aggiungere solo UILabel.");
                 }
             }
         }
@@ -144,21 +185,27 @@ namespace UIFrameworkDotNet
         // ======== A T T E N Z I O N E =================
         // SERVE SOLO PER TEST
         // ==============================================
-        public void SimulateJsEvent(
-                string elementId,
-                string eventType,
-                Dictionary<string, object> states)
+        public void SyncModelAndNotifyUI(UIEvent uiEvent
+                //string sourceId,
+                //string targetId,
+                //string eventType,
+                //bool notifyBack,
+                //Dictionary<string, object> states
+            )  // TODO usare oggetto UIEvents
         {
             Console.WriteLine("\n>>> EVENTO JS -> C#");
-            var evt = new UIEvent
-            {
-                ElementId = elementId,
-                EventType = eventType,
-                NewStates = states
-            };
-            Console.WriteLine(JsonConvert.SerializeObject(evt, Formatting.Indented));
+            //Enum.TryParse(eventType, out UIEventType enumFound);
+            //var evt = new UIEvent
+            //{
+            //    SourceId = sourceId,
+            //    TargetId = targetId,
+            //    EventType = enumFound,
+            //    NotifyBack = notifyBack,
+            //    NewStates = states
+            //};
+            Console.WriteLine(JsonConvert.SerializeObject(uiEvent, Formatting.Indented));
 
-            _dispatcher.HandleEvent(evt);
+            _dispatcher.HandleEvent(uiEvent);
         }
     }
 }

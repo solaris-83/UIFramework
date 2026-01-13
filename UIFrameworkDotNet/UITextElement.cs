@@ -60,20 +60,19 @@ namespace UIFrameworkDotNet
         }
     }
 
-    public class UITextElementTextChangedCommand : ICommand
-    {
-        private readonly UITextElement _textElement;
-        private readonly ITranslationService _translationService;
+    //public class UITextElementTextChangedCommand : ICommand
+    //{
+    //    private readonly UITextElement _textElement;
 
-        public UITextElementTextChangedCommand(UITextElement textElement, ITranslationService translationService)
-        {
-            _translationService = translationService;
-            _textElement = textElement;
-        }
+    //    public UITextElementTextChangedCommand(UITextElement textElement)
+    //    {
+    //        _textElement = textElement;
+    //    }
 
-        public void Execute(object newValue)
-        {
-            _textElement.UpdateText(_translationService.CurrentTranslations.GetLocalOrDefault(newValue.ToString()));
-        }
-    }
+    //    public void Execute(object newValue)
+    //    {
+    //        //_textElement.UpdateText(_translationService.CurrentTranslations.GetLocalOrDefault(newValue.ToString()));
+    //        _textElement.UpdateText(newValue.ToString());
+    //    }
+    //}
 }

@@ -47,18 +47,18 @@ namespace UIFrameworkDotNet
         #endregion
     }
 
-    public class CheckboxCheckedChangedCommand : ICommand
-    {
-        private readonly UICheckbox _checkbox;
+    //public class CheckboxCheckedChangedCommand : ICommand
+    //{
+    //    private readonly UICheckbox _checkbox;
 
-        public CheckboxCheckedChangedCommand(UICheckbox checkbox)
-        {
-            _checkbox = checkbox;
-        }
+    //    public CheckboxCheckedChangedCommand(UICheckbox checkbox)
+    //    {
+    //        _checkbox = checkbox;
+    //    }
 
-        public void Execute(object newValue)
-        {
-            _checkbox.Checked = Convert.ToBoolean(newValue);
-        }
-    }
+    //    public void Execute(object newValue)
+    //    {
+    //        _checkbox.Checked = Convert.ToBoolean(newValue);
+    //    }
+    //}
 }

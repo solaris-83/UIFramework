@@ -41,20 +41,20 @@ namespace UIFrameworkDotNet
         }
     }
 
-    public class DropDownPropertyChangedCommand : ICommand
-    {
-        private readonly UIDropDown _dropDown;
-        private readonly ITranslationService _translationService;
+    //public class DropDownPropertyChangedCommand : ICommand
+    //{
+    //    private readonly UIDropDown _dropDown;
+    //    private readonly ITranslationService _translationService;
 
-        public DropDownPropertyChangedCommand(UIDropDown dropDown, ITranslationService translationService)
-        {
-            _translationService = translationService;
-            _dropDown = dropDown;
-        }
+    //    public DropDownPropertyChangedCommand(UIDropDown dropDown, ITranslationService translationService)
+    //    {
+    //        _translationService = translationService;
+    //        _dropDown = dropDown;
+    //    }
 
-        public void Execute(object newValue)
-        {
-            throw new System.NotImplementedException();
-        }
-    }
+    //    public void Execute(object newValue)
+    //    {
+    //        throw new System.NotImplementedException();
+    //    }
+    //}
 }
