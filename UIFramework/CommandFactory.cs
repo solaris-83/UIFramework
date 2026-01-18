@@ -1,4 +1,5 @@
-﻿using UIFramework.Helpers;
+﻿/*
+using UIFramework.Helpers;
 using UIFramework.PredefinedPages;
 using static UIFramework.UIButton;
 using static UIFramework.UITabControl;
@@ -14,7 +15,7 @@ namespace UIFramework
             _page = page;
         }
 
-        public ICommand Create(UiEvent evt)
+        public ICommandOld Create(UiEvent evt)
         {
             var element = _page.FindById(evt.ElementId);
 
@@ -26,19 +27,19 @@ namespace UIFramework
                     => new TabControlPropertyChangedCommand(
                         tabControl,
                         //evt.Payload["activeTabId"]?.ToString()
-                        evt.Payload),
+                        evt.States),
 
                 UIButton btn when evt?.EventType == "propertyChanged" // "enabledChanged"
                     => new ButtonPropertyChangedCommand(
                         btn,
-                        evt.Payload
+                        evt.States
                         //Convert.ToBoolean(evt.Payload["enabled"])
                         ),
 
                 UIButton btn when evt?.EventType == "propertyChanged" // "visibilityChanged"
                     => new ButtonPropertyChangedCommand(
                         btn,
-                        evt.Payload
+                        evt.States
                         //Convert.ToBoolean(evt.Payload["visible"])
                         ),
 
@@ -46,19 +47,19 @@ namespace UIFramework
                     => new CheckboxPropertyChangedCommand(
                         cb,
                         // Convert.ToBoolean(evt.Payload["checked"])
-                        evt.Payload),
+                        evt.States),
 
                 UITextbox tb when evt?.EventType == "propertyChanged" // "valueChanged"
                     => new TextPropertyChangedCommand(
                         tb,
                         // evt.Payload["value"]?.ToString()
-                        evt.Payload),
+                        evt.States),
 
                 UIDropDown dd when evt?.EventType == "propertyChanged" // "selectedValueChanged"
                      => new DropDownPropertyChangedCommand(
                          dd,
                          // evt.Payload["selected"]?.ToString()
-                         evt.Payload),
+                         evt.States),
 
                 _ => throw new InvalidOperationException($"Unsupported event type '{evt?.EventType}' for element '{element?.GetType().Name}'.")
             };
@@ -67,3 +68,4 @@ namespace UIFramework
         }
     }
 }
+*/

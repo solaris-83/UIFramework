@@ -119,7 +119,7 @@ namespace UIFramework
         public double Percentage
         {
            get => (double)States["percentage"];
-           set => States["percentage"] = 100 - Remaining * 100 / Totalseconds;
+           set { States["percentage"] = 100 - Remaining * 100 / Totalseconds; OnPropertyChanged(nameof(Percentage)); }
         }
 
         [JsonIgnore]
@@ -144,7 +144,7 @@ namespace UIFramework
         public int Remaining
         {
             get => (int)States["remaining"];
-            set => States["remaining"] = value;
+            set { States["remaining"] = value; OnPropertyChanged(nameof(Remaining)); }
         }
 
         [JsonIgnore]
@@ -157,11 +157,11 @@ namespace UIFramework
         public string Text
         {
             get => States.ContainsKey("text") ? States["text"].ToString() : "";
-            set => States["text"] = value;
+            set { States["text"] = value; OnPropertyChanged(nameof(Text)); }
         }
     }
 
-    public class FeedbackTickCommand : ICommand
+    public class FeedbackTickCommand : ICommandOld
     {
         private readonly UIFeedback _feedback;
 
@@ -179,7 +179,7 @@ namespace UIFramework
         }
     }
 
-    public class FeedbackChangedCommand : ICommand
+    public class FeedbackChangedCommand : ICommandOld
     {
         private readonly UIFeedback _feedback;
         private readonly Dictionary<string, object> _states;

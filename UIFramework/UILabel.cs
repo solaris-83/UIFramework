@@ -8,14 +8,21 @@ namespace UIFramework
     {
         public UILabel(string text)
         {
-            States["text"] = text;
+            Text = text;
         }
 
+        private string _text;
         [JsonIgnore]
         public string Text
         {
-            get => States.ContainsKey("text") ? States["text"].ToString() : "";
-            set => States["text"] = value;
+            get => _text;
+            set 
+            { 
+                if (_text == value) return;
+                _text = value;
+                States["text"] = value; 
+                OnPropertyChanged(nameof(Text)); 
+            }
         }
     }
 }

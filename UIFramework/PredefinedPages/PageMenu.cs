@@ -73,7 +73,7 @@ namespace UIFramework.PredefinedPages
         {
             var chkbox = new UICheckbox(idStr, isChecked: false, isEnabled: true, tag);
             _checkboxgroup.Add(chkbox);
-            OnUpdated(chkbox.GetType());
+          //  OnUpdated(chkbox.GetType());
             return chkbox;
         }
 

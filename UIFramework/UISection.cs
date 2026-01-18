@@ -1,4 +1,4 @@
-﻿
+﻿using Newtonsoft.Json;
 
 namespace UIFramework
 {
@@ -11,7 +11,21 @@ namespace UIFramework
         }
         public UISection(string title)
         {
-            Props["title"] = title;
+           Title = title;
+        }
+
+        private string _title;
+        [JsonIgnore]
+        public string Title
+        {
+            get => _title;
+            set 
+            { 
+                if (_title == value) return;
+                _title = value;
+                Props["title"] = value;
+                OnPropertyChanged(nameof(Title)); 
+            }
         }
     }
 }
