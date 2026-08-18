@@ -20,21 +20,23 @@ namespace UIFrameworkDotNet
         {
             _uiContext = new UIContext(new FakeTranslationService());
             _registry = new CommandRegistry();
-            // Registro un command per la gestione dell'evento OnScrollToEnd relativo a un UIButton (target)
-            _registry.Register<UIButton>(
-                UIEventType.OnScrollToEnd.ToString(),// "onScrollToEnd"
-                (el) => new UpdateValueCommand<UIButton>(el)
-            );
+           
             // Registro un command per gli update delle property relative ad un oggetto UIElement
             _registry.Register<UIElement>(
               UIEventType.OnPropertyChanged.ToString(), //  "onPropertyChanged",
                (el) => new UpdateValueCommand<UIElement>(el)
            );
 
-            _registry.Register<UITabControl>(
-               UIEventType.OnPropertyChanged.ToString(), // nameof(UITabControl.ActiveTabId),
-                (tbc) => new UpdateValueCommand<UITabControl>(tbc)
+            // Registro un command per la gestione dell'evento OnScrollToEnd relativo a un UIButton (target)
+            _registry.Register<UIButton>(
+                UIEventType.OnScrollToEnd.ToString(),// "onScrollToEnd"
+                (el) => new UpdateValueCommand<UIButton>(el)
             );
+
+            //_registry.Register<UITabControl>(
+            //   UIEventType.OnPropertyChanged.ToString(), // nameof(UITabControl.ActiveTabId),
+            //    (tbc) => new UpdateValueCommand<UITabControl>(tbc)
+            //);
             // _registry.Register<UISection>(
             //     "onScrollToEnd",
             //     (el) => new UISectionChangedCommand(el)

@@ -312,11 +312,17 @@ namespace ConsoleApp
             var page = libraryUI.CreatePage();
             var titolo = page.SetTitle("TITOLO", "information");
             page.Title = "TITOLO2";
-            var tab = page.AddTab("tab", 1, 1);
-            tab.Title = "TITOLO DEL TAB";
+            var tab11 = page.AddTab("tab", 1, 1);
+          //  tab11.Title = "TAB_1";
+
+            var tab22 = page.AddTab("tab", 1, 1);
+           // tab22.Title = "TAB_2";
 
 
             libraryUI.ShowAndWait(page);
+
+            libraryUI.SyncModelAndNotifyUI(new UIEvent(tab22.Id, page.TabControl.Id, UIEventType.OnPropertyChanged, true, new Dictionary<string, object> { ["activeTabId"] = tab11.Id }));
+
 
             page.Title = "TITOLO3";
             libraryUI.SyncModelAndNotifyUI(new UIEvent(titolo.Id, UIEventType.OnPropertyChanged, true, new Dictionary<string, object> { ["text"] = "__NOTFOUND__" }));

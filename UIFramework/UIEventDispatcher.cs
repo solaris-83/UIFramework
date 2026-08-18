@@ -1,28 +1,88 @@
-﻿
-using UIFramework.PredefinedPages;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using UIFramework.SpecializedPages;
+using UIFramework.UIElements.Base;
 
 namespace UIFramework
 {
-    public class UIEvent
+    public enum UIEventType
     {
-        public string ElementId { get; set; }  // elemento su cui è stato lanciato l'evento
-        public string EventType { get; set; }   // tipo di evento "change", ...
+        [Description("onScrollToEnd")]
+        OnScrollToEnd = 0,
+        [Description("onPropertyChanged")]
+        OnPropertyChanged = 1,
+        [Description("onBackwardCompatibility")]
+        OnBackwardCompatibility = 2,
+        [Description("onButtonClicked")]
+        OnButtonClicked = 3,
+        [Description("onFileSelected")]
+        OnFileSelected = 4,
+        [Description("onInputChanged")]
+        OnInputChanged = 5
+        //[Description("onNoChecked")]
+        //OnNoChecked = 4,
+        //[Description("onAtLeastOneChecked")]
+        //OnAtLeastOneChecked = 5,
+        //[Description("onSelectedChanged")]
+        //OnSelectedChanged = 6,
+        //[Description("onRequestedPropertyChanged")]
+        //OnRequestedPropertyChanged = 7
+    }
+
+    public class UICustomEvent
+    {
+        public UICustomEvent(string sourceId, string targetId, UIEventType eventType, bool notifyBack, Dictionary<string, object> newStates)
+        {
+            SourceId = sourceId;
+            TargetId = targetId;
+            EventType = eventType;
+            NotifyBack = notifyBack;
+            NewStates = newStates;
+        }
+
+        public string SourceId { get; set; }  // elemento su cui è configurato l'evento
+        public string TargetId { get; set; } // elemento su cui va agire l'evento
+        public UIEventType EventType { get; set; }  // tipo di evento
+        public bool NotifyBack { get; set; } = true;
         public Dictionary<string, object> NewStates { get; set; }
+    }
+
+    public sealed class UIEventList : List<UIEvent>
+    {
+        
+    }
+
+    public sealed class UIEvent
+    {
+        public UIEvent(string sourceId, string targetId, UIEventType eventType, Dictionary<string, object> newStates, bool notifyBack)
+        {
+            SourceId = sourceId;
+            TargetId = targetId;
+            EventType = eventType;
+            NewStates = newStates;
+            NotifyBack = notifyBack;
+        }
+
+        public string SourceId { get; set; }
+        public string TargetId { get; set; } // elemento su cui va agire l'evento
+        public UIEventType EventType { get; set; }  // tipo di evento
+        public Dictionary<string, object> NewStates { get; set; }
+        public bool NotifyBack { get; set; }
     }
 
     public sealed class DiffOperation
     {
-        public DiffOperationType Operation { get; }
-        public string TargetId { get; }
-        public object? Payload { get; }
+        public DiffOperationType OperationType { get; }
+        public string ElementId { get; }
+        public object Payload { get; }
 
         public DiffOperation(
-            DiffOperationType operation,
-            string targetId,
-            object? payload)
+            DiffOperationType operationType,
+            string elementId,
+            object payload)
         {
-            Operation = operation;
-            TargetId = targetId;
+            OperationType = operationType;
+            ElementId = elementId;
             Payload = payload;
         }
     }
@@ -32,258 +92,95 @@ namespace UIFramework
     {
         Add = 0,
         Remove = 1,
-        UpdateProps = 2,
-        UpdateState = 3, 
+        UpdateState = 2,
+        UpdateProp = 3,
         Move = 4
-    }
-
-    public class UiDiff
-    {
-        public DiffOperationType Operation { get; set; }
-        public string ElementId { get; set; }
-        public string ParentId { get; set; } // serve per Add
-        public Dictionary<string, object> Props { get; set; } 
-        public Dictionary<string, object> States { get; set; }
-    }
-
-    public class PageSnapshot
-    {
-        public Dictionary<string, UIElementSnapshot> Elements { get; } = new();
-    }
-
-    public class UIElementSnapshot
-    {
-        public string Id { get; set; }
-        public string Type { get; }
-        public string ParentId { get; set; }
-        public Dictionary<string, object> Props { get; set; }
-        public Dictionary<string, object> States { get; set; }
-        public UIElementSnapshot(
-        string id,
-        string type,
-        Dictionary<string, object> props,
-        Dictionary<string, object> states,
-        string? parentId)
-        {
-            Id = id;
-            Type = type;
-            Props = props;
-            States = states;
-            ParentId = parentId;
-        }
-    }
-
-    public sealed class UISnapshot
-    {
-        public UISnapshot()
-        {
-            
-        }
-        public IReadOnlyDictionary<string, UIElementSnapshot> Elements { get; }
-
-        public UISnapshot(IEnumerable<UIElementSnapshot> elements)
-        {
-            Elements = elements.ToDictionary(e => e.Id);
-        }
     }
 
     public static class SnapshotBuilder
     {
-        public static UISnapshot From(Page page)
+        public static Dictionary<string, UIElement> Init(Page page)
         {
-            var list = new List<UIElementSnapshot>();
-
-            // Root: TabControl
-            Visit(
-                element: page,
-                parentId: null,
-                list: list
-            );
-
-            return new UISnapshot(list);
+            Dictionary<string, UIElement> dict = new Dictionary<string, UIElement>();
+            ToFlatten(page, dict);
+            return dict;
         }
 
-
-        private static void Visit(
-        UIElement element,
-        string? parentId,
-        List<UIElementSnapshot> list)
+        /// <summary>
+        /// Add a new flattened element to the current snapshot
+        /// </summary>
+        /// <param name="newElement">New element to flatten</param>
+        /// <param name="currentSnapshot">The current page presented as snapshot</param>
+        public static void FlattenAndUpdate(UIElement newElement, Dictionary<string, UIElement> currentSnapshot)
         {
-            list.Add(
-                new UIElementSnapshot(
-                    id: element.Id,
-                    type: element.GetType().Name,
-                    props: new Dictionary<string, object>(element.Props),
-                    states: new Dictionary<string, object>(element.States),
-                    parentId: parentId
-                )
-            );
-
-            if (element is ContainerElement container)
+            var stack = new Stack<UIElement>(32);
+            stack.Push(newElement);
+            Dictionary<string, UIElement> newDict = new Dictionary<string, UIElement>();
+            while (stack.Count > 0)
             {
-                foreach (var child in container.Children)
+                var current = stack.Pop();
+                newDict[current.Id] = current;
+
+                if (current is ContainerElement container)
                 {
-                    Visit(child, element.Id, list);
+                    var children = container.Children;
+                    for (int i = 0; i < children.Count; i++)
+                        stack.Push(children[i]);
+                }
+            }
+            foreach (var item in newDict)
+            {
+                currentSnapshot.Add(item.Key, item.Value);
+            }
+        }
+
+        /// <summary>
+        /// Remove an element and its children from the current snapshot
+        /// </summary>
+        /// <param name="newElement">New element to flatten</param>
+        /// <param name="currentSnapshot">The current page presented as snapshot</param>
+        public static void FlattenAndRemove(UIElement newElement, Dictionary<string, UIElement> currentSnapshot)
+        {
+            var stack = new Stack<UIElement>(32);
+            stack.Push(newElement);
+            Dictionary<string, UIElement> newDict = new Dictionary<string, UIElement>();
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+                newDict[current.Id] = current;
+
+                if (current is ContainerElement container)
+                {
+                    var children = container.Children;
+                    for (int i = 0; i < children.Count; i++)
+                        stack.Push(children[i]);
+                }
+            }
+            foreach (var item in newDict)
+            {
+                currentSnapshot.Remove(item.Key);
+            }
+        }
+
+        private static void ToFlatten(UIElement root, Dictionary<string, UIElement> target)
+        {
+            target.Clear();
+
+            var stack = new Stack<UIElement>(32);
+            stack.Push(root);
+
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+                target[current.Id] = current;
+
+                if (current is ContainerElement container)
+                {
+                    var children = container.Children;
+                    for (int i = 0; i < children.Count; i++)
+                        stack.Push(children[i]);
                 }
             }
         }
     }
-
-    //public static class PageSnapshotBuilder
-    //{
-    //    public static UISnapshot Create(Page page)
-    //    {
-    //        var snapshot = new UISnapshot();
-
-    //        foreach (var el in page.Children)
-    //            Collect(el, snapshot);
-
-    //        return snapshot;
-    //    }
-
-    //    private static void Collect(UIElement el, UISnapshot snapshot)
-    //    {
-    //        snapshot.Elements[el.Id] = new UIElementSnapshot(el.Id, el.GetType().Name, el.Props, el.States, el.ParentId);
-
-    //        if (el is ContainerElement container)
-    //        {
-    //            foreach (var child in container.Children)
-    //                Collect(child, snapshot);
-    //        }
-    //    }
-    //}
-
-    public class DiffEngine
-    {
-        public List<DiffOperation> Compute(
-            UISnapshot oldSnapshot,
-            UISnapshot newSnapshot)
-        {
-            var diffs = new List<DiffOperation>();
-
-            var oldElements = oldSnapshot.Elements;
-            var newElements = newSnapshot.Elements;
-
-            // 1️⃣ REMOVED
-            foreach (var oldId in oldElements.Keys)
-            {
-                if (!newElements.ContainsKey(oldId))
-                {
-                    diffs.Add(
-                        new DiffOperation(
-                            DiffOperationType.Remove,
-                            oldId,
-                            null
-                        )
-                    );
-                }
-            }
-
-            // 2️⃣ ADDED + UPDATED + MOVED
-            foreach (var (id, newEl) in newElements)
-            {
-                if (!oldElements.TryGetValue(id, out var oldEl))
-                {
-                    // ADD
-                    diffs.Add(
-                        new DiffOperation(
-                            DiffOperationType.Add,
-                            newEl.ParentId!,
-                            newEl
-                        )
-                    );
-                    continue;
-                }
-
-                // MOVE
-                if (oldEl.ParentId != newEl.ParentId)
-                {
-                    diffs.Add(
-                        new DiffOperation(
-                            DiffOperationType.Move,
-                            id,
-                            new { parentId = newEl.ParentId }
-                        )
-                    );
-                }
-
-                // UPDATE (state diff)
-                var stateDiff = ComputeStateDiff(
-                    oldEl.States,
-                    newEl.States);
-
-                if (stateDiff.Count > 0)
-                {
-                    diffs.Add(
-                        new DiffOperation(
-                            DiffOperationType.UpdateState,
-                            id,
-                            stateDiff
-                        )
-                    );
-                }
-
-                // UPDATE (prop diff)
-                var propDiff = ComputePropDiff(
-                    oldEl.Props,
-                    newEl.Props);
-
-                if (propDiff.Count > 0)
-                {
-                    diffs.Add(
-                        new DiffOperation(
-                            DiffOperationType.UpdateProps,
-                            id,
-                            propDiff
-                        )
-                    );
-                }
-            }
-
-            return diffs;
-        }
-
-        private Dictionary<string, object> ComputeStateDiff(
-                IReadOnlyDictionary<string, object> oldState,
-                IReadOnlyDictionary<string, object> newState)
-        {
-            Dictionary<string, object>? diff = null;
-
-            foreach (var (key, newValue) in newState)
-            {
-                if (!oldState.TryGetValue(key, out var oldValue) ||
-                    !Equals(oldValue, newValue))
-                {
-                    diff ??= new Dictionary<string, object>();
-                    diff[key] = newValue;
-                }
-            }
-
-            return diff ?? EmptyDictionary;
-        }
-
-        private Dictionary<string, object> ComputePropDiff(
-                IReadOnlyDictionary<string, object> oldProp,
-                IReadOnlyDictionary<string, object> newProp)
-        {
-            Dictionary<string, object>? diff = null;
-
-            foreach (var (key, newValue) in newProp)
-            {
-                if (!oldProp.TryGetValue(key, out var oldValue) ||
-                    !Equals(oldValue, newValue))
-                {
-                    diff ??= new Dictionary<string, object>();
-                    diff[key] = newValue;
-                }
-            }
-
-            return diff ?? EmptyDictionary;
-        }
-
-        private static readonly Dictionary<string, object> EmptyDictionary
-            = new();
-
-    }
-
 }
