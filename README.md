@@ -39,22 +39,15 @@ UIFramework is a comprehensive C# UI framework for building desktop applications
 
 ## Solution Architecture
 
-The solution (`UIFramework.sln`) contains **four projects**, and — importantly — **two parallel, independent implementations** of the UI model. This is a historical artifact of an in-progress refactor, and it is essential to understand which project you should reference:
+`UIFramework.sln` now contains a **single project: `UIFramework`** (namespace `UIFramework`, e.g. `UIFramework.UIElements`, `UIFramework.Reactive`, `UIFramework.Interfaces`). This is the actively maintained library and the one you should reference for all new development.
 
-| Project | Root Namespace | Role |
-|---------|-----------------|------|
-| `UIFrameworkDotNet` | `UIFrameworkDotNet` | **Legacy/active library.** Flat namespace, currently the one actually consumed by the other projects in the solution. |
-| `UIFramework` | `UIFramework` (`UIFramework.UIElements`, `UIFramework.Reactive`, `UIFramework.Interfaces`, ...) | **Newer, refactored library** with a cleaner folder-per-concern layout, adapters, and a more complete reactive/validation model. Not currently referenced by any other project in the solution — it is being developed as the eventual replacement for `UIFrameworkDotNet`. |
-| `ConsoleApp` | `ConsoleApp` | Sample/demo console application. References **`UIFrameworkDotNet`**. |
-| `UIFramework.UnitTest` | `UIFramework.UnitTest` | MSTest unit tests. References **`UIFrameworkDotNet`** (despite the project name). |
-
-⚠️ **Do not mix namespaces**: types with the same name exist in both libraries (e.g. `UIButton`, `UISection`, `UITab`) but they are **not interchangeable** — `UIFrameworkDotNet.UIButton` and `UIFramework.UIElements.UIButton` are unrelated classes in unrelated assemblies. Pick the project matching what you are extending: if you're working on `ConsoleApp` or the existing unit tests, use `UIFrameworkDotNet`; if you're building new features against the modern API, use `UIFramework`.
+> Note: the repository still contains a few sibling folders (`UIFrameworkDotNet`, `ConsoleApp`, `UIFramework.UnitTest`) left over from an earlier, unrelated implementation. These have been **removed from `UIFramework.sln`** and are no longer built as part of the solution — treat them as legacy/unmaintained and do not reference them from new code. All examples in this README target the `UIFramework` project only.
 
 ## Project Structure
 
 ```
 UIFramework/
-├── UIFramework/                  # New/refactored class library (.NET 4.5.2, standalone, not yet wired up)
+├── UIFramework/                  # Class library (.NET 4.5.2) — the only project in UIFramework.sln
 │   ├── UIElements/                # UI control implementations
 │   │   └── Base/                  # Base classes (UIElement, ContainerElement, Grid, GridPosition, Point, ProgressValue, PopupResult)
 │   ├── Interfaces/                # Core interfaces (ICommand, IUIContext, IValidationRule, ITranslatable, ...)
@@ -70,15 +63,7 @@ UIFramework/
 │   ├── UIEventDispatcher.cs       # UI event handling
 │   ├── UIPropertyChange.cs       # Property change notification data
 │   └── UIFramework.csproj        # Project file
-├── UIFrameworkDotNet/             # Legacy class library actually used by ConsoleApp/tests (.NET 4.5.2)
-│   ├── PredefinedPages/            # Page, PredefinedPage, PageDisclaimer, PageMenu, PageResult
-│   ├── Helpers/                    # ContainerElementExtensions, DataArray, ImageHelper, PageSerializer
-│   ├── LibraryUI.cs               # Entry point for creating/showing pages
-│   ├── UIContext.cs, CommandRegistry.cs, UICommandDispatcher.cs, UIEventDispatcher.cs
-│   └── [controls].cs              # UIButton, UISection, UITab, UITextbox, UIDropDown, etc.
-├── ConsoleApp/                    # Sample console application referencing UIFrameworkDotNet
-├── UIFramework.UnitTest/          # MSTest unit tests referencing UIFrameworkDotNet (PageTests.cs)
-├── UIFramework.sln                # Solution file
+├── UIFramework.sln                # Solution file (single project: UIFramework)
 └── .git/                          # Git repository
 ```
 
@@ -262,13 +247,7 @@ inputBox.Name = "my_name"; // Automatically translates and sets Props["name"]
 
 ## Usage examples
 
-The snippets below use the public types in this repository, grouped by which library they belong to (see [Solution Architecture](#solution-architecture)):
-
-- Core elements (interactive/display/layout/feedback/composite): `UIFramework.UIElements` — from the new `UIFramework` project.
-- Predefined pages: `UIFrameworkDotNet.PredefinedPages` — from the legacy `UIFrameworkDotNet` project.
-- Page host: `UIFrameworkDotNet.LibraryUI` — from the legacy `UIFrameworkDotNet` project.
-
-> ⚠️ These are shown together for illustration only. In real code, do not mix `using UIFramework.UIElements;` and `using UIFrameworkDotNet;` in the same class expecting the types to interoperate — they are separate, unrelated class hierarchies. Pick one library based on the project you are working in.
+The snippets below use the public types in the `UIFramework` project (the only project in `UIFramework.sln`), primarily under the `UIFramework.UIElements` namespace.
 
 ### Interactive elements
 
@@ -306,11 +285,8 @@ var numeric = new UINumericBox(10)
     ShowSpinners = true
 };
 
-var dropDown = new UIFrameworkDotNet.UIDropDown(new[]
-{
-    new UIFrameworkDotNet.DropDownOption("low", "Low"),
-    new UIFrameworkDotNet.DropDownOption("high", "High")
-}, "low");
+var dropDown = new UIDropDown(); // basic skeleton in this project; population API is still commented out
+var option = new DropDownOption("low", "Low");
 
 var fileInput = new UIFileInputBox
 {
@@ -435,47 +411,37 @@ thermo.SendUpdate(22);
 
 ## How to use a page
 
-1. Create a `LibraryUI`.
-2. Create a page.
+1. Create a `Page` (or one of the `SpecializedPage` subclasses), passing an `IUIContext`.
+2. Set the page title.
 3. Add a tab and one or more sections.
 4. Populate sections with elements.
-5. Call `ShowAndWait(page)`.
-6. Use `SyncModelAndNotifyUI(...)` to simulate or forward UI updates.
+5. Subscribe to `PropertyChanged` / element events to react to UI interactions, or update element properties directly to push changes to the UI.
 
 ```csharp
-using System.Collections.Generic;
-using UIFrameworkDotNet;
+using UIFramework.SpecializedPages;
+using UIFramework.UIElements;
 
-var libraryUI = new LibraryUI();
-var page = libraryUI.CreatePage();
+var page = new Page(uiContext);
 
 page.SetTitle("title", "Dashboard", "info");
 
 var tab = page.AddTab("main", 2, 2);
 
-var topLeft = libraryUI.CreateSection();
-var refresh = topLeft.AddButton("REFRESH", true, "primary");
+var topLeft = new UISection(1, 1, uiContext);
+topLeft.Add(new UIButton("REFRESH", true, "primary", "Refresh"));
 topLeft.AddParagraph("System ready");
 tab.Add(topLeft, 0, 0);
 
-var topRight = libraryUI.CreateSection();
-var image = topRight.AddImage("Screenshot.png");
+var topRight = new UISection(1, 1, uiContext);
+topRight.AddImage("Screenshot.png");
 tab.Add(topRight, 0, 1);
 
-var bottom = libraryUI.CreateSection();
+var bottom = new UISection(1, 1, uiContext);
 var status = bottom.AddParagraph("Waiting for updates...");
 tab.Add(bottom, 1, 0);
 
-libraryUI.ShowAndWait(page);
-
-libraryUI.SyncModelAndNotifyUI(
-    new UIEvent(
-        status.Id,
-        UIEventType.OnPropertyChanged,
-        true,
-        new Dictionary<string, object> { ["text"] = "Updated from JS" }
-    )
-);
+// Push an update to the element (e.g. in response to an external event)
+status.Text = "Updated from JS";
 ```
 
 ## Page Templates
@@ -652,11 +618,9 @@ public class Range
 ## Example: Creating a Complete Page
 
 ```csharp
-using System.Collections.Generic;
-using UIFrameworkDotNet;
+using UIFramework.SpecializedPages;
 
-var libraryUI = new LibraryUI();
-var page = libraryUI.CreatePageDisclaimer();
+var page = new PageDisclaimer(uiContext);
 
 page.RequiresCompleteRead = true;
 var intro = page.AddParagraph("Read the disclaimer and continue.");
@@ -664,16 +628,8 @@ page.AddBulletedItem("First bullet");
 page.AddOrderedItem("First step", 1);
 page.AddImage("Screenshot.png");
 
-libraryUI.ShowAndWait(page);
-
-libraryUI.SyncModelAndNotifyUI(
-    new UIEvent(
-        intro.Id,
-        UIEventType.OnPropertyChanged,
-        true,
-        new Dictionary<string, object> { ["text"] = "Updated after show" }
-    )
-);
+// Push an update to the element (e.g. in response to an external event)
+intro.Text = "Updated after show";
 ```
 
 ---
@@ -764,51 +720,36 @@ byte[] fileContents = fileInput.Value.ToArray(); // Encoded file data
 
 ### Project Files
 
-The solution (`UIFramework.sln`) includes four projects, all targeting **.NET Framework 4.5.2**:
+`UIFramework.sln` contains a single project targeting **.NET Framework 4.5.2**:
 
-1. **UIFramework.csproj** - New/refactored library (`UIFramework` namespace). Standalone; not yet referenced by any other project.
-2. **UIFrameworkDotNet.csproj** - Legacy/active library (`UIFrameworkDotNet` namespace). Referenced by `ConsoleApp` and `UIFramework.UnitTest`.
-3. **ConsoleApp.csproj** - Sample console application demonstrating `UIFrameworkDotNet` usage.
-4. **UIFramework.UnitTest.csproj** - MSTest test project covering `UIFrameworkDotNet` page/section behavior.
-
-Both libraries reference: `log4net`, `Newtonsoft.Json`, `ScriptLibraries.Data.Interfaces`, and (for `UIFrameworkDotNet`) `HtmlAgilityPack`, `BaseCustomApp.Helpers`.
+- **UIFramework.csproj** - The class library described throughout this README (`UIFramework` namespace).
 
 ### Dependencies
 
-Package references (from `.csproj` files):
+Package references (from `UIFramework.csproj`):
 - `log4net` - Logging
 - `Newtonsoft.Json` - JSON serialization
 - `ScriptLibraries.Data.Interfaces` - Data interface contracts
-- `HtmlAgilityPack` - HTML parsing (used by `UIFrameworkDotNet`/`UIHTMLViewer`)
-- `BaseCustomApp.Helpers` - Shared helper utilities (used by `UIFrameworkDotNet`)
+- `HtmlAgilityPack` - HTML parsing (used by `UIHTMLViewer`)
+- `BaseCustomApp.Helpers` - Shared helper utilities
 
 ### Build Commands
 
-Since this is a classic .NET Framework (non-SDK-style) solution, build it with MSBuild rather than `dotnet build`:
+Since this is a classic .NET Framework (non-SDK-style) project, build it with MSBuild rather than `dotnet build`:
 
 ```powershell
-# Build the whole solution
+# Build the solution
 msbuild UIFramework.sln /p:Configuration=Debug
 
-# Build a single project
+# Or build the project directly
 msbuild UIFramework\UIFramework.csproj
-msbuild UIFrameworkDotNet\UIFrameworkDotNet.csproj
-msbuild ConsoleApp\ConsoleApp.csproj
 ```
 
 ---
 
 ## Unit Tests
 
-The project includes unit tests in `UIFramework.UnitTest`:
-
-- `SingleSelection_SelectsSingleItemAndUpdatesSelectedProperties` - Tests single choice selection
-- `MultipleSelection_AllowsMultipleCheckedItemsAndReportsCountsAndContainment` - Tests multiple selection
-- `CreatePageDisclaimer_Test` - Tests disclaimer page creation and updates
-- `Page_UITab_UISection_Composition` - Tests tab/section composition
-- `PageDisclaimer_Paragraph_UpdatedByJs` - Tests paragraph updates from JS
-
-Tests use `LibraryUI` to create pages and `SyncModelAndNotifyUI` to simulate JS events.
+`UIFramework.sln` currently has **no unit test project**. The repository still contains a `UIFramework.UnitTest` folder with MSTest tests, but it targets the legacy `UIFrameworkDotNet` library and is no longer part of the solution — it is not applicable to the `UIFramework` project described in this README.
 
 ---
 
