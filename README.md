@@ -39,9 +39,9 @@ UIFramework is a comprehensive C# UI framework for building desktop applications
 
 ## Solution Architecture
 
-`UIFramework.sln` now contains a **single project: `UIFramework`** (namespace `UIFramework`, e.g. `UIFramework.UIElements`, `UIFramework.Reactive`, `UIFramework.Interfaces`). This is the actively maintained library and the one you should reference for all new development.
+`UIFramework.sln` contains a **single project: `UIFramework`** (namespace `UIFramework`, e.g. `UIFramework.UIElements`, `UIFramework.Reactive`, `UIFramework.Interfaces`). This is the actively maintained library and the one you should reference for all new development.
 
-> Note: the repository still contains a few sibling folders (`UIFrameworkDotNet`, `ConsoleApp`, `UIFramework.UnitTest`) left over from an earlier, unrelated implementation. These have been **removed from `UIFramework.sln`** and are no longer built as part of the solution — treat them as legacy/unmaintained and do not reference them from new code. All examples in this README target the `UIFramework` project only.
+> Note: earlier revisions of this repository also contained a few sibling projects (`UIFrameworkDotNet`, `ConsoleApp`, `UIFramework.UnitTest`) left over from an earlier, unrelated implementation. These have been **removed from the repository entirely** — `UIFramework` is now the only project. All examples in this README target the `UIFramework` project.
 
 ## Project Structure
 
@@ -749,7 +749,7 @@ msbuild UIFramework\UIFramework.csproj
 
 ## Unit Tests
 
-`UIFramework.sln` currently has **no unit test project**. The repository still contains a `UIFramework.UnitTest` folder with MSTest tests, but it targets the legacy `UIFrameworkDotNet` library and is no longer part of the solution — it is not applicable to the `UIFramework` project described in this README.
+`UIFramework.sln` currently has **no unit test project**. A previous `UIFramework.UnitTest` folder with MSTest tests targeted the legacy `UIFrameworkDotNet` library; both have since been removed from the repository along with the rest of the legacy code.
 
 ---
 
