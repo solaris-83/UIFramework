@@ -20,28 +20,66 @@ UIFramework is a comprehensive C# UI framework for building desktop applications
 
 ---
 
-## Project Structure (UIFramework Only)
+## Table of Contents
+
+- [Overview](#overview)
+- [Solution Architecture](#solution-architecture)
+- [Project Structure](#project-structure)
+- [Core Concepts](#core-concepts)
+- [Usage Examples](#usage-examples)
+- [How to Use a Page](#how-to-use-a-page)
+- [Page Templates](#page-templates)
+- [Data Grid](#data-grid)
+- [File Input](#file-input)
+- [Range-Based Status Display](#range-based-status-display-gaugemeter)
+- [Configuration and Build](#configuration-and-build)
+- [Unit Tests](#unit-tests)
+
+---
+
+## Solution Architecture
+
+The solution (`UIFramework.sln`) contains **four projects**, and — importantly — **two parallel, independent implementations** of the UI model. This is a historical artifact of an in-progress refactor, and it is essential to understand which project you should reference:
+
+| Project | Root Namespace | Role |
+|---------|-----------------|------|
+| `UIFrameworkDotNet` | `UIFrameworkDotNet` | **Legacy/active library.** Flat namespace, currently the one actually consumed by the other projects in the solution. |
+| `UIFramework` | `UIFramework` (`UIFramework.UIElements`, `UIFramework.Reactive`, `UIFramework.Interfaces`, ...) | **Newer, refactored library** with a cleaner folder-per-concern layout, adapters, and a more complete reactive/validation model. Not currently referenced by any other project in the solution — it is being developed as the eventual replacement for `UIFrameworkDotNet`. |
+| `ConsoleApp` | `ConsoleApp` | Sample/demo console application. References **`UIFrameworkDotNet`**. |
+| `UIFramework.UnitTest` | `UIFramework.UnitTest` | MSTest unit tests. References **`UIFrameworkDotNet`** (despite the project name). |
+
+⚠️ **Do not mix namespaces**: types with the same name exist in both libraries (e.g. `UIButton`, `UISection`, `UITab`) but they are **not interchangeable** — `UIFrameworkDotNet.UIButton` and `UIFramework.UIElements.UIButton` are unrelated classes in unrelated assemblies. Pick the project matching what you are extending: if you're working on `ConsoleApp` or the existing unit tests, use `UIFrameworkDotNet`; if you're building new features against the modern API, use `UIFramework`.
+
+## Project Structure
 
 ```
 UIFramework/
-├── UIFramework/                  # Main class library (.NET 4.5.2)
-│   ├── UIElements/               # UI control implementations
-│   │   ├── Base/                 # Base classes (UIElement, ContainerElement, Style, Point, ProgressValue)
-│   │   ├── Adapters/             # Adapter interfaces (ISectionMeterAdapter, ISectionChartAdapter, ITableAdapter, ISequenceAdapter)
-│   │   ├── Reactive/             # Reactive programming (conditions, bindings, reactions)
-│   │   ├── Helpers/              # Utility classes (ComparableHelper, ContainerElementExtensions, PropertyPathResolver)
-│   │   ├── Validation/           # Validation rules (EmailValidationRule, RangeValidationRule, etc.)
-│   │   ├── SpecializedPages/     # Specialized page types (Page, SpecializedPage, PageCountdown, etc.)
-│   │   ├── Interfaces/           # UI element interfaces
-│   │   └── [controls].cs         # Individual UI controls (buttons, inputs, displays, etc.)
-│   ├── UICommandDispatcher.cs    # Event dispatcher with command registry
-│   ├── UIEventDispatcher.cs      # UI event handling
+├── UIFramework/                  # New/refactored class library (.NET 4.5.2, standalone, not yet wired up)
+│   ├── UIElements/                # UI control implementations
+│   │   └── Base/                  # Base classes (UIElement, ContainerElement, Grid, GridPosition, Point, ProgressValue, PopupResult)
+│   ├── Interfaces/                # Core interfaces (ICommand, IUIContext, IValidationRule, ITranslatable, ...)
+│   │   ├── Adapters/               # IPageAdapter, ISectionChartAdapter, ISectionMeterAdapter, ISequenceAdapter, ITableAdapter
+│   │   └── Reactive/                # ICondition, IReaction
+│   ├── Reactive/                  # Conditions, reactions and bindings (EqualsCondition, Binding, Reaction, ...)
+│   ├── Commands/                  # CommandRegistry
+│   ├── Helpers/                   # ComparableHelper, ContainerElementExtensions, PropertyPathResolver
+│   ├── Validation/                # Validation rules (EmailValidationRule, RangeValidationRule, etc.)
+│   ├── SpecializedPages/          # Page, SpecializedPage, PageCountdown, PageDisclaimer, PageMenu, PageResult
+│   ├── SpecializedPopups/         # UISimpleModalPopup, UIWaitPopup
+│   ├── UICommandDispatcher.cs     # Event dispatcher with command registry
+│   ├── UIEventDispatcher.cs       # UI event handling
 │   ├── UIPropertyChange.cs       # Property change notification data
-│   ├── UIFramework.csproj        # Project file
-│   └── UIFramework.csproj.ReadLinesOnly
-├── UIFramework.UnitTest/         # Unit tests
-├── UIFramework.sln               # Solution file
-└── .git/                        # Git repository
+│   └── UIFramework.csproj        # Project file
+├── UIFrameworkDotNet/             # Legacy class library actually used by ConsoleApp/tests (.NET 4.5.2)
+│   ├── PredefinedPages/            # Page, PredefinedPage, PageDisclaimer, PageMenu, PageResult
+│   ├── Helpers/                    # ContainerElementExtensions, DataArray, ImageHelper, PageSerializer
+│   ├── LibraryUI.cs               # Entry point for creating/showing pages
+│   ├── UIContext.cs, CommandRegistry.cs, UICommandDispatcher.cs, UIEventDispatcher.cs
+│   └── [controls].cs              # UIButton, UISection, UITab, UITextbox, UIDropDown, etc.
+├── ConsoleApp/                    # Sample console application referencing UIFrameworkDotNet
+├── UIFramework.UnitTest/          # MSTest unit tests referencing UIFrameworkDotNet (PageTests.cs)
+├── UIFramework.sln                # Solution file
+└── .git/                          # Git repository
 ```
 
 ---
@@ -62,7 +100,7 @@ All UI elements inherit from `UIElement`, which provides:
 - `Dispose()` - Cleanup method
 
 ```csharp
-public class UIElement : INotifyPropertyChanged, IDisposable
+public abstract class UIElement : INotifyPropertyChanged, IDisposable
 {
     public string Id { get; } = Guid.NewGuid().ToString();
     public string Type { get; }
@@ -150,7 +188,8 @@ Extensive validation rule system implementing `IValidationRule`:
 | `RegexValidationRule` | Regex pattern match |
 
 ```csharp
-var inputBox = new UIInputBoxBase();
+// UIInputBoxBase is abstract; use a concrete subclass such as UIInputBox
+var inputBox = new UIInputBox(false);
 inputBox.AddValidationRule(new RangeValidationRule(0, 100));
 inputBox.ApplyValidationRules(userValue);
 ```
@@ -160,7 +199,8 @@ inputBox.ApplyValidationRules(userValue);
 `TranslationBinding` handles multi-language support:
 
 ```csharp
-var inputBox = new UIInputBoxBase();
+// UIInputBoxBase is abstract; use a concrete subclass such as UIInputBox
+var inputBox = new UIInputBox(false);
 inputBox.AttachContext(uiContext); // Attaches translator
 inputBox.ResolveTranslationBindings(); // Resolves all translatable properties
 inputBox.Name = "my_name"; // Automatically translates and sets Props["name"]
@@ -220,6 +260,224 @@ inputBox.Name = "my_name"; // Automatically translates and sets Props["name"]
 
 ---
 
+## Usage examples
+
+The snippets below use the public types in this repository, grouped by which library they belong to (see [Solution Architecture](#solution-architecture)):
+
+- Core elements (interactive/display/layout/feedback/composite): `UIFramework.UIElements` — from the new `UIFramework` project.
+- Predefined pages: `UIFrameworkDotNet.PredefinedPages` — from the legacy `UIFrameworkDotNet` project.
+- Page host: `UIFrameworkDotNet.LibraryUI` — from the legacy `UIFrameworkDotNet` project.
+
+> ⚠️ These are shown together for illustration only. In real code, do not mix `using UIFramework.UIElements;` and `using UIFrameworkDotNet;` in the same class expecting the types to interoperate — they are separate, unrelated class hierarchies. Pick one library based on the project you are working in.
+
+### Interactive elements
+
+```csharp
+using System.Text;
+using UIFramework.UIElements;
+
+var button = new UIButton("SAVE", true, "primary", "Save");
+button.Clicked += (_, __) => Console.WriteLine("Save clicked");
+
+var choiceGroup = new UIChoiceGroup(uiContext);
+choiceGroup.SetAppearance("radiobutton");
+choiceGroup.AddItem("AUTO", "Automatic", true);
+choiceGroup.AddItem("MANUAL", "Manual");
+
+var inputBox = new UIInputBox(false)
+{
+    Name = "user_name",
+    Description = "BCA_USER_NAME",
+    IsMandatory = true
+};
+inputBox.AttachContext(uiContext);
+
+var textBox = new UITextBox("Hello");
+var hex = textBox.ToHex();
+
+var secure = new UISecureTextBox();
+secure.SetValue(Encoding.UTF8.GetBytes("secret"));
+
+var numeric = new UINumericBox(10)
+{
+    MinValue = 0,
+    MaxValue = 100,
+    StepSize = 5,
+    ShowSpinners = true
+};
+
+var dropDown = new UIFrameworkDotNet.UIDropDown(new[]
+{
+    new UIFrameworkDotNet.DropDownOption("low", "Low"),
+    new UIFrameworkDotNet.DropDownOption("high", "High")
+}, "low");
+
+var fileInput = new UIFileInputBox
+{
+    AcceptPdf = true,
+    AcceptTxt = true
+};
+fileInput.AttachContext(uiContext);
+```
+
+### Display elements
+
+```csharp
+using UIFramework.UIElements;
+
+var label = new UILabel("Ready");
+
+var status = new UIStatus();
+status.Title = "Machine";
+status.Text = "Idle";
+status.Update("Machine ready", "success");
+
+var gauge = new UIGauge("temperature");
+gauge.AddValidRange(20, 30);
+gauge.AddWarningRange(30, 40);
+gauge.AddErrorRange(40, 100);
+gauge.SendUpdate(35);
+
+var meter = new UIMeter("pressure");
+meter.Unit = "bar";
+
+var chart = new UIChart(uiContext);
+var xAxis = chart.AddXAxis("Time", "s", 0, 60);
+var yAxis = chart.AddYAxis("RPM", "rpm", 0, 5000);
+var signal = chart.AddSignal("rpm", "Engine RPM", "#00ff00");
+signal.SetYAxis(yAxis);
+chart.SendUpdate("rpm", 1, 1200);
+
+var heading = new UIHeadingElement { Title = "Overview", SubTitle = "Live data" };
+var overlay = new UIOverlay(uiContext);
+```
+
+### Layout elements
+
+```csharp
+using UIFramework.UIElements;
+
+var tab = new UITab("main", 2, 2);
+
+var section = new UISection(1, 1, uiContext);
+section.AddParagraph("Hello world");
+tab.Add(section, 0, 0);
+
+var card = new UISectionCard(1, 1, uiContext);
+card.Title = "Summary";
+card.AddParagraph("Card content");
+
+var meterSection = new UISectionMeter(uiContext);
+var speedGauge = meterSection.AddGauge("speed");
+
+var chartSection = new UISectionChart(uiContext);
+var tempChart = chartSection.AddChart();
+
+var commandArea = new UICommandArea(uiContext);
+commandArea.Add(new UIButton("CANCEL", true, "danger", "Cancel"));
+
+var titleArea = new UITitleArea(uiContext);
+titleArea.Add(new UILabel("Main screen"));
+```
+
+### Feedback elements
+
+```csharp
+using UIFramework.UIElements;
+
+var countdown = new UIFeedbackCountdown(15000, isManual: false);
+countdown.StartCountdown();
+
+var progress = new UIFeedbackProgress(25, "Loading");
+progress.SendUpdate(50, "Halfway there");
+
+var message = new UIFeedbackMessage("Ready");
+message.UpdateText("Processing...");
+```
+
+### Composite / specialized elements
+
+```csharp
+using System.Collections.Generic;
+using UIFramework.UIElements;
+
+var device = new UIDevice("injector");
+device.SetStatus("active", "Ready");
+
+var sequence = new UISequence(uiContext);
+var step1 = sequence.AddStep("Connect");
+sequence.UpdateStep(step1.Id, "active");
+
+var table = new UITable();
+table.LoadData(df);
+
+var template = new DataGridTemplate();
+template.AddColumn("Name");
+template.AddColumn("Value");
+var grid = new UIDataGrid(template, uiContext);
+var row = new UIDataGridRow(uiContext);
+row.AddCell("Name", new UILabel("Pressure"));
+row.AddCell("Value", new UITextBox("12"));
+grid.AddRow(row);
+
+var html = new UIHTMLViewer(htmlPath);
+html.AttachContext(uiContext);
+
+var loader = new UILoader("spinner-big");
+
+var popup = new UIPopup(true, uiContext);
+popup.Title = "Confirm";
+popup.AddButton("OK", "OK", true);
+
+var thermo = new UIThermometer("cabin");
+thermo.SendUpdate(22);
+```
+
+## How to use a page
+
+1. Create a `LibraryUI`.
+2. Create a page.
+3. Add a tab and one or more sections.
+4. Populate sections with elements.
+5. Call `ShowAndWait(page)`.
+6. Use `SyncModelAndNotifyUI(...)` to simulate or forward UI updates.
+
+```csharp
+using System.Collections.Generic;
+using UIFrameworkDotNet;
+
+var libraryUI = new LibraryUI();
+var page = libraryUI.CreatePage();
+
+page.SetTitle("title", "Dashboard", "info");
+
+var tab = page.AddTab("main", 2, 2);
+
+var topLeft = libraryUI.CreateSection();
+var refresh = topLeft.AddButton("REFRESH", true, "primary");
+topLeft.AddParagraph("System ready");
+tab.Add(topLeft, 0, 0);
+
+var topRight = libraryUI.CreateSection();
+var image = topRight.AddImage("Screenshot.png");
+tab.Add(topRight, 0, 1);
+
+var bottom = libraryUI.CreateSection();
+var status = bottom.AddParagraph("Waiting for updates...");
+tab.Add(bottom, 1, 0);
+
+libraryUI.ShowAndWait(page);
+
+libraryUI.SyncModelAndNotifyUI(
+    new UIEvent(
+        status.Id,
+        UIEventType.OnPropertyChanged,
+        true,
+        new Dictionary<string, object> { ["text"] = "Updated from JS" }
+    )
+);
+```
+
 ## Page Templates
 
 ### `Page` (Base Page)
@@ -232,23 +490,24 @@ The base page class with complete UI structure:
 - `UITitleArea` - Top area with title label
 - `UIOverlay` - Overlay for modals/loading
 
-**Key Methods**:
-- `SetTitle(string tag, string idStr, string style)` - Set title with appearance
-- `AddButton(string idStr, bool isEnabled, string style, string text)` - Add button to command area
-- `AddButtonStop()` - Add Stop button (danger appearance)
-- `AddFeedbackCountdown(int ms, bool isManual)` - Add countdown feedback
-- `AddFeedbackProgress(int perc)` - Add progress feedback
-- `AddFeedbackMessage(string msg)` - Add message feedback
-- `CreateBinding(ICondition condition, IReaction reaction)` - Create reactive binding
-- `Validate()` - Validate page structure (tabs, sections, buttons, feedback)
+**Typical use**
+
+```csharp
+var page = libraryUI.CreatePage();
+var tab = page.AddTab("main", 2, 2);
+tab.Add(libraryUI.CreateSection(), 0, 0);
+```
 
 ### `SpecializedPage`
 
-Page with a single central section (`UISection`), useful for simpler pages. Provides:
-- `AddImage(string imageName)` - Add image
-- `AddBulletedItem(string idStr)` - Add bulleted list item
-- `AddOrderedItem(string idStr, int index)` - Add ordered list item
-- `AddParagraph(string idStr)` - Add paragraph text
+Page with a single central section (`UISection`), useful for simpler pages.
+
+**Typical use**
+
+```csharp
+var page = new PageCountdown("countdown-id", 15000, uiContext);
+page.AddParagraph("Loading...");
+```
 
 ### `PageCountdown`
 
@@ -261,16 +520,23 @@ var page = new PageCountdown("countdown-id", 15000, uiContext);
 
 ### `PageDisclaimer`
 
-Disclaimer page with "Requires Complete Read" feature:
+Disclaimer page with scroll-to-end support and a Continue button:
 
 ```csharp
 var page = new PageDisclaimer(uiContext);
-page.RequiresCompleteRead = true; // Enable scroll-to-end to enable Continue button
+page.RequiresCompleteRead = true;
+page.AddParagraph("Read everything before continuing.");
+page.AddBulletedItem("Item 1");
 ```
 
 ### `PageResult`
 
-Result page with exit button, typically shown after form completion.
+Result page with exit button, typically shown after form completion:
+
+```csharp
+var page = new PageResult(uiContext);
+page.AddParagraph("Operation completed successfully.");
+```
 
 ### `PageMenu`
 
@@ -278,12 +544,12 @@ Menu page with choice selection:
 
 ```csharp
 var page = new PageMenu(uiContext);
-page.IsMultipleSelection = true; // Allow multiple selections
-page.SetMessage("S_COMP"); // Set message text
-var item = page.AddItem("Activate_Injectors", "Activate_Injectors"); // Add choice
+page.HasCheckboxes = true;
+page.IsMultipleSelection = true;
+page.SetMessage("Choose one or more items");
+page.AddItem("Activate_Injectors", "Activate Injectors");
+page.AddItem("Activate_Coils", "Activate Coils");
 ```
-
----
 
 ## Data Grid
 
@@ -386,48 +652,28 @@ public class Range
 ## Example: Creating a Complete Page
 
 ```csharp
-using UIFramework;
-using UIFramework.UIElements;
-using UIFramework.Interfaces;
+using System.Collections.Generic;
+using UIFrameworkDotNet;
 
-// Create context (implementation depends on host)
-var uiContext = new UIContext(new TranslationService());
+var libraryUI = new LibraryUI();
+var page = libraryUI.CreatePageDisclaimer();
 
-// Create a page
-var page = new Page(uiContext);
+page.RequiresCompleteRead = true;
+var intro = page.AddParagraph("Read the disclaimer and continue.");
+page.AddBulletedItem("First bullet");
+page.AddOrderedItem("First step", 1);
+page.AddImage("Screenshot.png");
 
-// Set title
-page.SetTitle("TITOLO", "information");
-
-// Add tabs
-var tab = page.AddTab("mytab", 2, 2); // 2 rows, 2 columns
-
-// Add sections to tab
-var section1 = new UISection(1, 1, uiContext);
-section1.AddParagraph("Hello World", "paragraph", "gray");
-tab.Add(section1, 0, 0); // Row 0, Column 0
-
-var section2 = new UISection(1, 1, uiContext);
-section2.AddImage("Screenshot.png");
-tab.Add(section2, 0, 1); // Row 0, Column 1
-
-var section3 = new UISection(1, 1, uiContext);
-section3.AddButton("Click Me", true, ElementStatusEnum.Primary.GetDescription(), "btn1");
-tab.Add(section3, 1, 0); // Row 1, Column 0, spanning both columns
-
-section3.GridPosition.ColumnSpan = 2;
-
-// Add command button
-var cancelBtn = page.AddButton("CANCEL", true, ElementStatusEnum.Danger.GetDescription(), "Cancel");
-
-// Add feedback
-var feedback = page.AddFeedbackCountdown(10000); // 10 seconds
-
-// Validate page structure
-page.Validate();
-
-// Show page (host implementation)
 libraryUI.ShowAndWait(page);
+
+libraryUI.SyncModelAndNotifyUI(
+    new UIEvent(
+        intro.Id,
+        UIEventType.OnPropertyChanged,
+        true,
+        new Dictionary<string, object> { ["text"] = "Updated after show" }
+    )
+);
 ```
 
 ---
@@ -518,25 +764,36 @@ byte[] fileContents = fileInput.Value.ToArray(); // Encoded file data
 
 ### Project Files
 
-The solution includes the main project:
+The solution (`UIFramework.sln`) includes four projects, all targeting **.NET Framework 4.5.2**:
 
-1. **UIFramework.csproj** - Main library targeting .NET Framework 4.5.2
-   - References: log4net, Newtonsoft.Json, ScriptLibraries.Data.Interfaces, etc.
-   - Contains all UI element implementations, interfaces, and reactive model
+1. **UIFramework.csproj** - New/refactored library (`UIFramework` namespace). Standalone; not yet referenced by any other project.
+2. **UIFrameworkDotNet.csproj** - Legacy/active library (`UIFrameworkDotNet` namespace). Referenced by `ConsoleApp` and `UIFramework.UnitTest`.
+3. **ConsoleApp.csproj** - Sample console application demonstrating `UIFrameworkDotNet` usage.
+4. **UIFramework.UnitTest.csproj** - MSTest test project covering `UIFrameworkDotNet` page/section behavior.
+
+Both libraries reference: `log4net`, `Newtonsoft.Json`, `ScriptLibraries.Data.Interfaces`, and (for `UIFrameworkDotNet`) `HtmlAgilityPack`, `BaseCustomApp.Helpers`.
 
 ### Dependencies
 
-Package references (from `.gitignore` and `.csproj` files):
-- `log4net` 2.0.17 - Logging
-- `Newtonsoft.Json` 13.0.4 - JSON serialization
+Package references (from `.csproj` files):
+- `log4net` - Logging
+- `Newtonsoft.Json` - JSON serialization
 - `ScriptLibraries.Data.Interfaces` - Data interface contracts
+- `HtmlAgilityPack` - HTML parsing (used by `UIFrameworkDotNet`/`UIHTMLViewer`)
+- `BaseCustomApp.Helpers` - Shared helper utilities (used by `UIFrameworkDotNet`)
 
 ### Build Commands
 
-```bash
-dotnet build UIFramework/UIFramework.csproj
-# or
-msbuild UIFramework/UIFramework.csproj
+Since this is a classic .NET Framework (non-SDK-style) solution, build it with MSBuild rather than `dotnet build`:
+
+```powershell
+# Build the whole solution
+msbuild UIFramework.sln /p:Configuration=Debug
+
+# Build a single project
+msbuild UIFramework\UIFramework.csproj
+msbuild UIFrameworkDotNet\UIFrameworkDotNet.csproj
+msbuild ConsoleApp\ConsoleApp.csproj
 ```
 
 ---

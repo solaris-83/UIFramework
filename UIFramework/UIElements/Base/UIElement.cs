@@ -9,7 +9,7 @@ using UIFramework.Reactive;
 
 namespace UIFramework.UIElements.Base
 {
-    public class UIElement : INotifyPropertyChanged, IDisposable
+    public abstract class UIElement : INotifyPropertyChanged, IDisposable
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(UIElement));
         private List<Binding> _bindings = new List<Binding>();

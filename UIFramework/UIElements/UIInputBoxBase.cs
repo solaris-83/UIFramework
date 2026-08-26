@@ -7,7 +7,7 @@ using UIFramework.UIElements.Base;
 
 namespace UIFramework.UIElements
 {
-    public class UIInputBoxBase : UIElement, IAttachableContext, ITranslatable
+    public abstract class UIInputBoxBase : UIElement, IAttachableContext, ITranslatable
     {
         private readonly TranslationBinding _translationBinding = new TranslationBinding();
         private List<IValidationRule> _validationRules = new List<IValidationRule>();

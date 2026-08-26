@@ -6,7 +6,7 @@ namespace UIFramework.SpecializedPages
 {
     // Le PredefinedPage sono pagine un po' più avanzate della Page standard: viene automaticamente creato uno UITab e una unica sezione all'interno del CurrentTab.
     // Vengono utilizzate dalle Pagine custom es disclaimer, menu, result, ecc...
-    public class SpecializedPage : Page
+    public abstract class SpecializedPage : Page
     {
         protected UISection SingleSection;
 
