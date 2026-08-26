@@ -49,11 +49,5 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\UIFrameworkDotNet\UIFrameworkDotNet.csproj">
-      <Project>{758cf145-2067-448d-a646-e7288862fe70}</Project>
-      <Name>UIFrameworkDotNet</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
